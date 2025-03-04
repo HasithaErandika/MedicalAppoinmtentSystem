@@ -32,13 +32,13 @@ public class LoginServlet extends HttpServlet {
 
             switch (role) {
                 case "patient":
-                    response.sendRedirect(request.getContextPath() + "/pages/profile.jsp");
+                    response.sendRedirect(request.getContextPath() + "/pages/userPuserProfile.jsp");
                     break;
                 case "doctor":
                     response.sendRedirect(request.getContextPath() + "/pages/doctorDashboard.jsp");
                     break;
                 case "admin":
-                    response.sendRedirect(request.getContextPath() + "/pages/dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/pages/adminDadminDashboard.jsp");
                     break;
             }
         } else {
