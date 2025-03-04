@@ -21,7 +21,14 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
-        boolean isValid = validateCredentials(username, password, role, request);
+        boolean isValid;
+        try {
+            isValid = validateCredentials(username, password, role, request);
+        } catch (IOException e) {
+            request.setAttribute("error", "Error accessing user data: " + e.getMessage());
+            request.getRequestDispatcher("/pages/login.jsp").forward(request, response);
+            return;
+        }
 
         if (isValid) {
             HttpSession session = request.getSession();
@@ -30,13 +37,13 @@ public class LoginServlet extends HttpServlet {
 
             switch (role) {
                 case "patient":
-                    response.sendRedirect(request.getContextPath() + "/pages/userPuserProfile.jsp");
+                    response.sendRedirect(request.getContextPath() + "/pages/profile.jsp");
                     break;
                 case "doctor":
                     response.sendRedirect(request.getContextPath() + "/pages/doctorDashboard.jsp");
                     break;
                 case "admin":
-                    response.sendRedirect(request.getContextPath() + "/pages/adminDadminDashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/pages/adminDashboard.jsp");
                     break;
             }
         } else {
@@ -45,7 +52,7 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private boolean validateCredentials(String username, String password, String role, HttpServletRequest request) throws IOException {
+    private boolean validateCredentials(String username, String password, String role, HttpServletRequest request) throws ServletException, IOException {
         String filePath;
         String basePath = getBasePath(request);
         switch (role) {
@@ -53,6 +60,11 @@ public class LoginServlet extends HttpServlet {
             case "doctor": filePath = basePath + "doctors.txt"; break;
             case "admin": filePath = basePath + "admins.txt"; break;
             default: return false;
+        }
+
+        // Check if file exists before reading
+        if (!Files.exists(Paths.get(filePath))) {
+            throw new IOException("File not found: " + filePath);
         }
 
         List<String> lines = Files.readAllLines(Paths.get(filePath));
