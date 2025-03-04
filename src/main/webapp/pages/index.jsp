@@ -1,3 +1,4 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -412,7 +413,7 @@
 <body>
 <nav>
     <div class="container nav-content">
-        <a href="#" class="logo">
+        <a href="<%=request.getContextPath()%>/pages/index.jsp" class="logo">
             <i class="fas fa-heartbeat"></i> MediSchedule
         </a>
         <div class="nav-actions">
@@ -421,9 +422,9 @@
                     <i class="fas fa-user-md"></i> Login
                 </button>
                 <div class="dropdown-menu">
-                    <a href="webpage/pages/login.jsp?role=patient">Patient Login</a>
-                    <a href="webpage/pages/login.jsp?role=doctor">Doctor Login</a>
-                    <a href="webpage/pages/login.jsp?role=admin">Admin Login</a>
+                    <a href="<%=request.getContextPath()%>/pages/login.jsp?role=patient">Patient Login</a>
+                    <a href="<%=request.getContextPath()%>/pages/login.jsp?role=doctor">Doctor Login</a>
+                    <a href="<%=request.getContextPath()%>/pages/login.jsp?role=admin">Admin Login</a>
                 </div>
             </div>
             <button class="theme-toggle" id="theme-toggle">
@@ -432,7 +433,6 @@
         </div>
     </div>
 </nav>
-
 <header class="hero">
     <div class="hero-content">
         <h1>Your Healthcare Journey Starts Here</h1>
@@ -539,7 +539,6 @@
         </div>
     </div>
 </footer>
-
 <script>
     const toggle = document.getElementById('theme-toggle');
     const body = document.body;
