@@ -3,320 +3,566 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Medical Appointment System</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>MediSchedule - Your Healthcare Companion</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Base Styles */
         :root {
-            --bg-color: #f3f4f6; /* Light mode: gray-100 */
-            --text-color: #1f2937; /* Light mode: gray-800 */
-            --card-bg: #ffffff; /* Light mode: white */
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            --nav-bg: #ffffff;
-            --btn-bg: #2563eb; /* Blue-600 */
-            --btn-hover: #1d4ed8; /* Blue-700 */
-            --border-color: #d1d5db; /* Gray-300 */
+            --primary: #2c5282;
+            --secondary: #48bb78;
+            --accent: #ed8936;
+            --bg-light: #f7fafc;
+            --bg-dark: #1a202c;
+            --text-light: #2d3748;
+            --text-dark: #e2e8f0;
+            --card-bg: #ffffff;
+            --shadow: 0 6px 20px rgba(0,0,0,0.08);
         }
+
         [data-theme="dark"] {
-            --bg-color: #1f2937; /* Dark mode: gray-800 */
-            --text-color: #f3f4f6; /* Dark mode: gray-100 */
-            --card-bg: #374151; /* Dark mode: gray-700 */
-            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            --nav-bg: #111827; /* Gray-900 */
-            --btn-bg: #3b82f6; /* Blue-500 */
-            --btn-hover: #60a5fa; /* Blue-400 */
-            --border-color: #4b5563; /* Gray-600 */
+            --primary: #63b3ed;
+            --secondary: #68d391;
+            --bg-light: #1a202c;
+            --text-light: #e2e8f0;
+            --card-bg: #2d3748;
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s ease, color 0.3s ease;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-light);
+            line-height: 1.6;
+            transition: all 0.3s ease;
         }
-        nav, footer {
-            background-color: var(--nav-bg);
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 2rem;
         }
+
+        /* Navbar */
+        nav {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--primary) 50%, transparent 100%);
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            padding: 1rem 0;
+            box-shadow: var(--shadow);
+        }
+
+        .nav-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .dropdown-btn {
+            background: var(--secondary);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-btn:hover {
+            transform: translateY(-2px);
+            background: #38a169;
+        }
+
         .dropdown {
             position: relative;
-            display: inline-block;
         }
-        .dropdown:hover .dropdown-menu {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
+
         .dropdown-menu {
-            display: none;
             position: absolute;
             top: 100%;
             right: 0;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            min-width: 180px;
             opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease-in-out;
-            min-width: 160px;
-            background-color: var(--card-bg);
-            box-shadow: var(--card-shadow);
-            border-radius: 0.5rem;
-            z-index: 10;
-        }
-        .dropdown-menu a {
-            display: block;
-            padding: 0.75rem 1rem;
-            color: var(--text-color);
-            text-decoration: none;
-        }
-        .dropdown-menu a:hover {
-            background-color: #eff6ff;
-            color: #2563eb;
-        }
-        .feature-card, .specialty-card {
-            background-color: var(--card-bg);
-            box-shadow: var(--card-shadow);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .feature-card:hover, .specialty-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-        }
-        .hero-cta, .search-btn {
-            background-color: var(--btn-bg);
+            visibility: hidden;
+            transform: translateY(10px);
             transition: all 0.3s ease;
         }
-        .hero-cta:hover, .search-btn:hover {
-            background-color: var(--btn-hover);
-            transform: scale(1.05);
+
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
+
+        .dropdown-menu a {
+            padding: 0.75rem 1.25rem;
+            display: block;
+            color: var(--text-light);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu a:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .theme-toggle {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 0.6rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: rotate(20deg);
+            background: rgba(255,255,255,0.3);
+        }
+
+        /* Hero */
+        .hero {
+            background: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef') center/cover no-repeat;
+            padding: 8rem 2rem 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(44,82,130,0.8), rgba(72,187,120,0.6));
+        }
+
+        .hero-content {
+            position: relative;
+            text-align: center;
+            color: white;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            animation: slideUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .cta-btn {
+            background: var(--accent);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            transform: scale(1.05);
+            background: #dd6b20;
+        }
+
+        /* Search Form */
+        .search-section {
+            margin: -3rem 2rem 4rem;
+            position: relative;
+        }
+
         .search-form {
             background: var(--card-bg);
-            border-radius: 1rem;
-            box-shadow: var(--card-shadow);
             padding: 2rem;
-            max-width: 900px;
-            margin: -4rem auto 4rem;
-            position: relative;
-            z-index: 5;
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            border: 2px solid var(--primary);
         }
-        .specialty-card img {
-            height: 200px;
-            object-fit: cover;
-            border-top-left-radius: 0.75rem;
-            border-top-right-radius: 0.75rem;
+
+        .search-form h2 {
+            font-size: 1.75rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
         }
-        .toggle-btn {
+
+        .form-grid {
+            display: grid;
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(44,82,130,0.2);
+            outline: none;
+        }
+
+        .search-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 2rem;
+            border: none;
+            border-radius: 25px;
             cursor: pointer;
-            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            margin: 1rem auto 0;
         }
-        .toggle-btn:hover {
-            transform: scale(1.1);
+
+        .search-btn:hover {
+            background: #2b6cb0;
+            transform: translateY(-2px);
         }
-        /* Advanced Styling */
-        .hero-section {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+
+        /* Features */
+        .features {
+            padding: 4rem 0;
         }
-        .input-field {
-            border: 1px solid var(--border-color);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+
+        .features h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
         }
-        .input-field:focus {
-            border-color: #2563eb;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+
+        .features-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .features-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--secondary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Specialties */
+        .specialties {
+            padding: 4rem 0;
+            background: linear-gradient(180deg, var(--bg-light) 70%, rgba(44,82,130,0.1) 100%);
+        }
+
+        .specialties h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+
+        .specialties-grid {
+            display: grid;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .specialties-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .specialty-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+        }
+
+        .specialty-card:hover {
+            transform: translateY(-8px);
+        }
+
+        .specialty-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .specialty-card-content {
+            padding: 1.5rem;
+        }
+
+        .specialty-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.75rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--primary);
+            color: white;
+            padding: 2rem 0;
+        }
+
+        .footer-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: white;
+            margin-left: 1.5rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
     </style>
 </head>
-<body class="font-sans">
-<!-- Navbar with Theme Toggle -->
-<nav class="shadow-lg fixed w-full z-10 top-0">
-    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-        <a href="index.html" class="text-2xl font-bold text-blue-600 flex items-center">
-            <i class="fas fa-clinic-medical mr-2"></i>MediSchedule
+<body>
+<nav>
+    <div class="container nav-content">
+        <a href="#" class="logo">
+            <i class="fas fa-heartbeat"></i> MediSchedule
         </a>
-        <div class="flex items-center space-x-6">
+        <div class="nav-actions">
             <div class="dropdown">
-                <button class="text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-300 flex items-center hero-cta">
-                    <i class="fas fa-user mr-2"></i>Login
+                <button class="dropdown-btn">
+                    <i class="fas fa-user-md"></i> Login
                 </button>
                 <div class="dropdown-menu">
-                    <a href="login-user.html">User Login</a>
-                    <a href="login-admin.html">Admin Login</a>
-                    <a href="login-doctor.html">Doctor Login</a>
+                    <a href="webpage/pages/login.jsp?role=patient">Patient Login</a>
+                    <a href="webpage/pages/login.jsp?role=doctor">Doctor Login</a>
+                    <a href="webpage/pages/login.jsp?role=admin">Admin Login</a>
                 </div>
             </div>
-            <button id="theme-toggle" class="toggle-btn text-2xl p-2 rounded-full bg-gray-200 dark:bg-gray-700">
-                <i class="fas fa-sun"></i>
+            <button class="theme-toggle" id="theme-toggle">
+                <i class="fas fa-moon"></i>
             </button>
         </div>
     </div>
 </nav>
 
-<!-- Hero Section -->
-<header class="hero-section text-white text-center py-24 mt-16">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4 animate-fade-in">Effortless Medical Appointment Scheduling</h1>
-    <p class="text-lg md:text-xl opacity-90 max-w-2xl mx-auto">Book appointments, manage schedules, and simplify healthcare access with ease.</p>
-    <div class="mt-8 flex justify-center space-x-4">
-        <a href="appointment.html" class="text-white px-6 py-3 rounded-lg font-semibold hero-cta shadow-md">Book an Appointment</a>
+<header class="hero">
+    <div class="hero-content">
+        <h1>Your Healthcare Journey Starts Here</h1>
+        <p>Seamlessly book appointments and manage your medical needs with our intuitive platform.</p>
+        <a href="#" class="cta-btn">
+            <i class="fas fa-calendar-check"></i> Schedule Now
+        </a>
     </div>
 </header>
 
-<!-- Search Form Section -->
-<section class="search-form">
-    <h2 class="text-2xl font-bold mb-6 text-center">Find Your Appointment</h2>
-    <form action="#" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div>
-            <label for="doctor" class="block font-medium mb-1">Doctor Name</label>
-            <input type="text" id="doctor" name="doctor" placeholder="e.g., Dr. Smith" class="input-field w-full px-4 py-2 rounded-lg">
-        </div>
-        <div>
-            <label for="hospital" class="block font-medium mb-1">Hospital</label>
-            <input type="text" id="hospital" name="hospital" placeholder="e.g., City Hospital" class="input-field w-full px-4 py-2 rounded-lg">
-        </div>
-        <div>
-            <label for="specialization" class="block font-medium mb-1">Specialization</label>
-            <select id="specialization" name="specialization" class="input-field w-full px-4 py-2 rounded-lg">
-                <option value="">Select Specialization</option>
-                <option value="cardiology">Cardiology</option>
-                <option value="neurology">Neurology</option>
-                <option value="pediatrics">Pediatrics</option>
-                <option value="orthopedics">Orthopedics</option>
-            </select>
-        </div>
-        <div>
-            <label for="date" class="block font-medium mb-1">Date</label>
-            <input type="date" id="date" name="date" class="input-field w-full px-4 py-2 rounded-lg">
-        </div>
-        <div class="md:col-span-4 flex justify-center mt-4">
-            <button type="submit" class="search-btn text-white px-6 py-3 rounded-lg font-semibold flex items-center">
-                <i class="fas fa-search mr-2"></i>Search
+<section class="search-section">
+    <div class="container">
+        <form class="search-form">
+            <h2>Find Your Perfect Appointment</h2>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="doctor">Doctor</label>
+                    <input type="text" id="doctor" class="form-input" placeholder="Dr. Name">
+                </div>
+                <div class="form-group">
+                    <label for="hospital">Hospital</label>
+                    <input type="text" id="hospital" class="form-input" placeholder="Hospital Name">
+                </div>
+                <div class="form-group">
+                    <label for="specialty">Specialty</label>
+                    <select id="specialty" class="form-input">
+                        <option value="">Choose Specialty</option>
+                        <option value="cardiology">Cardiology</option>
+                        <option value="neurology">Neurology</option>
+                        <option value="pediatrics">Pediatrics</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" class="form-input">
+                </div>
+            </div>
+            <button type="submit" class="search-btn">
+                <i class="fas fa-search"></i> Find Appointment
             </button>
-        </div>
-    </form>
-</section>
-
-<!-- Features Section -->
-<section class="container mx-auto px-6 my-20">
-    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Why Choose MediSchedule?</h2>
-    <div class="grid md:grid-cols-3 gap-8">
-        <div class="p-6 rounded-xl text-center feature-card">
-            <i class="fas fa-clock text-blue-600 text-3xl mb-4"></i>
-            <h3 class="text-xl font-semibold">Fast Scheduling</h3>
-            <p class="mt-2">Quickly book appointments with our simple and efficient system.</p>
-        </div>
-        <div class="p-6 rounded-xl text-center feature-card">
-            <i class="fas fa-sort-amount-up text-blue-600 text-3xl mb-4"></i>
-            <h3 class="text-xl font-semibold">Priority-based Sorting</h3>
-            <p class="mt-2">Emergency cases get prioritized using smart algorithms.</p>
-        </div>
-        <div class="p-6 rounded-xl text-center feature-card">
-            <i class="fas fa-users text-blue-600 text-3xl mb-4"></i>
-            <h3 class="text-xl font-semibold">User-Friendly</h3>
-            <p class="mt-2">A seamless experience for patients, doctors, and admins.</p>
-        </div>
+        </form>
     </div>
 </section>
 
-<!-- Medical Specialties Section -->
-<section class="container mx-auto px-6 my-20">
-    <h2 class="text-3xl md:text-4xl font-bold text-center mb-12">Solutions for Every Specialty</h2>
-    <div class="grid md:grid-cols-3 gap-8">
-        <div class="rounded-xl specialty-card overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1519494026892-80cea6e6410c" alt="Medical Clinic">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold">Medical Clinics</h3>
-                <p class="mt-2">Access your calendar and patient info at all times via the admin app.</p>
+<section class="features">
+    <div class="container">
+        <h2>Why MediSchedule?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fas fa-bolt"></i>
+                <h3>Instant Booking</h3>
+                <p>Schedule appointments in seconds with our streamlined system.</p>
             </div>
-        </div>
-        <div class="rounded-xl specialty-card overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1666214379818-4a49d56e6bb5" alt="Physiologist">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold">Physiologists</h3>
-                <p class="mt-2">Enjoy caring for your patients and let MediSchedule handle your bookings.</p>
+            <div class="feature-card">
+                <i class="fas fa-shield-alt"></i>
+                <h3>Secure Access</h3>
+                <p>Your health data stays protected with top-tier security.</p>
             </div>
-        </div>
-        <div class="rounded-xl specialty-card overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c" alt="Chiropractor">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold">Chiropractors</h3>
-                <p class="mt-2">Send booking confirmations and reminders to clients and providers.</p>
-            </div>
-        </div>
-        <div class="rounded-xl specialty-card overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d" alt="Dental Clinic">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold">Dental Clinics</h3>
-                <p class="mt-2">Send automated "book soon" notifications 12 months after checkups.</p>
-            </div>
-        </div>
-        <div class="rounded-xl specialty-card overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1631217868264-e6b8221a077f" alt="Psychologist">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold">Psychologists</h3>
-                <p class="mt-2">A one-stop solution: website, bookings, payments, and more.</p>
-            </div>
-        </div>
-        <div class="rounded-xl specialty-card overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1592853621830-1b1b1d759676" alt="Acupuncture">
-            <div class="p-6">
-                <h3 class="text-xl font-semibold">Acupuncture</h3>
-                <p class="mt-2">Accept bookings via website, Facebook, Instagram, and Google.</p>
+            <div class="feature-card">
+                <i class="fas fa-mobile-alt"></i>
+                <h3>Mobile Friendly</h3>
+                <p>Manage your appointments anytime, anywhere.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Footer -->
-<footer class="py-8">
-    <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-center">
-            <p class="mb-4 md:mb-0">© 2025 MediSchedule. All rights reserved.</p>
-            <div class="flex space-x-6">
-                <a href="#" class="hover:text-blue-400 transition-colors duration-300">Privacy Policy</a>
-                <a href="#" class="hover:text-blue-400 transition-colors duration-300">Terms of Service</a>
-                <a href="#" class="hover:text-blue-400 transition-colors duration-300">Contact</a>
+<section class="specialties">
+    <div class="container">
+        <h2>Specialized Care Solutions</h2>
+        <div class="specialties-grid">
+            <div class="specialty-card">
+                <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef" alt="Cardiology">
+                <div class="specialty-card-content">
+                    <h3>Cardiology</h3>
+                    <p>Heart health management made simple.</p>
+                </div>
             </div>
+            <div class="specialty-card">
+                <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d" alt="Dentistry">
+                <div class="specialty-card-content">
+                    <h3>Dentistry</h3>
+                    <p>Smile with confidence through easy bookings.</p>
+                </div>
+            </div>
+            <div class="specialty-card">
+                <img src="https://images.unsplash.com/photo-1631217868264-e6b8221a077f" alt="Psychology">
+                <div class="specialty-card-content">
+                    <h3>Psychology</h3>
+                    <p>Mental wellness support at your fingertips.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <div class="container footer-content">
+        <p>© 2025 MediSchedule - Healthcare Simplified</p>
+        <div class="footer-links">
+            <a href="#">Privacy</a>
+            <a href="#">Terms</a>
+            <a href="#">Support</a>
         </div>
     </div>
 </footer>
 
 <script>
-    // Theme Toggle Functionality
-    const toggleButton = document.getElementById('theme-toggle');
+    const toggle = document.getElementById('theme-toggle');
     const body = document.body;
-    const sunIcon = '<i class="fas fa-sun"></i>';
-    const moonIcon = '<i class="fas fa-moon"></i>';
+    const sun = '<i class="fas fa-sun"></i>';
+    const moon = '<i class="fas fa-moon"></i>';
 
-    // Check for saved theme preference
     if (localStorage.getItem('theme') === 'dark') {
         body.setAttribute('data-theme', 'dark');
-        toggleButton.innerHTML = sunIcon;
+        toggle.innerHTML = sun;
     } else {
-        body.removeAttribute('data-theme');
-        toggleButton.innerHTML = moonIcon;
+        toggle.innerHTML = moon;
     }
 
-    toggleButton.addEventListener('click', () => {
+    toggle.addEventListener('click', () => {
         if (body.getAttribute('data-theme') === 'dark') {
             body.removeAttribute('data-theme');
-            toggleButton.innerHTML = moonIcon;
+            toggle.innerHTML = moon;
             localStorage.setItem('theme', 'light');
         } else {
             body.setAttribute('data-theme', 'dark');
-            toggleButton.innerHTML = sunIcon;
+            toggle.innerHTML = sun;
             localStorage.setItem('theme', 'dark');
         }
-    });
-
-    // Animations and Smooth Scroll
-    window.addEventListener('load', () => {
-        document.querySelector('h1').classList.add('animate-fade-in');
-    });
-
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function(e) {
-            e.preventDefault();
-            document.querySelector(this.getAttribute('href')).scrollIntoView({
-                behavior: 'smooth'
-            });
-        });
     });
 </script>
 </body>
