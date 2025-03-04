@@ -544,14 +544,12 @@
     const body = document.body;
     const sun = '<i class="fas fa-sun"></i>';
     const moon = '<i class="fas fa-moon"></i>';
-
     if (localStorage.getItem('theme') === 'dark') {
         body.setAttribute('data-theme', 'dark');
         toggle.innerHTML = sun;
     } else {
         toggle.innerHTML = moon;
     }
-
     toggle.addEventListener('click', () => {
         if (body.getAttribute('data-theme') === 'dark') {
             body.removeAttribute('data-theme');

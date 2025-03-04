@@ -13,10 +13,9 @@ import java.util.List;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-    private static final String BASE_PATH = "src/main/webapp/data/";
-    private static final String PATIENTS_FILE = BASE_PATH + "patients.txt";
-    private static final String DOCTORS_FILE = BASE_PATH + "doctors.txt";
-    private static final String ADMINS_FILE = BASE_PATH + "admins.txt";
+    private String getBasePath(HttpServletRequest request) {
+        return request.getServletContext().getRealPath("/data/");
+    }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -24,7 +23,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
-        boolean isValid = validateCredentials(username, password, role);
+        boolean isValid = validateCredentials(username, password, role, request);
 
         if (isValid) {
             HttpSession session = request.getSession();
@@ -48,12 +47,13 @@ public class LoginServlet extends HttpServlet {
         }
     }
 
-    private boolean validateCredentials(String username, String password, String role) throws IOException {
+    private boolean validateCredentials(String username, String password, String role, HttpServletRequest request) throws IOException {
         String filePath;
+        String basePath = getBasePath(request);
         switch (role) {
-            case "patient": filePath = PATIENTS_FILE; break;
-            case "doctor": filePath = DOCTORS_FILE; break;
-            case "admin": filePath = ADMINS_FILE; break;
+            case "patient": filePath = basePath + "patients.txt"; break;
+            case "doctor": filePath = basePath + "doctors.txt"; break;
+            case "admin": filePath = basePath + "admins.txt"; break;
             default: return false;
         }
 
