@@ -1,7 +1,6 @@
 package controller;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,7 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
     private String getBasePath(HttpServletRequest request) {
         return request.getServletContext().getRealPath("/data/");

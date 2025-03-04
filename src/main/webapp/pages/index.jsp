@@ -17,6 +17,7 @@
             --text-dark: #e2e8f0;
             --card-bg: #ffffff;
             --shadow: 0 6px 20px rgba(0,0,0,0.08);
+            --registerbutton: #F2A72C;
         }
 
         [data-theme="dark"] {
@@ -25,6 +26,7 @@
             --bg-light: #1a202c;
             --text-light: #e2e8f0;
             --card-bg: #2d3748;
+            --registerbutton: #F2801E;
         }
 
         * {
@@ -78,6 +80,23 @@
             gap: 1.5rem;
             align-items: center;
         }
+        .register-btn{
+            background: var(--registerbutton);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .register-btn:hover {
+            transform: translateY(-2px);
+            background: #ffcc66;
+        }
+
 
         .dropdown-btn {
             background: var(--secondary);
@@ -427,6 +446,9 @@
                     <a href="<%=request.getContextPath()%>/pages/login.jsp?role=admin">Admin Login</a>
                 </div>
             </div>
+            <button class="register-btn">
+                <i class="fas fa-plus"></i> Register
+            </button>
             <button class="theme-toggle" id="theme-toggle">
                 <i class="fas fa-moon"></i>
             </button>
@@ -449,14 +471,6 @@
             <h2>Find Your Perfect Appointment</h2>
             <div class="form-grid">
                 <div class="form-group">
-                    <label for="doctor">Doctor</label>
-                    <input type="text" id="doctor" class="form-input" placeholder="Dr. Name">
-                </div>
-                <div class="form-group">
-                    <label for="hospital">Hospital</label>
-                    <input type="text" id="hospital" class="form-input" placeholder="Hospital Name">
-                </div>
-                <div class="form-group">
                     <label for="specialty">Specialty</label>
                     <select id="specialty" class="form-input">
                         <option value="">Choose Specialty</option>
@@ -464,6 +478,14 @@
                         <option value="neurology">Neurology</option>
                         <option value="pediatrics">Pediatrics</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label for="doctor">Doctor</label>
+                    <input type="text" id="doctor" class="form-input" placeholder="Dr. Name">
+                </div>
+                <div class="form-group">
+                    <label for="hospital">Hospital</label>
+                    <input type="text" id="hospital" class="form-input" placeholder="Hospital Name">
                 </div>
                 <div class="form-group">
                     <label for="date">Date</label>
@@ -519,7 +541,7 @@
                 </div>
             </div>
             <div class="specialty-card">
-                <img src="https://images.unsplash.com/photo-1631217868264-e6b8221a077f" alt="Psychology">
+                <img src="https://img.freepik.com/premium-photo/psychology-doctor-examine-listen-patient-home-psychologic-health-care-house-isolated_660230-145414.jpg" alt="Psychology">
                 <div class="specialty-card-content">
                     <h3>Psychology</h3>
                     <p>Mental wellness support at your fingertips.</p>
