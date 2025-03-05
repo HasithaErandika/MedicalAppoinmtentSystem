@@ -37,7 +37,7 @@ public class LoginServlet extends HttpServlet {
 
             switch (role) {
                 case "patient":
-                    response.sendRedirect(request.getContextPath() + "/pages/userprofile.jsp");
+                    response.sendRedirect(request.getContextPath() + "/pages/userProfile.jsp");
                     break;
                 case "doctor":
                     response.sendRedirect(request.getContextPath() + "/pages/doctorDashboard.jsp");
