@@ -1,1 +1,3 @@
 patient1,pass123,John Doe,30,555-1234
+patient2,pass456,Jane Smith,25,555-5678
+patient3,user789,Alice Brown,40,555-9012

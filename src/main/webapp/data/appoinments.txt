@@ -1,1 +1,4 @@
-admin1,pass789
+1,patient1,doctor1,2025-03-10 10:00,1
+2,patient2,doctor2,2025-03-11 14:00,2
+3,patient3,doctor3,2025-03-12 09:30,1
+4,patient1,doctor2,2025-03-13 15:00,2

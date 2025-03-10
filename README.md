@@ -41,7 +41,7 @@ This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic fr
 │   │   │   ├── 📁 model                   # Data/Entity Classes (Encapsulation + OOP)
 │   │   │   │   ├── Patient.java           # Patient details (id, name, age, etc.)
 │   │   │   │   ├── Doctor.java            # Doctor details (name, specialization)
-│   │   │   │   ├── Appointment.java       # Appointment object (priority, time, doctor, patient)
+│   │   │   │   ├── Appoinment.java       # Appointment object (priority, time, doctor, patient)
 │   │   │   ├── 📁 service                  # Business Logic Layer
 │   │   │   │   ├── AppointmentService.java # Appointment scheduling & sorting (Bubble Sort)
 │   │   │   │   ├── FileHandler.java        # All file read/write CRUD methods
@@ -50,21 +50,19 @@ This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic fr
 │   │   │   │   ├── RegisterServlet.java    # Handles patient registration
 │   │   │   │   ├── AppointmentServlet.java # Handles booking/canceling
 │   │   │   │   ├── AdminServlet.java       # Admin dashboard (view/manage data)
-│   │   │   │   ├── DoctorServlet.java      # Optional - If doctor login needed
 │   │   ├── 📁 webapp                       # All frontend files (UI Pages + Data)
 │   │   │   ├── 📁 pages                    # All JSP Pages
 │   │   │   │   ├── index.jsp               # Home page (like The Odin Project)
 │   │   │   │   ├── login.jsp               # Combined Login page (User/Admin)
-│   │   │   │   ├── dashboard.jsp           # Admin Dashboard
+│   │   │   │   ├── adminDashboard.jsp           # Admin Dashboard
 │   │   │   │   ├── doctorDashboard.jsp     # Doctor Dashboard (if needed)
 │   │   │   │   ├── appointment.jsp         # Appointment Booking Page
-│   │   │   │   ├── profile.jsp             # Patient profile (view appointments)
+│   │   │   │   ├── userProfile.jsp             # Patient profile (view appointments)
 │   │   │   │   ├── error.jsp                # Display errors (invalid login, etc.)
 |   |   |   |   |---register.jsp             # register doctors and users
 │   │   │   ├── 📁 assets                    # Static files (CSS, JS, Images)
 │   │   │   │   ├── styles.css               # Custom styles
 │   │   │   │   ├── script.js                 # Optional JS
-│   │   │   │   ├── logo.png                  # System Logo (if needed)
 │   │   │   ├── WEB-INF
 │   │   │   │   ├── web.xml                   # Servlet Mappings
 │   │   │   ├── 📁 data                      # All system data (stored in plain files)

@@ -1,1 +1,3 @@
 doctor1,pass456,Dr. Smith,Cardiology
+doctor2,pass789,Dr. Jones,Neurology
+doctor3,doc123,Dr. Patel,Pediatrics
