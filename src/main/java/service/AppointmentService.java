@@ -8,72 +8,77 @@ import java.util.List;
 import java.util.PriorityQueue;
 
 public class AppointmentService {
+    private final String filePath;
     private final FileHandler fileHandler;
-    private PriorityQueue<Appointment> priorityQueue;
+    private PriorityQueue<Appointment> emergencyQueue;
 
     public AppointmentService(String filePath) {
+        this.filePath = filePath;
         this.fileHandler = new FileHandler(filePath);
-        this.priorityQueue = new PriorityQueue<>();
-        loadAppointments();
-    }
-
-    // Load existing appointments into the priority queue
-    private void loadAppointments() {
+        this.emergencyQueue = new PriorityQueue<>((a1, a2) -> Integer.compare(a2.getPriority(), a1.getPriority()));
         try {
-            List<Appointment> appointments = fileHandler.readAppointments();
-            priorityQueue.addAll(appointments);
+            List<Appointment> appointments = readAppointments();
+            if (appointments != null) {
+                emergencyQueue.addAll(appointments);
+            }
         } catch (IOException e) {
-            e.printStackTrace(); // Log error; could be enhanced with proper logging
+            e.printStackTrace();
         }
     }
 
-    // Book a new appointment
-    public void bookAppointment(String patientId, String doctorId, String dateTime, boolean isEmergency) throws IOException {
-        int id = getNextId(); // Generate a unique ID
-        int priority = isEmergency ? 1 : 2; // 1 = Emergency, 2 = Normal
-        Appointment appt = new Appointment(id, patientId, doctorId, dateTime, priority);
-        priorityQueue.add(appt);
-
-        // Update file
-        List<Appointment> allAppointments = new ArrayList<>(priorityQueue);
-        fileHandler.writeAppointments(allAppointments);
-    }
-
-    // Cancel an appointment by ID
-    public void cancelAppointment(int id) throws IOException {
-        PriorityQueue<Appointment> tempQueue = new PriorityQueue<>();
-        while (!priorityQueue.isEmpty()) {
-            Appointment appt = priorityQueue.poll();
-            if (appt.getId() != id) {
-                tempQueue.add(appt);
-            }
-        }
-        priorityQueue = tempQueue;
-        fileHandler.writeAppointments(new ArrayList<>(priorityQueue));
-    }
-
-    // Get all appointments (for admin display or other purposes)
     public List<Appointment> readAppointments() throws IOException {
-        return fileHandler.readAppointments();
-    }
-
-    // Get the next appointment in the priority queue (highest priority)
-    public Appointment getNextAppointment() {
-        return priorityQueue.peek(); // Peek to preview without removing
-    }
-
-    // Generate a unique ID for new appointments
-    private int getNextId() throws IOException {
-        List<Appointment> appointments = readAppointments();
-        if (appointments.isEmpty()) {
-            return 1;
-        }
-        int maxId = 0;
-        for (Appointment appt : appointments) {
-            if (appt.getId() > maxId) {
-                maxId = appt.getId();
+        List<String> lines = fileHandler.readLines();
+        if (lines == null) return new ArrayList<>();
+        List<Appointment> appointments = new ArrayList<>();
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts.length == 5) {
+                int id = Integer.parseInt(parts[0]);
+                String patientId = parts[1];
+                String doctorId = parts[2];
+                String dateTime = parts[3];
+                int priority = Integer.parseInt(parts[4]);
+                appointments.add(new Appointment(id, patientId, doctorId, dateTime, priority));
             }
         }
-        return maxId + 1;
+        return appointments;
+    }
+
+    public void bookAppointment(String patientId, String doctorId, String dateTime, boolean isEmergency) throws IOException {
+        List<Appointment> appointments = readAppointments();
+        int newId = appointments.stream().mapToInt(Appointment::getId).max().orElse(0) + 1;
+        Appointment newAppointment = new Appointment(newId, patientId, doctorId, dateTime, isEmergency ? 1 : 2);
+        appointments.add(newAppointment);
+        if (isEmergency) emergencyQueue.add(newAppointment);
+        writeAppointments(appointments);
+    }
+
+    public void updateAppointment(int id, String patientId, String doctorId, String dateTime, int priority) throws IOException {
+        List<Appointment> appointments = readAppointments();
+        for (int i = 0; i < appointments.size(); i++) {
+            if (appointments.get(i).getId() == id) {
+                appointments.set(i, new Appointment(id, patientId, doctorId, dateTime, priority));
+                break;
+            }
+        }
+        emergencyQueue.clear();
+        emergencyQueue.addAll(appointments);
+        writeAppointments(appointments);
+    }
+
+    public void cancelAppointment(int id) throws IOException {
+        List<Appointment> appointments = readAppointments();
+        appointments.removeIf(appt -> appt.getId() == id);
+        emergencyQueue.clear();
+        emergencyQueue.addAll(appointments);
+        writeAppointments(appointments);
+    }
+
+    private void writeAppointments(List<Appointment> appointments) throws IOException {
+        List<String> lines = new ArrayList<>();
+        for (Appointment appt : appointments) {
+            lines.add(String.format("%d,%s,%s,%s,%d", appt.getId(), appt.getPatientId(), appt.getDoctorId(), appt.getDateTime(), appt.getPriority()));
+        }
+        fileHandler.writeLines(lines);
     }
 }

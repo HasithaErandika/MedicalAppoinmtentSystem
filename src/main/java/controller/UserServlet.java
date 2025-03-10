@@ -11,13 +11,13 @@ import service.FileHandler;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 import com.google.gson.Gson;
 
-public class AppointmentServlet extends HttpServlet {
+public class UserServlet extends HttpServlet {
     private AppointmentService appointmentService;
     private DoctorAvailabilityService availabilityService;
     private FileHandler doctorFileHandler;
-    private FileHandler patientFileHandler;
 
     @Override
     public void init() throws ServletException {
@@ -25,12 +25,12 @@ public class AppointmentServlet extends HttpServlet {
         appointmentService = new AppointmentService(basePath + "appointments.txt");
         availabilityService = new DoctorAvailabilityService(basePath + "doctors_availability.txt", appointmentService);
         doctorFileHandler = new FileHandler(basePath + "doctors.txt");
-        patientFileHandler = new FileHandler(basePath + "patients.txt");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+        String username = (String) request.getSession().getAttribute("username");
 
         if ("getTimeSlots".equals(action)) {
             String doctorId = request.getParameter("doctorId");
@@ -41,62 +41,56 @@ public class AppointmentServlet extends HttpServlet {
             return;
         }
 
-        List<String> doctors = doctorFileHandler.readLines();
-        List<String> patients = patientFileHandler.readLines();
-        List<Appointment> appointments = appointmentService.readAppointments();
+        String specialty = request.getParameter("specialty");
+        String doctorName = request.getParameter("doctor");
+        String date = request.getParameter("date");
 
-        request.setAttribute("doctors", doctors);
-        request.setAttribute("patients", patients);
-        request.setAttribute("appointments", appointments);
+        List<String> allDoctors = doctorFileHandler.readLines();
+        List<String> filteredDoctors = allDoctors.stream()
+                .filter(doctor -> {
+                    String[] parts = doctor.split(",");
+                    boolean specialtyMatch = specialty == null || specialty.isEmpty() || parts[4].equalsIgnoreCase(specialty);
+                    boolean nameMatch = doctorName == null || doctorName.isEmpty() || parts[2].toLowerCase().contains(doctorName.toLowerCase());
+                    boolean availabilityMatch = date == null || !date.isEmpty() && availabilityService.hasAvailability(parts[0], date);
+                    return specialtyMatch && nameMatch && availabilityMatch;
+                })
+                .collect(Collectors.toList());
 
-        if ("edit".equals(action)) {
-            int id = Integer.parseInt(request.getParameter("appointmentId"));
-            Appointment editAppointment = appointments.stream()
-                    .filter(appt -> appt.getId() == id)
-                    .findFirst()
-                    .orElse(null);
-            request.setAttribute("editAppointment", editAppointment);
-        }
+        List<Appointment> allAppointments = appointmentService.readAppointments();
+        List<Appointment> userAppointments = allAppointments.stream()
+                .filter(appt -> appt.getPatientId().equals(username))
+                .collect(Collectors.toList());
 
-        request.getRequestDispatcher("/pages/appointment.jsp").forward(request, response);
+        request.setAttribute("filteredDoctors", filteredDoctors);
+        request.setAttribute("appointments", userAppointments);
+        request.setAttribute("param.date", date);
+        request.getRequestDispatcher("/pages/userProfile.jsp").forward(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
+        String username = (String) request.getSession().getAttribute("username");
 
-        try {
-            if ("add".equals(action) || "update".equals(action)) {
-                int id = "update".equals(action) ? Integer.parseInt(request.getParameter("appointmentId")) : -1;
-                String patientId = request.getParameter("patientId");
+        if ("book".equals(action)) {
+            try {
                 String doctorId = request.getParameter("doctorId");
                 String date = request.getParameter("date");
                 String timeSlot = request.getParameter("timeSlot");
                 String dateTime = date + " " + timeSlot;
                 boolean isEmergency = "on".equals(request.getParameter("isEmergency"));
-                int priority = isEmergency ? 1 : 2;
 
                 if (!availabilityService.isTimeSlotAvailable(doctorId, dateTime)) {
                     throw new Exception("Selected time slot is not available.");
                 }
 
-                if ("add".equals(action)) {
-                    appointmentService.bookAppointment(patientId, doctorId, dateTime, isEmergency);
-                    request.setAttribute("message", "Appointment added successfully!");
-                } else {
-                    appointmentService.updateAppointment(id, patientId, doctorId, dateTime, priority);
-                    request.setAttribute("message", "Appointment updated successfully!");
-                }
+                appointmentService.bookAppointment(username, doctorId, dateTime, isEmergency);
+                request.setAttribute("message", "Appointment booked successfully!");
                 request.setAttribute("messageType", "success");
-            } else if ("cancel".equals(action)) {
-                int id = Integer.parseInt(request.getParameter("appointmentId"));
-                appointmentService.cancelAppointment(id);
-                request.setAttribute("message", "Appointment canceled successfully!");
-                request.setAttribute("messageType", "success");
+            } catch (Exception e) {
+                request.setAttribute("message", "Error booking appointment: " + e.getMessage());
+                request.setAttribute("messageType", "error");
             }
-        } catch (Exception e) {
-            request.setAttribute("message", "Error: " + e.getMessage());
-            request.setAttribute("messageType", "error");
         }
 
         doGet(request, response);

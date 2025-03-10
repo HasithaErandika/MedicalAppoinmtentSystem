@@ -11,14 +11,14 @@
         :root {
             --primary: #ed8936; --secondary: #2c5282; --accent: #48bb78;
             --bg-light: #f4f7fa; --bg-dark: #2d3748; --text-light: #2d3748;
-            --text-dark: #ffffff; --card-bg: #ffffff; --shadow: 0 4px 15px rgba(0,0,0,0.1);
-            --hover: #f1f5f9; --danger: #e53e3e;
+            --text-dark: #ffffff; --card-bg: #ffffff; --shadow: 0 6px 20px rgba(0,0,0,0.08);
+            --hover: #edf2f7; --danger: #e53e3e;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg-light); color: var(--text-light); min-height: 100vh; display: flex; overflow-x: hidden; }
         .sidebar { width: 260px; background: var(--bg-dark); color: var(--text-dark); height: 100vh; position: fixed; padding: 2rem 1rem; transition: width 0.3s ease; z-index: 1000; }
         .sidebar.collapsed { width: 80px; }
-        .sidebar .logo { font-size: 1.5rem; font-weight: 600; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; color: var(--primary); }
+        .sidebar .logo { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; color: var(--primary); }
         .sidebar.collapsed .logo span { display: none; }
         .sidebar ul { list-style: none; }
         .sidebar ul li a { color: var(--text-dark); text-decoration: none; display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; border-radius: 8px; transition: all 0.3s ease; }
@@ -33,7 +33,7 @@
         .logout-btn:hover { background: rgba(255, 255, 255, 0.3); transform: scale(1.05); }
         .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
         .card { background: linear-gradient(135deg, #fff, #f9fafb); padding: 1.5rem; border-radius: 12px; box-shadow: var(--shadow); text-align: center; transition: all 0.3s ease; cursor: pointer; position: relative; overflow: hidden; }
-        .card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
         .card i { font-size: 2.2rem; color: var(--primary); margin-bottom: 0.75rem; }
         .card h3 { font-size: 1.1rem; font-weight: 500; margin-bottom: 0.5rem; }
         .card p { font-size: 1.6rem; font-weight: 700; color: var(--secondary); }
@@ -42,19 +42,19 @@
         .table-header h2 { font-size: 1.4rem; color: var(--text-light); }
         .table-actions { display: flex; gap: 1rem; }
         .search-bar { display: flex; align-items: center; gap: 0.5rem; }
-        .search-bar input { padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; width: 200px; }
-        .export-btn { padding: 0.6rem 1rem; background: var(--accent); color: var(--text-dark); border: none; border-radius: 8px; cursor: pointer; }
-        .export-btn:hover { background: #38a169; }
+        .search-bar input { padding: 0.6rem; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.9rem; width: 200px; transition: all 0.3s ease; }
+        .search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 5px rgba(237, 137, 54, 0.3); outline: none; }
+        .export-btn { padding: 0.6rem 1rem; background: var(--accent); color: var(--text-dark); border: none; border-radius: 8px; cursor: pointer; transition: all 0.3s ease; }
+        .export-btn:hover { background: #38a169; transform: scale(1.05); }
         .appointments-table { width: 100%; border-collapse: collapse; }
         .appointments-table th, .appointments-table td { padding: 1rem; text-align: left; border-bottom: 1px solid #e5e7eb; }
         .appointments-table th { background: var(--primary); color: var(--text-dark); font-weight: 600; cursor: pointer; }
         .appointments-table th:hover { background: #dd6b20; }
         .appointments-table tr:hover { background: var(--hover); }
         .priority-emergency { color: var(--danger); font-weight: 600; }
-        .action-btn { padding: 0.5rem 1rem; background: var(--danger); color: white; border: none; border-radius: 5px; cursor: pointer; }
-        .action-btn:hover { background: #c53030; }
         .pagination { margin-top: 1rem; text-align: center; }
-        .pagination button { padding: 0.5rem 1rem; margin: 0 0.25rem; background: var(--primary); color: var(--text-dark); border: none; border-radius: 5px; cursor: pointer; }
+        .pagination button { padding: 0.5rem 1rem; margin: 0 0.25rem; background: var(--primary); color: var(--text-dark); border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+        .pagination button:hover:not(:disabled) { background: #dd6b20; }
         .pagination button:disabled { background: #d1d5db; cursor: not-allowed; }
         @media (max-width: 768px) { .sidebar { width: 80px; } .sidebar .logo span, .sidebar ul li a span { display: none; } .main-content { margin-left: 80px; } .dashboard-grid { grid-template-columns: 1fr; } .table-actions { flex-direction: column; gap: 0.5rem; } }
         @media (max-width: 480px) { .main-content { padding: 1rem; } .search-bar input { width: 150px; } .appointments-table th, .appointments-table td { padding: 0.75rem; font-size: 0.85rem; } }
@@ -63,7 +63,7 @@
 <body>
 <%
     String username = (String) session.getAttribute("username");
-    if (username == null) {
+    if (username == null || !"admin".equals(session.getAttribute("role"))) {
         response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=admin");
         return;
     }
@@ -76,6 +76,7 @@
         <li><a href="<%=request.getContextPath()%>/ManageDoctorsServlet"><i class="fas fa-user-md"></i><span>Manage Doctors</span></a></li>
         <li><a href="<%=request.getContextPath()%>/ManagePatientsServlet"><i class="fas fa-users"></i><span>Manage Patients</span></a></li>
         <li><a href="<%=request.getContextPath()%>/DoctorScheduleServlet"><i class="fas fa-calendar-alt"></i><span>Doctor Schedule</span></a></li>
+        <li><a href="<%=request.getContextPath()%>/AppointmentServlet"><i class="fas fa-calendar-check"></i><span>Manage Appointments</span></a></li>
         <li><a href="<%=request.getContextPath()%>/DataManagementServlet"><i class="fas fa-database"></i><span>Data Management</span></a></li>
     </ul>
 </div>
@@ -136,7 +137,6 @@
                 <th onclick="sortTable(2)">Doctor ID <i class="fas fa-sort"></i></th>
                 <th onclick="sortTable(3)">Date & Time <i class="fas fa-sort"></i></th>
                 <th onclick="sortTable(4)">Priority <i class="fas fa-sort"></i></th>
-                <th>Actions</th>
             </tr>
             </thead>
             <tbody id="appointmentsBody">
@@ -148,9 +148,6 @@
                     <td>${appt.dateTime}</td>
                     <td class="${appt.priority == 1 ? 'priority-emergency' : ''}">
                             ${appt.priority == 1 ? 'Emergency' : 'Normal'}
-                    </td>
-                    <td>
-                        <button class="action-btn" onclick="cancelAppointment(${appt.id})">Cancel</button>
                     </td>
                 </tr>
             </c:forEach>
@@ -219,12 +216,6 @@
             }
         }
         updatePagination();
-    }
-
-    function cancelAppointment(id) {
-        if (confirm('Are you sure you want to cancel appointment ID ' + id + '?')) {
-            window.location.href = '<%=request.getContextPath()%>/AppointmentServlet?action=cancel&appointmentId=' + id;
-        }
     }
 
     function updatePagination() {
