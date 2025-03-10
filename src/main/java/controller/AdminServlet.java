@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AdminServlet extends HttpServlet {
-
     private AppointmentService appointmentService;
     private FileHandler doctorFileHandler;
     private FileHandler patientFileHandler;
@@ -21,16 +20,14 @@ public class AdminServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         String basePath = getServletContext().getRealPath("/data/");
+        System.out.println("Base Path: " + basePath); // Debug path
         appointmentService = new AppointmentService(basePath + "appointments.txt");
         doctorFileHandler = new FileHandler(basePath + "doctors.txt");
         patientFileHandler = new FileHandler(basePath + "patients.txt");
-        System.out.println("Base Path: " + basePath);
-        appointmentService = new AppointmentService(basePath + "appointments.txt");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Check if admin is logged in
         String username = (String) request.getSession().getAttribute("username");
         String role = (String) request.getSession().getAttribute("role");
         if (username == null || !"admin".equals(role)) {
@@ -39,32 +36,31 @@ public class AdminServlet extends HttpServlet {
         }
 
         try {
-            // Fetch data
+            List<Appointment> appointments = appointmentService.readAppointments();
+            System.out.println("Raw Appointments: " + (appointments != null ? appointments : "null")); // Debug raw data
+
             int totalAppointments = getTotalAppointments();
             int totalDoctors = getTotalDoctors();
             int totalPatients = getTotalPatients();
             int emergencyQueueSize = getEmergencyQueueSize();
             List<Appointment> sortedAppointments = getSortedAppointments();
 
-            // Set attributes for JSP
+            System.out.println("Total Appointments: " + totalAppointments);
+            System.out.println("Total Doctors: " + totalDoctors);
+            System.out.println("Total Patients: " + totalPatients);
+            System.out.println("Emergency Queue Size: " + emergencyQueueSize);
+            System.out.println("Sorted Appointments: " + (sortedAppointments != null ? sortedAppointments : "null"));
+
             request.setAttribute("totalAppointments", totalAppointments);
             request.setAttribute("totalDoctors", totalDoctors);
             request.setAttribute("totalPatients", totalPatients);
             request.setAttribute("emergencyQueueSize", emergencyQueueSize);
             request.setAttribute("sortedAppointments", sortedAppointments);
-
-            // Debug output to verify data
-            System.out.println("Total Appointments: " + totalAppointments);
-            System.out.println("Total Doctors: " + totalDoctors);
-            System.out.println("Total Patients: " + totalPatients);
-            System.out.println("Emergency Queue Size: " + emergencyQueueSize);
-            System.out.println("Sorted Appointments: " + sortedAppointments.size());
         } catch (IOException e) {
             e.printStackTrace();
-            request.setAttribute("error", "Error fetching data: " + e.getMessage());
+            request.setAttribute("error", "Error fetching dashboard data: " + e.getMessage());
         }
 
-        // Forward to admin dashboard
         request.getRequestDispatcher("/pages/adminDashboard.jsp").forward(request, response);
     }
 
@@ -88,9 +84,7 @@ public class AdminServlet extends HttpServlet {
         if (appointments == null) return 0;
         int count = 0;
         for (Appointment appt : appointments) {
-            if (appt.getPriority() == 1) { // 1 = Emergency
-                count++;
-            }
+            if (appt.getPriority() == 1) count++;
         }
         return count;
     }
@@ -98,14 +92,13 @@ public class AdminServlet extends HttpServlet {
     private List<Appointment> getSortedAppointments() throws IOException {
         List<Appointment> appointments = appointmentService.readAppointments();
         if (appointments == null || appointments.isEmpty()) {
-            return new ArrayList<>(); // Return empty list if no appointments
+            System.out.println("No appointments to sort.");
+            return new ArrayList<>();
         }
-        // Bubble Sort by dateTime
         int n = appointments.size();
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
                 if (appointments.get(j).getDateTime().compareTo(appointments.get(j + 1).getDateTime()) > 0) {
-                    // Swap
                     Appointment temp = appointments.get(j);
                     appointments.set(j, appointments.get(j + 1));
                     appointments.set(j + 1, temp);

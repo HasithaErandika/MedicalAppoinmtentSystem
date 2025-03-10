@@ -34,5 +34,45 @@
     <servlet-name>AdminServlet</servlet-name>
     <url-pattern>/AdminServlet</url-pattern>
   </servlet-mapping>
+  <servlet>
+    <servlet-name>ManageDoctorsServlet</servlet-name>
+    <servlet-class>controller.ManageDoctorsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ManageDoctorsServlet</servlet-name>
+    <url-pattern>/ManageDoctorsServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ManagePatientsServlet</servlet-name>
+    <servlet-class>controller.ManagePatientsServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ManagePatientsServlet</servlet-name>
+    <url-pattern>/ManagePatientsServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>AppointmentServlet</servlet-name>
+    <servlet-class>controller.AppointmentServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AppointmentServlet</servlet-name>
+    <url-pattern>/AppointmentServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>DoctorScheduleServlet</servlet-name>
+    <servlet-class>controller.DoctorScheduleServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DoctorScheduleServlet</servlet-name>
+    <url-pattern>/DoctorScheduleServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>DataManagementServlet</servlet-name>
+    <servlet-class>controller.DataManagementServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DataManagementServlet</servlet-name>
+    <url-pattern>/DataManagementServlet</url-pattern>
+  </servlet-mapping>
 
 </web-app>
