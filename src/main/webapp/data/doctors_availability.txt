@@ -1,2 +1,2 @@
-doctor1,Monday,03:30 PM,05:30 PM
-doctor2,Tuesday,09:00 AM,11:00 AM
+doctor1,2025-03-11,09:00,11:00
+doctor2,2025-03-12,13:00,15:30

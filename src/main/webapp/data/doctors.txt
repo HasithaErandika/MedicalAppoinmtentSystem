@@ -1,4 +1,5 @@
-doctor1,pass456,Dr. Smith,Cardiology
-doctor2,pass789,Dr. Jones,Neurology
-doctor3,doc123,Dr. Patel,Pediatrics
-doctor4,pass789,ihnfnwdij,Cardiology
+doctor1,pass456,Dr. Smith,Cardiology,smith@hospital.com,+1-555-123-4567
+doctor2,pass789,Dr. Jones,Neurology,jones@hospital.com,+1-555-234-5678
+doctor3,doc123,Dr. Patel,Pediatrics,patel@hospital.com,+1-555-345-6789
+doctor4,pass789,Dr. Brown,Cardiology,brown@hospital.com,+1-555-456-7890
+doctor5,pass123,Hasitha Erandika Wickramasinghe,Neuro Surgent 

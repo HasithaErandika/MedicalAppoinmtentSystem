@@ -82,7 +82,7 @@ public class AppointmentServlet extends HttpServlet {
 
                 if ("add".equals(action)) {
                     appointmentService.bookAppointment(patientId, doctorId, dateTime, isEmergency);
-                    request.setAttribute("message", "Appointment added successfully!");
+                    request.setAttribute("message", "Appointment booked successfully!");
                 } else {
                     appointmentService.updateAppointment(id, patientId, doctorId, dateTime, priority);
                     request.setAttribute("message", "Appointment updated successfully!");

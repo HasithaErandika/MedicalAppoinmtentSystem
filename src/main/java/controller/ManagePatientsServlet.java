@@ -31,19 +31,50 @@ public class ManagePatientsServlet extends HttpServlet {
         List<String> patients = patientFileHandler.readLines();
         if (patients == null) patients = new ArrayList<>();
 
+        System.out.println("Action: " + action); // Debug
+
         if ("add".equals(action)) {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
             String name = request.getParameter("name");
-            String age = request.getParameter("age");
+            String email = request.getParameter("email");
             String phone = request.getParameter("phone");
-            patients.add(username + "," + password + "," + name + "," + age + "," + phone);
+            String dob = request.getParameter("dob");
+            boolean exists = patients.stream().anyMatch(line -> line.split(",")[0].equals(username));
+            if (!exists) {
+                String newPatient = String.join(",", username, password, name, email, phone, dob);
+                patients.add(newPatient);
+                System.out.println("Added: " + newPatient);
+            }
         } else if ("remove".equals(action)) {
             String username = request.getParameter("username");
-            patients.removeIf(line -> line.startsWith(username + ","));
+            if (username != null && !username.isEmpty()) {
+                patients.removeIf(line -> line.split(",")[0].equals(username));
+                System.out.println("Removed: " + username);
+            }
+        } else if ("edit".equals(action)) {
+            String originalUsername = request.getParameter("originalUsername");
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String dob = request.getParameter("dob");
+            if (originalUsername != null && !originalUsername.isEmpty()) {
+                for (int i = 0; i < patients.size(); i++) {
+                    String[] parts = patients.get(i).split(",");
+                    if (parts[0].equals(originalUsername)) {
+                        String updatedPatient = String.join(",", username, password, name, email, phone, dob);
+                        patients.set(i, updatedPatient);
+                        System.out.println("Updated: " + updatedPatient);
+                        break;
+                    }
+                }
+            }
         }
 
         patientFileHandler.writeLines(patients);
+        System.out.println("Patients after update: " + patients);
         response.sendRedirect(request.getContextPath() + "/ManagePatientsServlet");
     }
 }

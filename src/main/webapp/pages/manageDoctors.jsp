@@ -9,27 +9,26 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #ed8936;
-            --danger: #e53e3e;
-            --bg-light: #f7fafc;
-            --text-dark: #1a202c;
-            --text-muted: #718096;
-            --card-bg: #ffffff;
-            --shadow: 0 6px 20px rgba(0,0,0,0.08);
-            --border: #e2e8f0;
-            --hover: #edf2f7;
+            --primary: #4A90E2;
+            --secondary: #26A69A;
+            --accent: #EF5350;
+            --bg-light: #F5F6F5;
+            --text-primary: #333333;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --border: #E0E0E0;
+            --hover: #F9FAFB;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Segoe UI', Arial, sans-serif;
             background: var(--bg-light);
-            color: var(--text-dark);
+            color: var(--text-primary);
             line-height: 1.6;
         }
-
         .container {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 2rem auto;
             padding: 0 1rem;
         }
@@ -40,112 +39,11 @@
             align-items: center;
             margin-bottom: 2rem;
         }
-
         h1 {
             color: var(--primary);
             font-size: 2rem;
             font-weight: 600;
         }
-
-        .card {
-            background: var(--card-bg);
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            padding: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-dark);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: border-color 0.2s ease;
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(237, 137, 54, 0.2);
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #dd6b20;
-            transform: translateY(-1px);
-        }
-
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #c53030;
-            transform: translateY(-1px);
-        }
-
-        .table-container {
-            overflow-x: auto;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            background: var(--card-bg);
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-        }
-
-        th {
-            background: var(--primary);
-            color: white;
-            font-weight: 600;
-            padding: 1rem;
-            text-align: left;
-        }
-
-        th:first-child { border-top-left-radius: 10px; }
-        th:last-child { border-top-right-radius: 10px; }
-
-        td {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        tr:last-child td { border-bottom: none; }
-        tr:hover { background: var(--hover); }
-
         .back-btn {
             color: var(--primary);
             text-decoration: none;
@@ -153,11 +51,142 @@
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            transition: color 0.2s ease;
+            transition: color 0.3s ease;
+        }
+        .back-btn:hover {
+            color: #357ABD;
         }
 
-        .back-btn:hover {
-            color: #dd6b20;
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+            outline: none;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .btn-primary {
+            background: var(--primary);
+            color: #FFFFFF;
+        }
+        .btn-primary:hover {
+            background: #357ABD;
+            transform: translateY(-2px);
+        }
+        .btn-danger {
+            background: var(--accent);
+            color: #FFFFFF;
+        }
+        .btn-danger:hover {
+            background: #D32F2F;
+            transform: translateY(-2px);
+        }
+        .btn-edit {
+            background: var(--secondary);
+            color: #FFFFFF;
+            margin-right: 0.5rem;
+        }
+        .btn-edit:hover {
+            background: #00897B;
+            transform: translateY(-2px);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        th {
+            background: var(--primary);
+            color: #FFFFFF;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: left;
+        }
+        th:first-child { border-top-left-radius: 12px; }
+        th:last-child { border-top-right-radius: 12px; }
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        tr:last-child td { border-bottom: none; }
+        tr:hover { background: var(--hover); }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 600px;
+        }
+        .modal-content h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+        }
+        .modal-close {
+            float: right;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .modal-close:hover {
+            color: var(--accent);
         }
 
         @media (max-width: 768px) {
@@ -200,6 +229,14 @@
                     <label for="specialization">Specialization</label>
                     <input type="text" id="specialization" name="specialization" required placeholder="Enter specialization">
                 </div>
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" required placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" required placeholder="Enter phone number">
+                </div>
             </div>
             <button type="submit" class="btn btn-primary">Add Doctor</button>
         </form>
@@ -212,16 +249,28 @@
                 <th>Username</th>
                 <th>Name</th>
                 <th>Specialization</th>
+                <th>Email</th>
+                <th>Phone</th>
                 <th>Action</th>
             </tr>
             </thead>
             <tbody>
             <c:forEach var="doctor" items="${doctors}">
                 <tr>
-                    <td>${doctor.split(',')[0]}</td>
-                    <td>${doctor.split(',')[2]}</td>
-                    <td>${doctor.split(',')[3]}</td>
+                    <td><c:out value="${doctor.split(',')[0]}"/></td>
+                    <td><c:out value="${doctor.split(',')[2]}"/></td>
+                    <td><c:out value="${doctor.split(',')[3]}"/></td>
+                    <td><c:out value="${doctor.split(',')[4]}"/></td>
+                    <td><c:out value="${doctor.split(',')[5]}"/></td>
                     <td>
+                        <button class="btn btn-edit" onclick="openEditModal(
+                                '<c:out value="${doctor.split(',')[0]}"/>',
+                                '<c:out value="${doctor.split(',')[1]}"/>',
+                                '<c:out value="${doctor.split(',')[2]}"/>',
+                                '<c:out value="${doctor.split(',')[3]}"/>',
+                                '<c:out value="${doctor.split(',')[4]}"/>',
+                                '<c:out value="${doctor.split(',')[5]}"/>'
+                                )">Edit</button>
                         <form action="<%=request.getContextPath()%>/ManageDoctorsServlet" method="post" style="display:inline;">
                             <input type="hidden" name="action" value="remove">
                             <input type="hidden" name="username" value="${doctor.split(',')[0]}">
@@ -234,5 +283,69 @@
         </table>
     </div>
 </div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <button class="modal-close" onclick="closeEditModal()">×</button>
+        <h2>Edit Doctor</h2>
+        <form action="<%=request.getContextPath()%>/ManageDoctorsServlet" method="post">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="originalUsername" id="editOriginalUsername">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="editUsername">Username</label>
+                    <input type="text" id="editUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPassword">Password</label>
+                    <input type="password" id="editPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="editName">Name</label>
+                    <input type="text" id="editName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editSpecialization">Specialization</label>
+                    <input type="text" id="editSpecialization" name="specialization" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email Address</label>
+                    <input type="email" id="editEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPhone">Phone Number</label>
+                    <input type="tel" id="editPhone" name="phone" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function openEditModal(username, password, name, specialization, email, phone) {
+        console.log("Opening modal with:", username, password, name, specialization, email, phone); // Debug
+        document.getElementById('editOriginalUsername').value = username;
+        document.getElementById('editUsername').value = username;
+        document.getElementById('editPassword').value = password;
+        document.getElementById('editName').value = name;
+        document.getElementById('editSpecialization').value = specialization;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('editModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
+</script>
 </body>
 </html>

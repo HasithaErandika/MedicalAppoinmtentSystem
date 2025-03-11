@@ -31,18 +31,54 @@ public class ManageDoctorsServlet extends HttpServlet {
         List<String> doctors = doctorFileHandler.readLines();
         if (doctors == null) doctors = new ArrayList<>();
 
+        System.out.println("Action: " + action); // Debug: Check which action is triggered
+
         if ("add".equals(action)) {
             String username = request.getParameter("username");
             String password = request.getParameter("password");
             String name = request.getParameter("name");
             String specialization = request.getParameter("specialization");
-            doctors.add(username + "," + password + "," + name + "," + specialization);
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            boolean exists = doctors.stream().anyMatch(line -> line.split(",")[0].equals(username));
+            if (!exists) {
+                String newDoctor = String.join(",", username, password, name, specialization, email, phone);
+                doctors.add(newDoctor);
+                System.out.println("Added: " + newDoctor); // Debug: Confirm addition
+            }
         } else if ("remove".equals(action)) {
             String username = request.getParameter("username");
-            doctors.removeIf(line -> line.startsWith(username + ","));
+            if (username != null && !username.isEmpty()) {
+                doctors.removeIf(line -> line.split(",")[0].equals(username));
+                System.out.println("Removed: " + username); // Debug: Confirm removal
+            }
+        } else if ("edit".equals(action)) {
+            String originalUsername = request.getParameter("originalUsername");
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String name = request.getParameter("name");
+            String specialization = request.getParameter("specialization");
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+
+            System.out.println("Editing - Original Username: " + originalUsername); // Debug
+            System.out.println("New Data: " + username + "," + password + "," + name + "," + specialization + "," + email + "," + phone);
+
+            if (originalUsername != null && !originalUsername.isEmpty()) {
+                for (int i = 0; i < doctors.size(); i++) {
+                    String[] parts = doctors.get(i).split(",");
+                    if (parts[0].equals(originalUsername)) {
+                        String updatedDoctor = String.join(",", username, password, name, specialization, email, phone);
+                        doctors.set(i, updatedDoctor);
+                        System.out.println("Updated: " + updatedDoctor); // Debug: Confirm update
+                        break;
+                    }
+                }
+            }
         }
 
         doctorFileHandler.writeLines(doctors);
+        System.out.println("Doctors after update: " + doctors); // Debug: Check final list
         response.sendRedirect(request.getContextPath() + "/ManageDoctorsServlet");
     }
 }
