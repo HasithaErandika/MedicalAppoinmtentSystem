@@ -14,9 +14,8 @@
             --bg-light: #F5F6F5;
             --text-primary: #333333;
             --card-bg: #FFFFFF;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             --register-btn: #66BB6A;
-            --hover-primary: #357ABD;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,17 +24,15 @@
             background: var(--bg-light);
             color: var(--text-primary);
             line-height: 1.6;
-            overflow-x: hidden;
         }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 1rem; }
+        .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
 
-        /* Navigation */
+        /* Navigation styles remain same */
         nav {
             background: var(--primary);
             position: fixed;
             width: 100%;
-            top: 0;
-            z-index: 1000;
+            z-index: 100;
             padding: 1rem 0;
             box-shadow: var(--shadow);
         }
@@ -45,7 +42,7 @@
             align-items: center;
         }
         .logo {
-            font-size: 1.5rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: #FFFFFF;
             text-decoration: none;
@@ -55,56 +52,115 @@
         }
         .nav-actions {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
+            align-items: center;
         }
-        .btn {
+        .register-btn {
+            background: var(--register-btn);
+            color: #FFFFFF;
             padding: 0.6rem 1.5rem;
             border-radius: 25px;
             border: none;
             cursor: pointer;
-            font-weight: 600;
             transition: all 0.3s ease;
-            color: #FFFFFF;
-        }
-        .login-btn {
-            background: var(--secondary);
-        }
-        .login-btn:hover {
-            background: #00897B;
-            transform: translateY(-2px);
-        }
-        .register-btn {
-            background: var(--register-btn);
         }
         .register-btn:hover {
             background: #4CAF50;
             transform: translateY(-2px);
         }
-
-        /* Hero */
-        .hero {
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
-            url('https://images.unsplash.com/photo-1576091160550-2173dba999ef') center/cover no-repeat;
-            padding: 6rem 1rem 4rem;
+        .dropdown-btn {
+            background: var(--secondary);
             color: #FFFFFF;
+            padding: 0.6rem 1.5rem;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .dropdown-btn:hover {
+            background: #00897B;
+            transform: translateY(-2px);
+        }
+        .dropdown { position: relative; }
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            min-width: 180px;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        .dropdown:hover .dropdown-menu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+        .dropdown-menu a {
+            padding: 0.75rem 1.25rem;
+            display: block;
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+        .dropdown-menu a:hover {
+            background: var(--secondary);
+            color: #FFFFFF;
+        }
+
+        /* Hero Section remains same */
+        .hero {
+            background: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef') center/cover no-repeat;
+            padding: 8rem 2rem 6rem;
+            position: relative;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.8), rgba(38, 166, 154, 0.6));
+        }
+        .hero-content {
+            position: relative;
             text-align: center;
+            color: #FFFFFF;
+            max-width: 800px;
+            margin: 0 auto;
         }
         .hero h1 {
-            font-size: 2.5rem;
+            font-size: 2.75rem;
+            font-weight: 700;
             margin-bottom: 1rem;
-            animation: fadeIn 1s ease;
+            animation: slideUp 1s ease;
         }
         .hero p {
-            font-size: 1.2rem;
-            max-width: 600px;
-            margin: 0 auto 2rem;
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+        }
+        .cta-btn {
+            background: var(--secondary);
+            color: #FFFFFF;
+            padding: 0.8rem 2rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .cta-btn:hover {
+            background: #00897B;
+            transform: scale(1.05);
         }
 
-        /* Search Section */
+        /* Search Section with Popup */
         .search-section {
-            margin: -2rem 1rem 3rem;
+            margin: -3rem 2rem 4rem;
             position: relative;
-            z-index: 10;
         }
         .search-form {
             background: var(--card-bg);
@@ -112,38 +168,30 @@
             border-radius: 15px;
             box-shadow: var(--shadow);
             border: 2px solid var(--primary);
-            animation: slideUp 0.5s ease;
         }
         .search-form h2 {
-            font-size: 1.8rem;
-            color: var(--primary);
+            font-size: 1.75rem;
             margin-bottom: 1.5rem;
-            text-align: center;
+            color: var(--primary);
         }
         .form-grid {
             display: grid;
             gap: 1rem;
-            grid-template-columns: 1fr;
         }
         @media (min-width: 768px) {
             .form-grid { grid-template-columns: repeat(4, 1fr); }
         }
-        .form-group {
-            display: flex;
-            flex-direction: column;
-        }
         .form-group label {
-            font-weight: 500;
+            display: block;
             margin-bottom: 0.5rem;
-            color: var(--text-primary);
+            font-weight: 500;
         }
         .form-input {
+            width: 100%;
             padding: 0.75rem;
             border: 2px solid #E0E0E0;
             border-radius: 8px;
-            font-size: 1rem;
             transition: all 0.3s ease;
-            background: #FFFFFF;
         }
         .form-input:focus {
             border-color: var(--primary);
@@ -157,25 +205,15 @@
             border: none;
             border-radius: 25px;
             cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
+            margin: 1rem auto 0;
             transition: all 0.3s ease;
-            grid-column: span 4;
-            margin-top: 1rem;
         }
         .search-btn:hover {
-            background: var(--hover-primary);
+            background: #357ABD;
             transform: translateY(-2px);
         }
-        .search-btn:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
 
-        /* Popup */
+        /* Popup Styles */
         .popup {
             display: none;
             position: fixed;
@@ -183,36 +221,31 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 2000;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
             justify-content: center;
             align-items: center;
-            animation: fadeIn 0.3s ease;
         }
         .popup-content {
             background: var(--card-bg);
             padding: 2rem;
             border-radius: 15px;
-            max-width: 90%;
+            max-width: 800px;
+            width: 90%;
             max-height: 80vh;
             overflow-y: auto;
             position: relative;
             box-shadow: var(--shadow);
-            width: 800px;
         }
         .close-btn {
             position: absolute;
             top: 1rem;
             right: 1rem;
             font-size: 1.5rem;
+            cursor: pointer;
             background: none;
             border: none;
-            cursor: pointer;
             color: var(--text-primary);
-            transition: color 0.3s ease;
-        }
-        .close-btn:hover {
-            color: var(--accent);
         }
         .results-grid {
             display: grid;
@@ -223,54 +256,35 @@
             .results-grid { grid-template-columns: repeat(2, 1fr); }
         }
         .result-card {
-            background: #F9F9F9;
+            background: #f9f9f9;
             padding: 1.5rem;
             border-radius: 10px;
-            border: 1px solid #EEE;
-            transition: transform 0.3s ease;
-        }
-        .result-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-        .result-card h3 {
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-        .result-card p {
-            margin: 0.3rem 0;
-            font-size: 0.95rem;
+            border: 1px solid #eee;
         }
         .book-btn {
             background: var(--secondary);
             color: #FFFFFF;
-            padding: 0.6rem 1.2rem;
+            padding: 0.5rem 1rem;
             border: none;
             border-radius: 25px;
             cursor: pointer;
             margin-top: 1rem;
-            transition: all 0.3s ease;
         }
         .book-btn:hover {
             background: #00897B;
-            transform: translateY(-2px);
         }
 
-        /* Features */
-        .features {
-            padding: 3rem 1rem;
-            background: var(--bg-light);
-        }
+        /* Rest of the styles remain same */
+        .features { padding: 4rem 0; }
         .features h2 {
             text-align: center;
             font-size: 2rem;
+            margin-bottom: 3rem;
             color: var(--primary);
-            margin-bottom: 2rem;
         }
         .features-grid {
             display: grid;
-            gap: 1.5rem;
-            grid-template-columns: 1fr;
+            gap: 2rem;
         }
         @media (min-width: 768px) {
             .features-grid { grid-template-columns: repeat(3, 1fr); }
@@ -285,6 +299,7 @@
         }
         .feature-card:hover {
             transform: translateY(-8px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
         }
         .feature-card i {
             font-size: 2rem;
@@ -292,33 +307,56 @@
             margin-bottom: 1rem;
         }
 
-        /* Footer */
+        .specialties {
+            padding: 4rem 0;
+            background: linear-gradient(180deg, var(--bg-light) 70%, rgba(74, 144, 226, 0.05) 100%);
+        }
+        .specialties h2 {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+            color: var(--primary);
+        }
+        .specialties-grid {
+            display: grid;
+            gap: 2rem;
+        }
+        @media (min-width: 768px) {
+            .specialties-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .specialty-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .specialty-card:hover { transform: translateY(-8px); }
+        .specialty-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+        .specialty-card-content { padding: 1.5rem; }
+
         footer {
             background: var(--primary);
             color: #FFFFFF;
-            padding: 2rem 1rem;
-            text-align: center;
+            padding: 2rem 0;
         }
         .footer-content {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            gap: 2rem;
         }
         .footer-links a {
             color: #FFFFFF;
+            margin-left: 1.5rem;
             text-decoration: none;
-            margin: 0 0.5rem;
         }
-        .footer-links a:hover {
-            color: var(--secondary);
-        }
+        .footer-links a:hover { color: var(--secondary); }
 
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -332,20 +370,37 @@
             <i class="fas fa-heartbeat"></i> MediSchedule
         </a>
         <div class="nav-actions">
-            <button class="btn login-btn" onclick="window.location.href='<%=request.getContextPath()%>/pages/login.jsp';">
-                <i class="fas fa-user-md"></i> Login
-            </button>
-            <button class="btn register-btn" onclick="window.location.href='<%=request.getContextPath()%>/pages/register.jsp';">
+            <% if (session.getAttribute("username") == null) { %>
+            <div class="dropdown">
+                <button class="dropdown-btn"><i class="fas fa-user-md"></i> Login</button>
+                <div class="dropdown-menu">
+                    <a href="<%=request.getContextPath()%>/pages/login.jsp?role=patient">Patient Login</a>
+                    <a href="<%=request.getContextPath()%>/pages/login.jsp?role=doctor">Doctor Login</a>
+                    <a href="<%=request.getContextPath()%>/pages/login.jsp?role=admin">Admin Login</a>
+                </div>
+            </div>
+            <button class="register-btn" onclick="window.location.href='<%=request.getContextPath()%>/pages/register.jsp';">
                 <i class="fas fa-plus"></i> Register
             </button>
+            <% } else { %>
+            <a href="<%=request.getContextPath()%>/UserServlet" class="dropdown-btn">
+                <i class="fas fa-user"></i> Profile
+            </a>
+            <form action="<%=request.getContextPath()%>/LogoutServlet" method="post" style="display:inline;">
+                <button type="submit" class="register-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </form>
+            <% } %>
         </div>
     </div>
 </nav>
 
 <header class="hero">
-    <div class="container">
+    <div class="hero-content">
         <h1>Your Healthcare Journey Starts Here</h1>
-        <p>Book appointments with ease and manage your healthcare needs efficiently.</p>
+        <p>Seamlessly book appointments with available doctors.</p>
+        <a href="<%=request.getContextPath()%>/pages/login.jsp?role=patient" class="cta-btn">
+            <i class="fas fa-calendar-check"></i> Schedule Now
+        </a>
     </div>
 </header>
 
@@ -356,7 +411,7 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="specialty">Specialty</label>
-                    <select id="specialty" name="specialty" class="form-input" onchange="updateDoctors()" required>
+                    <select id="specialty" name="specialty" class="form-input" onchange="updateDoctors()">
                         <option value="">Select Specialty</option>
                     </select>
                 </div>
@@ -381,82 +436,76 @@
                     </select>
                 </div>
             </div>
-            <button type="submit" class="search-btn" id="searchBtn">
-                <i class="fas fa-search"></i> Search Doctors
-            </button>
+            <button type="submit" class="search-btn"><i class="fas fa-search"></i> Search Doctors</button>
         </form>
     </div>
 </section>
 
+<!-- Popup for Results -->
 <div class="popup" id="resultsPopup">
     <div class="popup-content">
         <button class="close-btn" onclick="closePopup()">×</button>
-        <h2>Available Doctors</h2>
+        <h2>Available Doctors (Sorted by Name)</h2>
         <div class="results-grid" id="resultsContainer"></div>
     </div>
 </div>
 
 <section class="features">
     <div class="container">
-        <h2>Why Choose MediSchedule?</h2>
+        <h2>Why MediSchedule?</h2>
         <div class="features-grid">
-            <div class="feature-card">
-                <i class="fas fa-calendar-check"></i>
-                <h3>Easy Booking</h3>
-                <p>Schedule appointments in just a few clicks.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-user-md"></i>
-                <h3>Expert Doctors</h3>
-                <p>Connect with top healthcare professionals.</p>
-            </div>
-            <div class="feature-card">
-                <i class="fas fa-clock"></i>
-                <h3>Flexible Timing</h3>
-                <p>Choose slots that fit your schedule.</p>
-            </div>
+            <div class="feature-card"><i class="fas fa-bolt"></i><h3>Instant Booking</h3><p>Schedule with available doctors in seconds.</p></div>
+            <div class="feature-card"><i class="fas fa-shield-alt"></i><h3>Secure Access</h3><p>Your data stays protected with top-tier security.</p></div>
+            <div class="feature-card"><i class="fas fa-mobile-alt"></i><h3>Mobile Friendly</h3><p>Manage appointments anytime, anywhere.</p></div>
+        </div>
+    </div>
+</section>
+
+<section class="specialties">
+    <div class="container">
+        <h2>Specialized Care Solutions</h2>
+        <div class="specialties-grid">
+            <div class="specialty-card"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef" alt="Cardiology"><div class="specialty-card-content"><h3>Cardiology</h3><p>Heart health management made simple.</p></div></div>
+            <div class="specialty-card"><img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d" alt="Dentistry"><div class="specialty-card-content"><h3>Dentistry</h3><p>Smile with confidence through easy bookings.</p></div></div>
+            <div class="specialty-card"><img src="https://img.freepik.com/premium-photo/psychology-doctor-examine-listen-patient-home-psychologic-health-care-house-isolated_660230-145414.jpg" alt="Psychology"><div class="specialty-card-content"><h3>Psychology</h3><p>Mental wellness support at your fingertips.</p></div></div>
         </div>
     </div>
 </section>
 
 <footer>
     <div class="container footer-content">
-        <p>© 2025 MediSchedule - All Rights Reserved</p>
+        <p>© 2025 MediSchedule - Healthcare Simplified</p>
         <div class="footer-links">
-            <a href="#">Privacy Policy</a>
-            <a href="#">Terms of Service</a>
-            <a href="#">Contact Us</a>
+            <a href="#">Privacy</a><a href="#">Terms</a><a href="#">Support</a>
         </div>
     </div>
 </footer>
 
 <script>
-    let specialties = [];
-    let doctors = [];
-    let availability = [];
+    let allSpecialties = [];
+    let allDoctors = [];
+    let allAvailability = [];
 
-    // Load specialties on page load
     window.onload = function() {
+        document.getElementById('resultsContainer').innerHTML = '<p class="loading">Loading specialties...</p>';
         fetch('<%=request.getContextPath()%>/SortServlet')
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                console.log('Loaded specialties:', data);
-                specialties = data.specialties || [];
+                console.log('Initial load:', data);
+                allSpecialties = data.specialties; // Already sorted by Set in SortServlet
                 populateSpecialties();
+                document.getElementById('resultsContainer').innerHTML = '';
             })
             .catch(error => {
-                console.error('Error loading specialties:', error);
-                alert('Failed to load specialties. Please refresh the page.');
+                console.error('Initial load error:', error);
+                document.getElementById('resultsContainer').innerHTML = '<p class="error">Failed to load specialties. Please try again.</p>';
             });
     };
 
     function populateSpecialties() {
         const specialtySelect = document.getElementById('specialty');
         specialtySelect.innerHTML = '<option value="">Select Specialty</option>';
-        specialties.forEach(specialty => {
+        allSpecialties.forEach(specialty => {
             specialtySelect.innerHTML += `<option value="${specialty}">${specialty}</option>`;
         });
     }
@@ -464,23 +513,24 @@
     function updateDoctors() {
         const specialty = document.getElementById('specialty').value;
         const doctorSelect = document.getElementById('doctor');
-        const dateSelect = document.getElementById('date');
-        doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
-        dateSelect.innerHTML = '<option value="">Select Date</option>';
+        doctorSelect.innerHTML = '<option value="">Loading doctors...</option>';
 
-        if (!specialty) return;
+        if (!specialty) {
+            doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+            updateDates();
+            return;
+        }
 
-        fetch(`<%=request.getContextPath()%>/SortServlet?specialty=${encodeURIComponent(specialty)}`)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return response.json();
-            })
+        fetch('<%=request.getContextPath()%>/SortServlet?specialty=' + encodeURIComponent(specialty))
+            .then(response => response.json())
             .then(data => {
-                console.log('Loaded doctors:', data);
-                doctors = data.doctors || [];
-                doctors.forEach(doctor => {
+                console.log('Doctors for specialty:', data);
+                allDoctors = data.doctors; // Sorted alphabetically by SortServlet
+                doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+                allDoctors.forEach(doctor => {
                     doctorSelect.innerHTML += `<option value="${doctor}">${doctor}</option>`;
                 });
+                updateDates();
             })
             .catch(error => {
                 console.error('Error loading doctors:', error);
@@ -492,19 +542,22 @@
         const specialty = document.getElementById('specialty').value;
         const doctor = document.getElementById('doctor').value;
         const dateSelect = document.getElementById('date');
-        dateSelect.innerHTML = '<option value="">Select Date</option>';
+        dateSelect.innerHTML = '<option value="">Loading dates...</option>';
 
-        if (!specialty || !doctor) return;
+        if (!specialty || !doctor) {
+            dateSelect.innerHTML = '<option value="">Select Date</option>';
+            return;
+        }
 
-        fetch(`<%=request.getContextPath()%>/SortServlet?specialty=${encodeURIComponent(specialty)}&doctor=${encodeURIComponent(doctor)}`)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return response.json();
-            })
+        fetch('<%=request.getContextPath()%>/SortServlet?specialty=' + encodeURIComponent(specialty) +
+            '&doctor=' + encodeURIComponent(doctor))
+            .then(response => response.json())
             .then(data => {
-                console.log('Loaded availability:', data);
-                availability = data.availability || [];
-                const uniqueDates = [...new Set(availability.map(item => item.date))];
+                console.log('Availability:', data);
+                allAvailability = data.availability; // Sorted by name in SortServlet
+                dateSelect.innerHTML = '<option value="">Select Date</option>';
+                const uniqueDates = [...new Set(allAvailability.map(avail => avail.date))];
+                uniqueDates.sort(); // Sort dates for better UX
                 uniqueDates.forEach(date => {
                     dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
                 });
@@ -522,58 +575,49 @@
         const doctor = document.getElementById('doctor').value;
         const date = document.getElementById('date').value;
         const time = document.getElementById('time').value;
-        const searchBtn = document.getElementById('searchBtn');
 
         if (!specialty) {
-            alert('Please select a specialty.');
+            alert('Please select a specialty');
             return;
         }
 
-        searchBtn.disabled = true;
-        searchBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Searching...';
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.innerHTML = '<p class="loading">Searching for doctors...</p>';
+        document.getElementById('resultsPopup').style.display = 'flex';
 
-        fetch(`<%=request.getContextPath()%>/SortServlet?${new URLSearchParams({
-                specialty: specialty,
-                doctor: doctor,
-                date: date,
-                time: time
-            })}`)
-            .then(response => {
-                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                return response.json();
-            })
+        fetch('<%=request.getContextPath()%>/SortServlet?' + new URLSearchParams({
+            specialty: specialty,
+            doctor: doctor,
+            date: date,
+            time: time
+        }))
+            .then(response => response.json())
             .then(data => {
                 console.log('Search results:', data);
-                const resultsContainer = document.getElementById('resultsContainer');
                 resultsContainer.innerHTML = '';
 
                 if (!data.availability || data.availability.length === 0) {
                     resultsContainer.innerHTML = '<p>No doctors found matching your criteria.</p>';
                 } else {
-                    data.availability.forEach(doc => {
-                        resultsContainer.innerHTML += `
-                                <div class="result-card">
-                                    <h3>${doc.name}</h3>
-                                    <p>Specialty: ${doc.specialty}</p>
-                                    <p>Date: ${doc.date}</p>
-                                    <p>Time: ${doc.startTime} - ${doc.endTime}</p>
-                                    <button class="book-btn" onclick="bookAppointment('${doc.username}', '${doc.date}', '${doc.startTime}')">
-                                        Book Now
-                                    </button>
-                                </div>
-                            `;
+                    data.availability.forEach(doc => { // Data is already sorted by name from SortServlet
+                        const card = `
+                            <div class="result-card">
+                                <h3>${doc.name}</h3>
+                                <p>Specialty: ${doc.specialty}</p>
+                                <p>Date: ${doc.date}</p>
+                                <p>Time: ${doc.startTime} - ${doc.endTime}</p>
+                                <button class="book-btn" onclick="bookAppointment('${doc.username}', '${doc.date}', '${doc.startTime}')">
+                                    Book Now
+                                </button>
+                            </div>
+                        `;
+                        resultsContainer.innerHTML += card;
                     });
                 }
-                document.getElementById('resultsPopup').style.display = 'flex';
             })
             .catch(error => {
                 console.error('Search error:', error);
-                document.getElementById('resultsContainer').innerHTML = `<p>Error: ${error.message}</p>`;
-                document.getElementById('resultsPopup').style.display = 'flex';
-            })
-            .finally(() => {
-                searchBtn.disabled = false;
-                searchBtn.innerHTML = '<i class="fas fa-search"></i> Search Doctors';
+                resultsContainer.innerHTML = '<p class="error">Error loading results. Please try again.</p>';
             });
     }
 
@@ -586,24 +630,18 @@
         fetch('<%=request.getContextPath()%>/AppointmentServlet', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username, date, time })
+            body: JSON.stringify({ username: username, date: date, time: time })
         })
-            .then(response => {
-                if (!response.ok) throw new Error('Booking failed');
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
                 if (data.success) {
                     alert('Appointment booked successfully!');
                     closePopup();
                 } else {
-                    alert('Booking failed: ' + (data.message || 'Unknown error'));
+                    alert('Failed to book appointment: ' + data.message);
                 }
             })
-            .catch(error => {
-                console.error('Booking error:', error);
-                alert('Error booking appointment: ' + error.message);
-            });
+            .catch(error => console.error('Booking error:', error));
     }
 </script>
 </body>

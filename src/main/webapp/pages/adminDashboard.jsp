@@ -8,27 +8,30 @@
     <title>MediSchedule - Admin Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Color Palette */
+        /* Updated Color Palette */
         :root {
             --primary: #4A90E2;        /* Soft Blue */
             --secondary: #26A69A;      /* Teal */
             --accent: #EF5350;         /* Soft Red */
-            --bg-light: #F5F6F5;       /* Light Gray */
-            --text-primary: #333333;   /* Dark Gray */
-            --card-bg: #FFFFFF;        /* White */
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --hover: #F9FAFB;
+            --bg-light: #F7F9FC;       /* Softer Light Gray */
+            --text-primary: #2D3748;   /* Darker Gray for contrast */
+            --card-bg: #FFFFFF;
+            --shadow: 0 6px 20px rgba(0, 0, 0, 0.06); /* Softer shadow */
+            --hover: #EDF2F7;          /* Light hover state */
             --danger: #EF5350;
+            --success: #38A169;        /* Green for positive actions */
+            --border-radius: 12px;     /* Consistent border radius */
         }
 
         /* Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif; /* Modern font */
             background: var(--bg-light);
             color: var(--text-primary);
-            min-height: 100vh;
+            line-height: 1.6;
             display: flex;
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
@@ -38,19 +41,18 @@
             background: var(--card-bg);
             height: 100vh;
             position: fixed;
-            padding: 2rem 1rem;
+            padding: 2rem 1.5rem;
             transition: width 0.3s ease;
-            z-index: 1000;
             box-shadow: var(--shadow);
         }
-        .sidebar.collapsed { width: 80px; }
+        .sidebar.collapsed { width: 80px; padding: 2rem 1rem; }
         .sidebar .logo {
-            font-size: 1.75rem;
+            font-size: 1.8rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
+            gap: 0.75rem;
+            margin-bottom: 2.5rem;
             color: var(--primary);
         }
         .sidebar.collapsed .logo span { display: none; }
@@ -60,104 +62,107 @@
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
+            gap: 1rem;
+            padding: 0.9rem 1rem;
+            border-radius: var(--border-radius);
             transition: all 0.3s ease;
         }
         .sidebar ul li a:hover,
         .sidebar ul li a.active {
             background: var(--primary);
             color: #FFFFFF;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
         }
         .sidebar.collapsed ul li a span { display: none; }
         .toggle-btn {
             background: none;
             border: none;
             color: var(--primary);
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             cursor: pointer;
             position: absolute;
-            top: 1rem;
-            right: 1rem;
-            transition: all 0.3s ease;
+            top: 1.5rem;
+            right: 1.5rem;
         }
-        .toggle-btn:hover { color: var(--secondary); }
+        .toggle-btn:hover { color: var(--secondary); transform: rotate(90deg); }
 
         /* Main Content */
         .main-content {
             margin-left: 260px;
             flex: 1;
-            padding: 2rem;
+            padding: 2.5rem;
             transition: margin-left 0.3s ease;
         }
         .main-content.expanded { margin-left: 80px; }
 
         /* Header */
         .header {
-            background: var(--primary);
-            padding: 1.5rem;
-            border-radius: 12px;
+            background: linear-gradient(135deg, var(--primary), #357ABD); /* Gradient */
+            padding: 1.75rem;
+            border-radius: var(--border-radius);
             color: #FFFFFF;
             display: flex;
             justify-content: space-between;
             align-items: center;
             box-shadow: var(--shadow);
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 1.9rem;
             font-weight: 600;
         }
         .logout-btn {
             background: var(--secondary);
             color: #FFFFFF;
             border: none;
-            padding: 0.6rem 1.2rem;
-            border-radius: 20px;
+            padding: 0.7rem 1.5rem;
+            border-radius: 25px;
             cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
             transition: all 0.3s ease;
         }
         .logout-btn:hover {
             background: #00897B;
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
 
         /* Dashboard Grid */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2.5rem;
         }
         .card {
             background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 12px;
+            padding: 2rem;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
         }
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
         }
         .card i {
-            font-size: 2.2rem;
+            font-size: 2.5rem;
             color: var(--secondary);
+            margin-bottom: 1rem;
+            transition: transform 0.3s ease;
+        }
+        .card:hover i { transform: scale(1.1); }
+        .card h3 {
+            font-size: 1.2rem;
+            font-weight: 500;
             margin-bottom: 0.75rem;
         }
-        .card h3 {
-            font-size: 1.1rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
         .card p {
-            font-size: 1.6rem;
+            font-size: 2rem;
             font-weight: 700;
             color: var(--primary);
         }
@@ -165,18 +170,19 @@
         /* Table Section */
         .table-section {
             background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 12px;
+            padding: 2rem;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
         }
         .table-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
         .table-header h2 {
-            font-size: 1.5rem;
+            font-size: 1.6rem;
+            font-weight: 600;
             color: var(--primary);
         }
         .table-actions {
@@ -185,60 +191,70 @@
             align-items: center;
         }
         .search-bar {
+            background: #FFFFFF;
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            padding: 0.5rem 1rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        .search-bar:focus-within {
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(74, 144, 226, 0.2);
+        }
+        .search-bar input {
+            border: none;
+            padding: 0.5rem;
+            font-size: 0.95rem;
+            width: 220px;
+            background: transparent;
+        }
+        .search-bar input:focus { outline: none; }
+        .search-bar i { color: var(--text-primary); }
+        .export-btn {
+            padding: 0.7rem 1.5rem;
+            background: var(--success);
+            color: #FFFFFF;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            background: #FFFFFF;
-            border: 1px solid #E0E0E0;
-            border-radius: 8px;
-            padding: 0.25rem 0.75rem;
-        }
-        .search-bar input {
-            padding: 0.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            width: 200px;
-            transition: all 0.3s ease;
-        }
-        .search-bar input:focus {
-            outline: none;
-            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
-        }
-        .search-bar i {
-            color: var(--text-primary);
-        }
-        .export-btn {
-            padding: 0.6rem 1rem;
-            background: var(--secondary);
-            color: #FFFFFF;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
         .export-btn:hover {
-            background: #00897B;
-            transform: scale(1.05);
+            background: #2F855A;
+            transform: translateY(-2px);
         }
+
+        /* Table */
         .appointments-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
         }
         .appointments-table th,
         .appointments-table td {
-            padding: 1rem;
+            padding: 1.25rem;
             text-align: left;
-            border-bottom: 1px solid #E0E0E0;
+            border-bottom: 1px solid #EDF2F7;
         }
         .appointments-table th {
             background: var(--primary);
             color: #FFFFFF;
             font-weight: 600;
-            cursor: pointer;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .appointments-table th:hover {
             background: #357ABD;
+            cursor: pointer;
+        }
+        .appointments-table tr {
+            transition: background 0.2s ease;
         }
         .appointments-table tr:hover {
             background: var(--hover);
@@ -246,28 +262,34 @@
         .priority-emergency {
             color: var(--danger);
             font-weight: 600;
+            background: #FEE2E2;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
         }
 
         /* Pagination */
         .pagination {
-            margin-top: 1.5rem;
-            text-align: center;
+            margin-top: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .pagination button {
-            padding: 0.5rem 1rem;
-            margin: 0 0.25rem;
+            padding: 0.6rem 1.2rem;
             background: var(--primary);
             color: #FFFFFF;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
         .pagination button:hover:not(:disabled) {
             background: #357ABD;
+            transform: translateY(-2px);
         }
         .pagination button:disabled {
-            background: #E0E0E0;
+            background: #E2E8F0;
+            color: #A0AEC0;
             cursor: not-allowed;
         }
 
@@ -276,8 +298,11 @@
             color: var(--danger);
             padding: 1rem;
             background: #FEE2E2;
-            border-radius: 8px;
-            margin-bottom: 1rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         /* Responsive Design */
@@ -285,15 +310,15 @@
             .sidebar { width: 80px; }
             .sidebar .logo span,
             .sidebar ul li a span { display: none; }
-            .main-content { margin-left: 80px; }
+            .main-content { margin-left: 80px; padding: 1.5rem; }
             .dashboard-grid { grid-template-columns: 1fr; }
-            .table-actions { flex-direction: column; gap: 0.5rem; }
+            .table-actions { flex-direction: column; align-items: flex-start; }
+            .search-bar input { width: 100%; }
         }
         @media (max-width: 480px) {
-            .main-content { padding: 1rem; }
-            .search-bar input { width: 150px; }
+            .header h1 { font-size: 1.5rem; }
             .appointments-table th,
-            .appointments-table td { padding: 0.75rem; font-size: 0.85rem; }
+            .appointments-table td { padding: 0.8rem; font-size: 0.9rem; }
         }
     </style>
 </head>
@@ -313,7 +338,7 @@
         <li><a href="<%=request.getContextPath()%>/ManageDoctorsServlet"><i class="fas fa-user-md"></i><span>Manage Doctors</span></a></li>
         <li><a href="<%=request.getContextPath()%>/ManagePatientsServlet"><i class="fas fa-users"></i><span>Manage Patients</span></a></li>
         <li><a href="<%=request.getContextPath()%>/DoctorScheduleServlet"><i class="fas fa-calendar-alt"></i><span>Doctor Schedule</span></a></li>
-        <li><a href="<%=request.getContextPath()%>/AppointmentServlet"><i class="fas fa-calendar-check"></i><span>Manage Appointments</span></a></li>
+        <li><a href="<%=request.getContextPath()%>/AppointmentServlet"><i class="fas fa-calendar-check"></i><span>Appointments</span></a></li>
         <li><a href="<%=request.getContextPath()%>/DataManagementServlet"><i class="fas fa-database"></i><span>Data Management</span></a></li>
     </ul>
 </div>
@@ -328,7 +353,7 @@
 
     <% if (request.getAttribute("error") != null) { %>
     <div class="error-message">
-        <%= request.getAttribute("error") %>
+        <i class="fas fa-exclamation-circle"></i> <%= request.getAttribute("error") %>
     </div>
     <% } %>
 
@@ -363,7 +388,7 @@
                     <input type="text" id="searchInput" placeholder="Search appointments..." onkeyup="searchTable()">
                     <i class="fas fa-search"></i>
                 </div>
-                <button class="export-btn" onclick="exportTable()">Export to CSV</button>
+                <button class="export-btn" onclick="exportTable()"><i class="fas fa-download"></i> Export</button>
             </div>
         </div>
         <table class="appointments-table" id="appointmentsTable">
@@ -464,7 +489,7 @@
         if (totalPages <= 1) return;
 
         const prevBtn = document.createElement('button');
-        prevBtn.innerText = 'Previous';
+        prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
         prevBtn.disabled = currentPage === 1;
         prevBtn.onclick = () => { currentPage--; showPage(); };
         pagination.appendChild(prevBtn);
@@ -478,7 +503,7 @@
         }
 
         const nextBtn = document.createElement('button');
-        nextBtn.innerText = 'Next';
+        nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
         nextBtn.disabled = currentPage === totalPages;
         nextBtn.onclick = () => { currentPage++; showPage(); };
         pagination.appendChild(nextBtn);
@@ -488,9 +513,14 @@
 
     function showPage() {
         const rows = document.getElementsByClassName('appointment-row');
-        for (let row of rows) {
-            const page = parseInt(row.getAttribute('data-page'));
-            row.style.display = (page === currentPage && row.style.display !== 'none') ? '' : 'none';
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        let visibleCount = 0;
+        for (let i = 0; i < rows.length; i++) {
+            if (rows[i].style.display !== 'none') {
+                rows[i].style.display = (visibleCount >= start && visibleCount < end) ? '' : 'none';
+                visibleCount++;
+            }
         }
         updatePaginationButtons();
     }
@@ -520,7 +550,7 @@
         const csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
         const link = document.createElement('a');
         link.setAttribute('href', encodeURI(csvContent));
-        link.setAttribute('download', 'appointments.csv');
+        link.setAttribute('download', 'appointments_export_' + new Date().toISOString().slice(0,10) + '.csv');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

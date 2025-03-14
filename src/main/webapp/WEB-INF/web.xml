@@ -11,7 +11,14 @@
     <welcome-file>pages/index.jsp</welcome-file>
   </welcome-file-list>
 
-
+  <servlet>
+    <servlet-name>SortServlet</servlet-name>
+    <servlet-class>controller.SortServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>SortServlet</servlet-name>
+    <url-pattern>/SortServlet</url-pattern>
+  </servlet-mapping>
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>controller.LoginServlet</servlet-class>
@@ -27,6 +34,14 @@
   <servlet-mapping>
     <servlet-name>LogoutServlet</servlet-name>
     <url-pattern>/LogoutServlet</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>RegisterServlet</servlet-name>
+    <servlet-class>controller.RegisterServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>RegisterServlet</servlet-name>
+    <url-pattern>/RegisterServlet</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>AdminServlet</servlet-name>

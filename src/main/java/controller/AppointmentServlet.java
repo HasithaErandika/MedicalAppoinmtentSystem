@@ -6,11 +6,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Appointment;
 import service.AppointmentService;
-import service.DoctorAvailabilityService;
 import service.FileHandler;
 import com.google.gson.Gson;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -19,7 +22,7 @@ public class AppointmentServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(AppointmentServlet.class.getName());
 
     private AppointmentService appointmentService;
-    private DoctorAvailabilityService availabilityService;
+    private FileHandler doctorAvailabilityFileHandler;
     private FileHandler doctorFileHandler;
     private FileHandler patientFileHandler;
 
@@ -27,7 +30,7 @@ public class AppointmentServlet extends HttpServlet {
     public void init() throws ServletException {
         String basePath = getServletContext().getRealPath("/data/");
         appointmentService = new AppointmentService(basePath + "appointments.txt");
-        availabilityService = new DoctorAvailabilityService(basePath + "doctors_availability.txt", appointmentService);
+        doctorAvailabilityFileHandler = new FileHandler(basePath + "doctors_availability.txt");
         doctorFileHandler = new FileHandler(basePath + "doctors.txt");
         patientFileHandler = new FileHandler(basePath + "patients.txt");
     }
@@ -72,9 +75,43 @@ public class AppointmentServlet extends HttpServlet {
     private void handleGetTimeSlots(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String doctorId = request.getParameter("doctorId");
         String date = request.getParameter("date");
-        List<String> slots = availabilityService.getAvailableTimeSlots(doctorId, date);
+        List<String> availableSlots = getAvailableTimeSlots(doctorId, date);
+
         response.setContentType("application/json");
-        response.getWriter().write(new Gson().toJson(slots));
+        response.getWriter().write(new Gson().toJson(availableSlots));
+    }
+
+    private List<String> getAvailableTimeSlots(String doctorId, String date) throws IOException {
+        List<String> availabilityLines = doctorAvailabilityFileHandler.readLines();
+        List<String> slots = new ArrayList<>();
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
+
+        // Find availability for the selected doctor and date
+        for (String line : availabilityLines) {
+            String[] parts = line.split(",");
+            if (parts.length == 4 && parts[0].equals(doctorId) && parts[1].equals(date)) {
+                LocalTime startTime = LocalTime.parse(parts[2], timeFormatter);
+                LocalTime endTime = LocalTime.parse(parts[3], timeFormatter);
+
+                LocalTime currentTime = startTime;
+                while (currentTime.isBefore(endTime)) {
+                    slots.add(currentTime.format(timeFormatter));
+                    currentTime = currentTime.plusMinutes(30); // 30-minute intervals
+                }
+                break; // Assuming one availability per doctor per date
+            }
+        }
+
+        // Filter out booked slots
+        List<Appointment> appointments = appointmentService.readAppointments();
+        for (Appointment appt : appointments) {
+            if (appt.getDoctorId().equals(doctorId) && appt.getDateTime().startsWith(date)) {
+                String bookedTime = appt.getDateTime().substring(11);
+                slots.remove(bookedTime);
+            }
+        }
+
+        return slots;
     }
 
     private void handleDefaultGet(HttpServletRequest request, HttpServletResponse response, String action) throws IOException, ServletException {
@@ -108,7 +145,8 @@ public class AppointmentServlet extends HttpServlet {
         boolean isEmergency = "on".equals(request.getParameter("isEmergency"));
         int priority = isEmergency ? 1 : 2;
 
-        if (!availabilityService.isTimeSlotAvailable(doctorId, dateTime)) {
+        List<String> availableSlots = getAvailableTimeSlots(doctorId, date);
+        if (!availableSlots.contains(timeSlot)) {
             throw new Exception("Selected time slot is not available.");
         }
 

@@ -75,39 +75,6 @@
         .message.success { background: #E6F4EA; color: var(--success); }
         .message.error { background: #FEE2E2; color: var(--danger); }
 
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        .form-group label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
-        }
-        .form-group input, .form-group select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
-            outline: none;
-        }
-        .form-group.checkbox {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .form-group.checkbox input { width: auto; }
-
         .btn {
             padding: 0.75rem 1.5rem;
             border: none;
@@ -170,6 +137,68 @@
         tr:hover { background: var(--hover); }
         .priority-emergency { color: var(--accent); font-weight: 600; }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+            outline: none;
+        }
+        .form-group.checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .form-group.checkbox input { width: auto; }
+
         @media (max-width: 768px) {
             .form-grid { grid-template-columns: 1fr; }
             .header {
@@ -195,55 +224,6 @@
         <%= request.getAttribute("message") %>
     </div>
     <% } %>
-
-    <div class="card">
-        <form action="<%=request.getContextPath()%>/AppointmentServlet" method="post" onsubmit="return validateForm()">
-            <input type="hidden" name="action" value="${editAppointment != null ? 'update' : 'add'}">
-            <input type="hidden" name="appointmentId" value="${editAppointment != null ? editAppointment.id : ''}">
-            <div class="form-grid">
-                <div class="form-group">
-                    <label for="patientId">Patient</label>
-                    <select id="patientId" name="patientId" required>
-                        <option value="" disabled selected>Select a patient</option>
-                        <c:forEach var="patient" items="${patients}">
-                            <option value="${patient.split(',')[0]}" ${editAppointment != null && editAppointment.patientId == patient.split(',')[0] ? 'selected' : ''}>
-                                    ${patient.split(',')[2]} (${patient.split(',')[0]})
-                            </option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="doctorId">Doctor</label>
-                    <select id="doctorId" name="doctorId" required onchange="updateTimeSlots()">
-                        <option value="" disabled selected>Select a doctor</option>
-                        <c:forEach var="doctor" items="${doctors}">
-                            <option value="${doctor.split(',')[0]}" ${editAppointment != null && editAppointment.doctorId == doctor.split(',')[0] ? 'selected' : ''}>
-                                    ${doctor.split(',')[2]} (${doctor.split(',')[0]})
-                            </option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="date">Date</label>
-                    <input type="date" id="date" name="date" value="${editAppointment != null ? editAppointment.dateTime.substring(0,10) : ''}" required onchange="updateTimeSlots()" min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
-                </div>
-                <div class="form-group">
-                    <label for="timeSlot">Time Slot</label>
-                    <select id="timeSlot" name="timeSlot" required>
-                        <option value="" disabled selected>Select a time slot</option>
-                        <c:if test="${editAppointment != null}">
-                            <option value="${editAppointment.dateTime.substring(11)}" selected>${editAppointment.dateTime.substring(11)}</option>
-                        </c:if>
-                    </select>
-                </div>
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="isEmergency" name="isEmergency" ${editAppointment != null && editAppointment.priority == 1 ? 'checked' : ''}>
-                    <label for="isEmergency">Emergency</label>
-                </div>
-            </div>
-            <button type="submit" class="btn btn-primary">${editAppointment != null ? 'Update Appointment' : 'Book Appointment'}</button>
-        </form>
-    </div>
 
     <div class="card">
         <h2 style="margin-bottom: 1.5rem;">Current Appointments</h2>
@@ -282,11 +262,7 @@
                                 ${appt.priority == 1 ? 'Emergency' : 'Normal'}
                         </td>
                         <td>
-                            <form action="<%=request.getContextPath()%>/AppointmentServlet" method="get" style="display:inline;">
-                                <input type="hidden" name="action" value="edit">
-                                <input type="hidden" name="appointmentId" value="${appt.id}">
-                                <button type="submit" class="btn btn-edit">Edit</button>
-                            </form>
+                            <button class="btn btn-edit" onclick="openEditModal(${appt.id}, '${appt.patientId}', '${appt.doctorId}', '${appt.dateTime.substring(0,10)}', '${appt.dateTime.substring(11)}', ${appt.priority == 1})">Edit</button>
                             <form action="<%=request.getContextPath()%>/AppointmentServlet" method="post" style="display:inline;" onsubmit="return confirmCancel()">
                                 <input type="hidden" name="action" value="cancel">
                                 <input type="hidden" name="appointmentId" value="${appt.id}">
@@ -301,29 +277,101 @@
     </div>
 </div>
 
-<script>
-    function updateTimeSlots() {
-        const doctorId = document.getElementById('doctorId').value;
-        const date = document.getElementById('date').value;
-        const timeSlotSelect = document.getElementById('timeSlot');
-        timeSlotSelect.innerHTML = '<option value="" disabled selected>Select a time slot</option>';
+<!-- Edit Modal -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeEditModal()">×</span>
+        <h2>Edit Appointment</h2>
+        <form id="editForm" action="<%=request.getContextPath()%>/AppointmentServlet" method="post" onsubmit="return validateForm()">
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" id="appointmentId" name="appointmentId">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="patientId">Patient</label>
+                    <select id="patientId" name="patientId" required>
+                        <option value="" disabled>Select a patient</option>
+                        <c:forEach var="patient" items="${patients}">
+                            <option value="${patient.split(',')[0]}">${patient.split(',')[2]} (${patient.split(',')[0]})</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="doctorId">Doctor</label>
+                    <select id="doctorId" name="doctorId" required onchange="updateTimeSlots()">
+                        <option value="" disabled>Select a doctor</option>
+                        <c:forEach var="doctor" items="${doctors}">
+                            <option value="${doctor.split(',')[0]}">${doctor.split(',')[2]} (${doctor.split(',')[0]})</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date">Date</label>
+                    <input type="date" id="date" name="date" required onchange="updateTimeSlots()" min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
+                </div>
+                <div class="form-group">
+                    <label for="timeSlot">Time Slot</label>
+                    <select id="timeSlot" name="timeSlot" required>
+                        <option value="" disabled>Select a time slot</option>
+                    </select>
+                </div>
+                <div class="form-group checkbox">
+                    <input type="checkbox" id="isEmergency" name="isEmergency">
+                    <label for="isEmergency">Emergency</label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Appointment</button>
+        </form>
+    </div>
+</div>
 
-        if (doctorId && date) {
-            fetch('<%=request.getContextPath()%>/AppointmentServlet?action=getTimeSlots&doctorId=' + doctorId + '&date=' + date)
-                .then(response => response.json())
-                .then(slots => {
-                    slots.forEach(slot => {
-                        const option = document.createElement('option');
-                        option.value = slot;
-                        option.text = slot;
-                        timeSlotSelect.appendChild(option);
+<script>
+    function openEditModal(id, patientId, doctorId, date, timeSlot, isEmergency) {
+        document.getElementById('appointmentId').value = id;
+        document.getElementById('patientId').value = patientId;
+        document.getElementById('doctorId').value = doctorId;
+        document.getElementById('date').value = date;
+        document.getElementById('isEmergency').checked = isEmergency;
+
+        const timeSlotSelect = document.getElementById('timeSlot');
+        timeSlotSelect.innerHTML = '<option value="" disabled>Select a time slot</option>';
+        updateTimeSlots().then(() => {
+            timeSlotSelect.value = timeSlot; // Set the original time slot after fetching
+        });
+
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    function updateTimeSlots() {
+        return new Promise((resolve, reject) => {
+            const doctorId = document.getElementById('doctorId').value;
+            const date = document.getElementById('date').value;
+            const timeSlotSelect = document.getElementById('timeSlot');
+            timeSlotSelect.innerHTML = '<option value="" disabled>Select a time slot</option>';
+
+            if (doctorId && date) {
+                fetch('<%=request.getContextPath()%>/AppointmentServlet?action=getTimeSlots&doctorId=' + doctorId + '&date=' + date)
+                    .then(response => response.json())
+                    .then(slots => {
+                        slots.forEach(slot => {
+                            const option = document.createElement('option');
+                            option.value = slot;
+                            option.text = slot;
+                            timeSlotSelect.appendChild(option);
+                        });
+                        resolve();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching time slots:', error);
+                        reject(error);
                     });
-                    if ('${editAppointment}' && timeSlotSelect.querySelector('option[value="${editAppointment.dateTime.substring(11)}"]')) {
-                        timeSlotSelect.value = '${editAppointment.dateTime.substring(11)}';
-                    }
-                })
-                .catch(error => console.error('Error fetching time slots:', error));
-        }
+            } else {
+                resolve();
+            }
+        });
     }
 
     function validateForm() {
@@ -343,10 +391,10 @@
         return confirm('Are you sure you want to cancel this appointment?');
     }
 
-    // Trigger time slot update on page load if editing
-    window.onload = function() {
-        if ('${editAppointment}') {
-            updateTimeSlots();
+    window.onclick = function(event) {
+        const modal = document.getElementById('editModal');
+        if (event.target === modal) {
+            closeEditModal();
         }
     }
 </script>
