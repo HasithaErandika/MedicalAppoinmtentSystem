@@ -15,7 +15,16 @@ public class Patient {
         this.password = password;
     }
 
-    public String toFileFormat() {
+    // Getters
+    public String getName() { return name; }
+    public int getAge() { return age; }
+    public String getContact() { return contact; }
+    public String getUsername() { return username; }
+    public String getPassword() { return password; }
+
+    // For file storage: Format as a single line
+    @Override
+    public String toString() {
         return name + "," + age + "," + contact + "," + username + "," + password;
     }
 }

@@ -10,9 +10,18 @@ import service.FileHandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AdminServlet extends HttpServlet {
+    private static final Logger logger = Logger.getLogger(AdminServlet.class.getName());
+    private static final String ADMIN_ROLE = "admin";
+    private static final String APPOINTMENTS_FILE = "appointments.txt";
+    private static final String DOCTORS_FILE = "doctors.txt";
+    private static final String PATIENTS_FILE = "patients.txt";
+
     private AppointmentService appointmentService;
     private FileHandler doctorFileHandler;
     private FileHandler patientFileHandler;
@@ -20,36 +29,37 @@ public class AdminServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         String basePath = getServletContext().getRealPath("/data/");
-        System.out.println("Base Path: " + basePath); // Debug path
-        appointmentService = new AppointmentService(basePath + "appointments.txt");
-        doctorFileHandler = new FileHandler(basePath + "doctors.txt");
-        patientFileHandler = new FileHandler(basePath + "patients.txt");
+        logger.info("Base Path: " + basePath);
+        appointmentService = new AppointmentService(basePath + APPOINTMENTS_FILE);
+        doctorFileHandler = new FileHandler(basePath + DOCTORS_FILE);
+        patientFileHandler = new FileHandler(basePath + PATIENTS_FILE);
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = (String) request.getSession().getAttribute("username");
         String role = (String) request.getSession().getAttribute("role");
-        if (username == null || !"admin".equals(role)) {
+        if (username == null || !ADMIN_ROLE.equals(role)) {
             response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=admin");
             return;
         }
 
         try {
             List<Appointment> appointments = appointmentService.readAppointments();
-            System.out.println("Raw Appointments: " + (appointments != null ? appointments : "null")); // Debug raw data
+            logger.info("Raw Appointments: " + (appointments != null ? appointments : "null"));
 
-            int totalAppointments = getTotalAppointments();
-            int totalDoctors = getTotalDoctors();
-            int totalPatients = getTotalPatients();
-            int emergencyQueueSize = getEmergencyQueueSize();
-            List<Appointment> sortedAppointments = getSortedAppointments();
+            int totalAppointments = appointments != null ? appointments.size() : 0;
+            int totalDoctors = doctorFileHandler.readLines().size();
+            int totalPatients = patientFileHandler.readLines().size();
+            int emergencyQueueSize = (int) appointments.stream().filter(appt -> appt.getPriority() == 1).count();
+            List<Appointment> sortedAppointments = new ArrayList<>(appointments);
+            Collections.sort(sortedAppointments, (a, b) -> a.getDateTime().compareTo(b.getDateTime()));
 
-            System.out.println("Total Appointments: " + totalAppointments);
-            System.out.println("Total Doctors: " + totalDoctors);
-            System.out.println("Total Patients: " + totalPatients);
-            System.out.println("Emergency Queue Size: " + emergencyQueueSize);
-            System.out.println("Sorted Appointments: " + (sortedAppointments != null ? sortedAppointments : "null"));
+            logger.info("Total Appointments: " + totalAppointments);
+            logger.info("Total Doctors: " + totalDoctors);
+            logger.info("Total Patients: " + totalPatients);
+            logger.info("Emergency Queue Size: " + emergencyQueueSize);
+            logger.info("Sorted Appointments: " + (sortedAppointments != null ? sortedAppointments : "null"));
 
             request.setAttribute("totalAppointments", totalAppointments);
             request.setAttribute("totalDoctors", totalDoctors);
@@ -57,54 +67,10 @@ public class AdminServlet extends HttpServlet {
             request.setAttribute("emergencyQueueSize", emergencyQueueSize);
             request.setAttribute("sortedAppointments", sortedAppointments);
         } catch (IOException e) {
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Error fetching dashboard data", e);
             request.setAttribute("error", "Error fetching dashboard data: " + e.getMessage());
         }
 
         request.getRequestDispatcher("/pages/adminDashboard.jsp").forward(request, response);
-    }
-
-    private int getTotalAppointments() throws IOException {
-        List<Appointment> appointments = appointmentService.readAppointments();
-        return appointments != null ? appointments.size() : 0;
-    }
-
-    private int getTotalDoctors() throws IOException {
-        List<String> doctors = doctorFileHandler.readLines();
-        return doctors != null ? doctors.size() : 0;
-    }
-
-    private int getTotalPatients() throws IOException {
-        List<String> patients = patientFileHandler.readLines();
-        return patients != null ? patients.size() : 0;
-    }
-
-    private int getEmergencyQueueSize() throws IOException {
-        List<Appointment> appointments = appointmentService.readAppointments();
-        if (appointments == null) return 0;
-        int count = 0;
-        for (Appointment appt : appointments) {
-            if (appt.getPriority() == 1) count++;
-        }
-        return count;
-    }
-
-    private List<Appointment> getSortedAppointments() throws IOException {
-        List<Appointment> appointments = appointmentService.readAppointments();
-        if (appointments == null || appointments.isEmpty()) {
-            System.out.println("No appointments to sort.");
-            return new ArrayList<>();
-        }
-        int n = appointments.size();
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                if (appointments.get(j).getDateTime().compareTo(appointments.get(j + 1).getDateTime()) > 0) {
-                    Appointment temp = appointments.get(j);
-                    appointments.set(j, appointments.get(j + 1));
-                    appointments.set(j + 1, temp);
-                }
-            }
-        }
-        return appointments;
     }
 }

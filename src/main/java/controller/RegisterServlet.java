@@ -38,17 +38,13 @@ public class RegisterServlet extends HttpServlet {
         // Check for duplicate username
         boolean usernameExists = patients.stream().anyMatch(line -> line.split(",")[0].equals(username));
         if (usernameExists) {
-            request.setAttribute("message", "Username already exists. Please choose a different one.");
-            request.setAttribute("messageType", "error");
-            request.getRequestDispatcher("/pages/register.jsp").forward(request, response);
+            setErrorMessage(request, response, "Username already exists. Please choose a different one.");
             return;
         }
 
         // Basic validation (could be expanded)
-        if (username.isEmpty() || password.isEmpty() || name.isEmpty() || email.isEmpty() || phone.isEmpty() || dob.isEmpty()) {
-            request.setAttribute("message", "All fields are required.");
-            request.setAttribute("messageType", "error");
-            request.getRequestDispatcher("/pages/register.jsp").forward(request, response);
+        if (isAnyFieldEmpty(username, password, name, email, phone, dob)) {
+            setErrorMessage(request, response, "All fields are required.");
             return;
         }
 
@@ -61,5 +57,20 @@ public class RegisterServlet extends HttpServlet {
         request.getSession().setAttribute("message", "Registration successful! Please log in.");
         request.getSession().setAttribute("messageType", "success");
         response.sendRedirect(request.getContextPath() + "/login.jsp");
+    }
+
+    private boolean isAnyFieldEmpty(String... fields) {
+        for (String field : fields) {
+            if (field.isEmpty()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void setErrorMessage(HttpServletRequest request, HttpServletResponse response, String message) throws ServletException, IOException {
+        request.setAttribute("message", message);
+        request.setAttribute("messageType", "error");
+        request.getRequestDispatcher("/pages/register.jsp").forward(request, response);
     }
 }

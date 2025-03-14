@@ -45,11 +45,17 @@ This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic fr
 │   │   │   ├── 📁 service                  # Business Logic Layer
 │   │   │   │   ├── AppointmentService.java # Appointment scheduling & sorting (Bubble Sort)
 │   │   │   │   ├── FileHandler.java        # All file read/write CRUD methods
+│   │   │   │   ├── DoctorAvailabilityService.java        # search doctor availability
 │   │   │   ├── 📁 controller               # Servlets (Handles HTTP Requests)
 │   │   │   │   ├── LoginServlet.java       # Handles user/admin login
 │   │   │   │   ├── RegisterServlet.java    # Handles patient registration
 │   │   │   │   ├── AppointmentServlet.java # Handles booking/canceling
 │   │   │   │   ├── AdminServlet.java       # Admin dashboard (view/manage data)
+│   │   │   │   ├── DataManagementServlet.java       
+│   │   │   │   ├── DoctorScheduleServlet.java       
+│   │   │   │   ├── ManageDoctorsServlet.java       
+│   │   │   │   ├── ManagePatientsServlet.java      
+│   │   │   │   ├── UserServlet.java       
 │   │   ├── 📁 webapp                       # All frontend files (UI Pages + Data)
 │   │   │   ├── 📁 pages                    # All JSP Pages
 │   │   │   │   ├── index.jsp               # Home page (like The Odin Project)
@@ -59,7 +65,11 @@ This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic fr
 │   │   │   │   ├── appointment.jsp         # Appointment Booking Page
 │   │   │   │   ├── userProfile.jsp             # Patient profile (view appointments)
 │   │   │   │   ├── error.jsp                # Display errors (invalid login, etc.)
-|   |   |   |   |---register.jsp             # register doctors and users
+│   │   │   │   ├── dataManagement.jsp               
+│   │   │   │   ├── doctorSchedule.jsp                 
+│   │   │   │   ├── manageDoctors.jsp               
+│   │   │   │   ├── managePatients.jsp 
+│   │   │   │   ├── register.jsp                 
 │   │   │   ├── 📁 assets                    # Static files (CSS, JS, Images)
 │   │   │   │   ├── styles.css               # Custom styles
 │   │   │   │   ├── script.js                 # Optional JS
@@ -69,7 +79,8 @@ This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic fr
 │   │   │   │   ├── patients.txt              # Patient records
 │   │   │   │   ├── doctors.txt               # Doctor records
 │   │   │   │   ├── appointments.txt          # Appointments
-│   │   │   │   ├── admins.txt                 # Admin credentials (username/password)
+│   │   │   │   ├── audit.txt                 # Admin credentials (username/password)
+│   │   │   │   ├── doctors_availability.txt        
 │── 📁 target                               # Maven build output (ignore)
 │── 📄 pom.xml                              # Maven Config (dependencies)
 │── 📄 README.md                            # Project description

@@ -7,19 +7,17 @@
     <title>MediSchedule - Your Healthcare Companion</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Light Mode Color Palette */
         :root {
-            --primary: #4A90E2;        /* Soft Blue for trust and professionalism */
-            --secondary: #26A69A;      /* Teal for health and positivity */
-            --accent: #EF5350;         /* Soft Red for alerts or highlights */
-            --bg-light: #F5F6F5;       /* Light Gray for clean backgrounds */
-            --text-primary: #333333;   /* Dark Gray for readable text */
-            --card-bg: #FFFFFF;        /* White for cards */
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Subtle shadow */
-            --register-btn: #66BB6A;   /* Green for registration */
+            --primary: #4A90E2;
+            --secondary: #26A69A;
+            --accent: #EF5350;
+            --bg-light: #F5F6F5;
+            --text-primary: #333333;
+            --card-bg: #FFFFFF;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            --register-btn: #66BB6A;
         }
 
-        /* Reset and Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
@@ -29,7 +27,7 @@
         }
         .container { max-width: 1280px; margin: 0 auto; padding: 0 2rem; }
 
-        /* Navigation */
+        /* Navigation styles remain same */
         nav {
             background: var(--primary);
             position: fixed;
@@ -64,8 +62,6 @@
             border-radius: 25px;
             border: none;
             cursor: pointer;
-            display: flex;
-            gap: 0.5rem;
             transition: all 0.3s ease;
         }
         .register-btn:hover {
@@ -79,8 +75,6 @@
             border-radius: 25px;
             border: none;
             cursor: pointer;
-            display: flex;
-            gap: 0.5rem;
             transition: all 0.3s ease;
         }
         .dropdown-btn:hover {
@@ -111,19 +105,17 @@
             display: block;
             color: var(--text-primary);
             text-decoration: none;
-            transition: all 0.3s ease;
         }
         .dropdown-menu a:hover {
             background: var(--secondary);
             color: #FFFFFF;
         }
 
-        /* Hero Section */
+        /* Hero Section remains same */
         .hero {
             background: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef') center/cover no-repeat;
             padding: 8rem 2rem 6rem;
             position: relative;
-            overflow: hidden;
         }
         .hero::before {
             content: '';
@@ -158,9 +150,6 @@
             border-radius: 25px;
             text-decoration: none;
             font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
             transition: all 0.3s ease;
         }
         .cta-btn:hover {
@@ -168,7 +157,7 @@
             transform: scale(1.05);
         }
 
-        /* Search Section */
+        /* Search Section with Popup */
         .search-section {
             margin: -3rem 2rem 4rem;
             position: relative;
@@ -190,13 +179,12 @@
             gap: 1rem;
         }
         @media (min-width: 768px) {
-            .form-grid { grid-template-columns: repeat(3, 1fr); }
+            .form-grid { grid-template-columns: repeat(4, 1fr); }
         }
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
-            color: var(--text-primary);
         }
         .form-input {
             width: 100%;
@@ -204,7 +192,6 @@
             border: 2px solid #E0E0E0;
             border-radius: 8px;
             transition: all 0.3s ease;
-            font-size: 1rem;
         }
         .form-input:focus {
             border-color: var(--primary);
@@ -218,21 +205,77 @@
             border: none;
             border-radius: 25px;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
             margin: 1rem auto 0;
+            transition: all 0.3s ease;
         }
         .search-btn:hover {
             background: #357ABD;
             transform: translateY(-2px);
         }
 
-        /* Features Section */
-        .features {
-            padding: 4rem 0;
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
         }
+        .popup-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 15px;
+            max-width: 800px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: var(--shadow);
+        }
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 1.5rem;
+            cursor: pointer;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+        }
+        .results-grid {
+            display: grid;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        @media (min-width: 768px) {
+            .results-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        .result-card {
+            background: #f9f9f9;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #eee;
+        }
+        .book-btn {
+            background: var(--secondary);
+            color: #FFFFFF;
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+        .book-btn:hover {
+            background: #00897B;
+        }
+
+        /* Rest of the styles remain same */
+        .features { padding: 4rem 0; }
         .features h2 {
             text-align: center;
             font-size: 2rem;
@@ -263,13 +306,7 @@
             color: var(--secondary);
             margin-bottom: 1rem;
         }
-        .feature-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
-        }
 
-        /* Specialties Section */
         .specialties {
             padding: 4rem 0;
             background: linear-gradient(180deg, var(--bg-light) 70%, rgba(74, 144, 226, 0.05) 100%);
@@ -292,26 +329,15 @@
             border-radius: 15px;
             overflow: hidden;
             box-shadow: var(--shadow);
-            transition: all 0.3s ease;
         }
-        .specialty-card:hover {
-            transform: translateY(-8px);
-        }
+        .specialty-card:hover { transform: translateY(-8px); }
         .specialty-card img {
             width: 100%;
             height: 180px;
             object-fit: cover;
         }
-        .specialty-card-content {
-            padding: 1.5rem;
-        }
-        .specialty-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-            color: var(--text-primary);
-        }
+        .specialty-card-content { padding: 1.5rem; }
 
-        /* Footer */
         footer {
             background: var(--primary);
             color: #FFFFFF;
@@ -328,13 +354,9 @@
             color: #FFFFFF;
             margin-left: 1.5rem;
             text-decoration: none;
-            transition: all 0.3s ease;
         }
-        .footer-links a:hover {
-            color: var(--secondary);
-        }
+        .footer-links a:hover { color: var(--secondary); }
 
-        /* Animation */
         @keyframes slideUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -388,7 +410,7 @@
 
 <section class="search-section">
     <div class="container">
-        <form class="search-form" action="<%=request.getContextPath()%>/UserServlet" method="get">
+        <form class="search-form" id="searchForm" onsubmit="searchDoctors(event)">
             <h2>Find Your Doctor</h2>
             <div class="form-grid">
                 <div class="form-group">
@@ -397,7 +419,7 @@
                         <option value="">All Specialties</option>
                         <option value="cardiology">Cardiology</option>
                         <option value="neurology">Neurology</option>
-                        <option value="pediatrics">Pediatrics</option>
+                        <option value="orthopedics">Orthopedics</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -408,6 +430,14 @@
                     <label for="date">Preferred Date</label>
                     <input type="date" id="date" name="date" class="form-input" required>
                 </div>
+                <div class="form-group">
+                    <label for="time">Preferred Time</label>
+                    <select id="time" name="time" class="form-input">
+                        <option value="">Any Time</option>
+                        <option value="morning">Morning (8:00-12:00)</option>
+                        <option value="afternoon">Afternoon (12:00-17:00)</option>
+                    </select>
+                </div>
             </div>
             <button type="submit" class="search-btn">
                 <i class="fas fa-search"></i> Search Doctors
@@ -415,6 +445,15 @@
         </form>
     </div>
 </section>
+
+<!-- Popup for Results -->
+<div class="popup" id="resultsPopup">
+    <div class="popup-content">
+        <button class="close-btn" onclick="closePopup()">×</button>
+        <h2>Available Doctors</h2>
+        <div class="results-grid" id="resultsContainer"></div>
+    </div>
+</div>
 
 <section class="features">
     <div class="container">
@@ -478,5 +517,85 @@
         </div>
     </div>
 </footer>
+
+<script>
+    // Sample doctor data (in practice, this would come from your servlet)
+    const doctors = [
+        { username: "doctor1", name: "Dr. Smith", specialty: "Cardiology", date: "2025-03-11", startTime: "09:00", endTime: "11:00" },
+        { username: "doctor2", name: "Dr. Johnson", specialty: "Neurology", date: "2025-03-12", startTime: "13:00", endTime: "15:30" },
+        { username: "doctor3", name: "Dr. Williams", specialty: "Orthopedics", date: "2025-03-13", startTime: "10:00", endTime: "12:30" },
+        { username: "doctor4", name: "Dr. Brown", specialty: "Cardiology", date: "2025-03-14", startTime: "08:00", endTime: "10:00" }
+    ];
+
+    function bubbleSort(arr) {
+        let n = arr.length;
+        for (let i = 0; i < n - 1; i++) {
+            for (let j = 0; j < n - i - 1; j++) {
+                if (arr[j].name > arr[j + 1].name) {
+                    [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                }
+            }
+        }
+        return arr;
+    }
+
+    function searchDoctors(event) {
+        event.preventDefault();
+
+        const specialty = document.getElementById('specialty').value;
+        const doctorName = document.getElementById('doctor').value.toLowerCase();
+        const date = document.getElementById('date').value;
+        const time = document.getElementById('time').value;
+
+        let filteredDoctors = doctors.filter(doc => {
+            return (!specialty || doc.specialty.toLowerCase() === specialty) &&
+                (!doctorName || doc.name.toLowerCase().includes(doctorName)) &&
+                (!date || doc.date === date) &&
+                (!time || (
+                    time === 'morning' ?
+                        parseInt(doc.startTime.split(':')[0]) < 12 :
+                        parseInt(doc.startTime.split(':')[0]) >= 12
+                ));
+        });
+
+        // Sort results using bubble sort
+        filteredDoctors = bubbleSort(filteredDoctors);
+
+        // Display results
+        const resultsContainer = document.getElementById('resultsContainer');
+        resultsContainer.innerHTML = '';
+
+        if (filteredDoctors.length === 0) {
+            resultsContainer.innerHTML = '<p>No doctors found matching your criteria.</p>';
+        } else {
+            filteredDoctors.forEach(doc => {
+                const card = `
+                        <div class="result-card">
+                            <h3>${doc.name}</h3>
+                            <p>Specialty: ${doc.specialty}</p>
+                            <p>Date: ${doc.date}</p>
+                            <p>Time: ${doc.startTime} - ${doc.endTime}</p>
+                            <button class="book-btn" onclick="bookAppointment('${doc.username}', '${doc.date}', '${doc.startTime}')">
+                                Book Now
+                            </button>
+                        </div>
+                    `;
+                resultsContainer.innerHTML += card;
+            });
+        }
+
+        document.getElementById('resultsPopup').style.display = 'flex';
+    }
+
+    function closePopup() {
+        document.getElementById('resultsPopup').style.display = 'none';
+    }
+
+    function bookAppointment(username, date, time) {
+        // In a real application, this would send a request to your BookServlet
+        alert(`Booking appointment with ${username} on ${date} at ${time}`);
+        closePopup();
+    }
+</script>
 </body>
 </html>

@@ -9,8 +9,12 @@ import service.FileHandler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DoctorScheduleServlet extends HttpServlet {
+    private static final Logger logger = Logger.getLogger(DoctorScheduleServlet.class.getName());
+
     private FileHandler availabilityFileHandler;
     private FileHandler doctorFileHandler;
 
@@ -22,62 +26,85 @@ public class DoctorScheduleServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<String> availability = availabilityFileHandler.readLines();
-        List<String> doctors = doctorFileHandler.readLines();
-        request.setAttribute("availability", availability);
-        request.setAttribute("doctors", doctors);
-        request.getRequestDispatcher("/pages/doctorSchedule.jsp").forward(request, response);
+        try {
+            List<String> availability = availabilityFileHandler.readLines();
+            List<String> doctors = doctorFileHandler.readLines();
+            request.setAttribute("availability", availability);
+            request.setAttribute("doctors", doctors);
+            request.getRequestDispatcher("/pages/doctorSchedule.jsp").forward(request, response);
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error reading files", e);
+            request.setAttribute("message", "Error: " + e.getMessage());
+            request.setAttribute("messageType", "error");
+            request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
+        }
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-        List<String> availability = availabilityFileHandler.readLines();
-        if (availability == null) availability = new ArrayList<>();
 
-        System.out.println("Action: " + action); // Debug
+        try {
+            List<String> availability = availabilityFileHandler.readLines();
+            if (availability == null) availability = new ArrayList<>();
 
-        if ("add".equals(action)) {
-            String doctorId = request.getParameter("doctorId");
-            String date = request.getParameter("date");
-            String startTime = request.getParameter("startTime");
-            String endTime = request.getParameter("endTime");
-            String slot = String.join(",", doctorId, date, startTime, endTime);
-            boolean exists = availability.contains(slot);
-            if (!exists) {
-                availability.add(slot);
-                System.out.println("Added: " + slot);
+            if ("add".equals(action)) {
+                handleAdd(request, availability);
+            } else if ("remove".equals(action)) {
+                handleRemove(request, availability);
+            } else if ("edit".equals(action)) {
+                handleEdit(request, availability);
             }
-        } else if ("remove".equals(action)) {
-            String doctorId = request.getParameter("doctorId");
-            String date = request.getParameter("date");
-            String startTime = request.getParameter("startTime");
-            String endTime = request.getParameter("endTime");
-            String slot = String.join(",", doctorId, date, startTime, endTime);
-            availability.remove(slot);
-            System.out.println("Removed: " + slot);
-        } else if ("edit".equals(action)) {
-            String originalDoctorId = request.getParameter("originalDoctorId");
-            String originalDate = request.getParameter("originalDate");
-            String originalStartTime = request.getParameter("originalStartTime");
-            String originalEndTime = request.getParameter("originalEndTime");
-            String doctorId = request.getParameter("doctorId");
-            String date = request.getParameter("date");
-            String startTime = request.getParameter("startTime");
-            String endTime = request.getParameter("endTime");
-            String originalSlot = String.join(",", originalDoctorId, originalDate, originalStartTime, originalEndTime);
-            String newSlot = String.join(",", doctorId, date, startTime, endTime);
-            for (int i = 0; i < availability.size(); i++) {
-                if (availability.get(i).equals(originalSlot)) {
-                    availability.set(i, newSlot);
-                    System.out.println("Edited: " + originalSlot + " to " + newSlot);
-                    break;
-                }
+
+            availabilityFileHandler.writeLines(availability);
+            response.sendRedirect(request.getContextPath() + "/DoctorScheduleServlet");
+        } catch (IOException e) {
+            logger.log(Level.SEVERE, "Error updating availability", e);
+            request.setAttribute("message", "Error: " + e.getMessage());
+            request.setAttribute("messageType", "error");
+            request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
+        }
+    }
+
+    private void handleAdd(HttpServletRequest request, List<String> availability) {
+        String slot = getSlot(request);
+        if (!availability.contains(slot)) {
+            availability.add(slot);
+            logger.info("Added: " + slot);
+        }
+    }
+
+    private void handleRemove(HttpServletRequest request, List<String> availability) {
+        String slot = getSlot(request);
+        availability.remove(slot);
+        logger.info("Removed: " + slot);
+    }
+
+    private void handleEdit(HttpServletRequest request, List<String> availability) {
+        String originalSlot = getOriginalSlot(request);
+        String newSlot = getSlot(request);
+        for (int i = 0; i < availability.size(); i++) {
+            if (availability.get(i).equals(originalSlot)) {
+                availability.set(i, newSlot);
+                logger.info("Edited: " + originalSlot + " to " + newSlot);
+                break;
             }
         }
+    }
 
-        availabilityFileHandler.writeLines(availability);
-        System.out.println("Availability after update: " + availability);
-        response.sendRedirect(request.getContextPath() + "/DoctorScheduleServlet");
+    private String getSlot(HttpServletRequest request) {
+        String doctorId = request.getParameter("doctorId");
+        String date = request.getParameter("date");
+        String startTime = request.getParameter("startTime");
+        String endTime = request.getParameter("endTime");
+        return String.join(",", doctorId, date, startTime, endTime);
+    }
+
+    private String getOriginalSlot(HttpServletRequest request) {
+        String originalDoctorId = request.getParameter("originalDoctorId");
+        String originalDate = request.getParameter("originalDate");
+        String originalStartTime = request.getParameter("originalStartTime");
+        String originalEndTime = request.getParameter("originalEndTime");
+        return String.join(",", originalDoctorId, originalDate, originalStartTime, originalEndTime);
     }
 }
