@@ -408,6 +408,7 @@
     </div>
 </header>
 
+
 <section class="search-section">
     <div class="container">
         <form class="search-form" id="searchForm" onsubmit="searchDoctors(event)">
@@ -415,20 +416,21 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="specialty">Specialty</label>
-                    <select id="specialty" name="specialty" class="form-input">
-                        <option value="">All Specialties</option>
-                        <option value="cardiology">Cardiology</option>
-                        <option value="neurology">Neurology</option>
-                        <option value="orthopedics">Orthopedics</option>
+                    <select id="specialty" name="specialty" class="form-input" onchange="updateDoctors()">
+                        <option value="">Select Specialty</option>
                     </select>
                 </div>
                 <div class="form-group">
                     <label for="doctor">Doctor Name</label>
-                    <input type="text" id="doctor" name="doctor" class="form-input" placeholder="e.g., Dr. Smith">
+                    <select id="doctor" name="doctor" class="form-input" onchange="updateDates()">
+                        <option value="">Select Doctor</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="date">Preferred Date</label>
-                    <input type="date" id="date" name="date" class="form-input" required>
+                    <select id="date" name="date" class="form-input">
+                        <option value="">Select Date</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="time">Preferred Time</label>
@@ -454,6 +456,7 @@
         <div class="results-grid" id="resultsContainer"></div>
     </div>
 </div>
+
 
 <section class="features">
     <div class="container">
@@ -518,58 +521,110 @@
     </div>
 </footer>
 
-<script>
-    // Sample doctor data (in practice, this would come from your servlet)
-    const doctors = [
-        { username: "doctor1", name: "Dr. Smith", specialty: "Cardiology", date: "2025-03-11", startTime: "09:00", endTime: "11:00" },
-        { username: "doctor2", name: "Dr. Johnson", specialty: "Neurology", date: "2025-03-12", startTime: "13:00", endTime: "15:30" },
-        { username: "doctor3", name: "Dr. Williams", specialty: "Orthopedics", date: "2025-03-13", startTime: "10:00", endTime: "12:30" },
-        { username: "doctor4", name: "Dr. Brown", specialty: "Cardiology", date: "2025-03-14", startTime: "08:00", endTime: "10:00" }
-    ];
 
-    function bubbleSort(arr) {
-        let n = arr.length;
-        for (let i = 0; i < n - 1; i++) {
-            for (let j = 0; j < n - i - 1; j++) {
-                if (arr[j].name > arr[j + 1].name) {
-                    [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
-                }
-            }
+<script>
+    let allSpecialties = [];
+    let allDoctors = [];
+    let allAvailability = [];
+
+    // Initial load of specialties
+    window.onload = function() {
+        fetch('<%=request.getContextPath()%>/SortServlet')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Initial load:', data);
+                allSpecialties = data.specialties;
+                populateSpecialties();
+            })
+            .catch(error => console.error('Initial load error:', error));
+    };
+
+    function populateSpecialties() {
+        const specialtySelect = document.getElementById('specialty');
+        specialtySelect.innerHTML = '<option value="">Select Specialty</option>';
+        allSpecialties.forEach(specialty => {
+            specialtySelect.innerHTML += `<option value="${specialty}">${specialty}</option>`;
+        });
+    }
+
+    function updateDoctors() {
+        const specialty = document.getElementById('specialty').value;
+        if (!specialty) {
+            document.getElementById('doctor').innerHTML = '<option value="">Select Doctor</option>';
+            updateDates();
+            return;
         }
-        return arr;
+
+        fetch('<%=request.getContextPath()%>/SortServlet?specialty=' + encodeURIComponent(specialty))
+            .then(response => response.json())
+            .then(data => {
+                console.log('Doctors for specialty:', data);
+                allDoctors = data.doctors;
+                const doctorSelect = document.getElementById('doctor');
+                doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+                allDoctors.forEach(doctor => {
+                    doctorSelect.innerHTML += `<option value="${doctor}">${doctor}</option>`;
+                });
+                updateDates(); // Reset dates when doctors change
+            })
+            .catch(error => console.error('Error loading doctors:', error));
+    }
+
+    function updateDates() {
+        const specialty = document.getElementById('specialty').value;
+        const doctor = document.getElementById('doctor').value;
+        const dateSelect = document.getElementById('date');
+
+        if (!specialty || !doctor) {
+            dateSelect.innerHTML = '<option value="">Select Date</option>';
+            return;
+        }
+
+        fetch('<%=request.getContextPath()%>/SortServlet?specialty=' + encodeURIComponent(specialty) +
+            '&doctor=' + encodeURIComponent(doctor))
+            .then(response => response.json())
+            .then(data => {
+                console.log('Availability:', data);
+                allAvailability = data.availability;
+                dateSelect.innerHTML = '<option value="">Select Date</option>';
+                const uniqueDates = [...new Set(allAvailability.map(avail => avail.date))];
+                uniqueDates.forEach(date => {
+                    dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
+                });
+            })
+            .catch(error => console.error('Error loading dates:', error));
     }
 
     function searchDoctors(event) {
         event.preventDefault();
 
         const specialty = document.getElementById('specialty').value;
-        const doctorName = document.getElementById('doctor').value.toLowerCase();
+        const doctor = document.getElementById('doctor').value;
         const date = document.getElementById('date').value;
         const time = document.getElementById('time').value;
 
-        let filteredDoctors = doctors.filter(doc => {
-            return (!specialty || doc.specialty.toLowerCase() === specialty) &&
-                (!doctorName || doc.name.toLowerCase().includes(doctorName)) &&
-                (!date || doc.date === date) &&
-                (!time || (
-                    time === 'morning' ?
-                        parseInt(doc.startTime.split(':')[0]) < 12 :
-                        parseInt(doc.startTime.split(':')[0]) >= 12
-                ));
-        });
+        if (!specialty) {
+            alert('Please select a specialty');
+            return;
+        }
 
-        // Sort results using bubble sort
-        filteredDoctors = bubbleSort(filteredDoctors);
+        fetch('<%=request.getContextPath()%>/SortServlet?' + new URLSearchParams({
+            specialty: specialty,
+            doctor: doctor,
+            date: date,
+            time: time
+        }))
+            .then(response => response.json())
+            .then(data => {
+                console.log('Search results:', data);
+                const resultsContainer = document.getElementById('resultsContainer');
+                resultsContainer.innerHTML = '';
 
-        // Display results
-        const resultsContainer = document.getElementById('resultsContainer');
-        resultsContainer.innerHTML = '';
-
-        if (filteredDoctors.length === 0) {
-            resultsContainer.innerHTML = '<p>No doctors found matching your criteria.</p>';
-        } else {
-            filteredDoctors.forEach(doc => {
-                const card = `
+                if (!data.availability || data.availability.length === 0) {
+                    resultsContainer.innerHTML = '<p>No doctors found matching your criteria.</p>';
+                } else {
+                    data.availability.forEach(doc => {
+                        const card = `
                         <div class="result-card">
                             <h3>${doc.name}</h3>
                             <p>Specialty: ${doc.specialty}</p>
@@ -580,11 +635,16 @@
                             </button>
                         </div>
                     `;
-                resultsContainer.innerHTML += card;
+                        resultsContainer.innerHTML += card;
+                    });
+                }
+                document.getElementById('resultsPopup').style.display = 'flex';
+            })
+            .catch(error => {
+                console.error('Search error:', error);
+                document.getElementById('resultsContainer').innerHTML = '<p>Error loading results. Please try again.</p>';
+                document.getElementById('resultsPopup').style.display = 'flex';
             });
-        }
-
-        document.getElementById('resultsPopup').style.display = 'flex';
     }
 
     function closePopup() {
@@ -592,9 +652,22 @@
     }
 
     function bookAppointment(username, date, time) {
-        // In a real application, this would send a request to your BookServlet
-        alert(`Booking appointment with ${username} on ${date} at ${time}`);
-        closePopup();
+        console.log('Booking:', { username, date, time });
+        fetch('<%=request.getContextPath()%>/AppointmentServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: username, date: date, time: time })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Appointment booked successfully!');
+                    closePopup();
+                } else {
+                    alert('Failed to book appointment: ' + data.message);
+                }
+            })
+            .catch(error => console.error('Booking error:', error));
     }
 </script>
 </body>

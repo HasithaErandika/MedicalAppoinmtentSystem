@@ -1,14 +1,13 @@
+package controller;
+
 import java.io.*;
 import java.util.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.servlet.annotation.WebServlet;
+import jakarta.servlet.*;
+import jakarta.servlet.http.*;
 import com.google.gson.Gson;
 
-@WebServlet("/SortServlet")
 public class SortServlet extends HttpServlet {
 
-    // Doctor class to hold doctor information
     static class Doctor implements Comparable<Doctor> {
         String username;
         String name;
@@ -36,54 +35,88 @@ public class SortServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Set response type to JSON
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
-        // Get search parameters
         String specialty = request.getParameter("specialty");
         String doctorName = request.getParameter("doctor");
         String date = request.getParameter("date");
         String time = request.getParameter("time");
 
-        // Load and filter doctors
-        List<Doctor> doctors = loadDoctors();
-        List<Doctor> filteredDoctors = filterDoctors(doctors, specialty, doctorName, date, time);
+        // Load data
+        Map<String, List<String>> specialtyDoctors = loadSpecialtiesAndDoctors(request);
+        List<Doctor> allDoctors = loadDoctors(request);
 
-        // Sort using bubble sort
-        bubbleSort(filteredDoctors);
+        // Prepare response
+        Map<String, Object> responseData = new HashMap<>();
+        responseData.put("specialties", new ArrayList<>(specialtyDoctors.keySet()));
 
-        // Convert to JSON and send response
+        if (specialty == null || specialty.isEmpty()) {
+            responseData.put("doctors", new ArrayList<>());
+            responseData.put("availability", new ArrayList<>());
+        } else {
+            List<String> doctorsForSpecialty = specialtyDoctors.getOrDefault(specialty, new ArrayList<>());
+            responseData.put("doctors", doctorsForSpecialty);
+
+            List<Doctor> filteredDoctors = filterDoctors(allDoctors, specialty, doctorName, date, time);
+            bubbleSort(filteredDoctors);
+            responseData.put("availability", filteredDoctors);
+        }
+
         Gson gson = new Gson();
-        String jsonResponse = gson.toJson(filteredDoctors);
+        String jsonResponse = gson.toJson(responseData);
         PrintWriter out = response.getWriter();
         out.print(jsonResponse);
         out.flush();
     }
 
-    private List<Doctor> loadDoctors() {
-        List<Doctor> doctors = new ArrayList<>();
+    private Map<String, List<String>> loadSpecialtiesAndDoctors(HttpServletRequest request) {
+        Map<String, List<String>> specialtyDoctors = new HashMap<>();
+        String doctorsPath = request.getServletContext().getRealPath("/data/doctors.txt");
 
-        // Load doctor details
-        Map<String, String[]> doctorDetails = new HashMap<>();
-        try (BufferedReader br = new BufferedReader(new FileReader(getServletContext().getRealPath("/WEB-INF/doctors.txt")))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(doctorsPath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                doctorDetails.put(parts[0], new String[]{parts[2], parts[3]}); // username -> [name, specialty]
+                if (parts.length >= 4) {
+                    String specialty = parts[3].trim();
+                    String doctorName = parts[2].trim();
+                    specialtyDoctors.computeIfAbsent(specialty, k -> new ArrayList<>()).add(doctorName);
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return specialtyDoctors;
+    }
+
+    private List<Doctor> loadDoctors(HttpServletRequest request) {
+        List<Doctor> doctors = new ArrayList<>();
+        Map<String, String[]> doctorDetails = new HashMap<>();
+        String doctorsPath = request.getServletContext().getRealPath("/data/doctors.txt");
+
+        try (BufferedReader br = new BufferedReader(new FileReader(doctorsPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 4) {
+                    doctorDetails.put(parts[0], new String[]{parts[2], parts[3]});
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        // Load availability and combine with doctor details
-        try (BufferedReader br = new BufferedReader(new FileReader(getServletContext().getRealPath("/WEB-INF/doctors_availability.txt")))) {
+        String availabilityPath = request.getServletContext().getRealPath("/data/doctors_availability.txt");
+        try (BufferedReader br = new BufferedReader(new FileReader(availabilityPath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                String[] details = doctorDetails.get(parts[0]);
-                if (details != null) {
-                    doctors.add(new Doctor(parts[0], details[0], details[1], parts[1], parts[2], parts[3]));
+                if (parts.length >= 4) {
+                    String[] details = doctorDetails.get(parts[0]);
+                    if (details != null) {
+                        doctors.add(new Doctor(parts[0], details[0], details[1], parts[1], parts[2], parts[3]));
+                    }
                 }
             }
         } catch (IOException e) {
@@ -103,8 +136,7 @@ public class SortServlet extends HttpServlet {
             if (specialty != null && !specialty.isEmpty() && !doc.specialty.equalsIgnoreCase(specialty)) {
                 matches = false;
             }
-            if (doctorName != null && !doctorName.isEmpty() &&
-                    !doc.name.toLowerCase().contains(doctorName.toLowerCase())) {
+            if (doctorName != null && !doctorName.isEmpty() && !doc.name.equalsIgnoreCase(doctorName)) {
                 matches = false;
             }
             if (date != null && !date.isEmpty() && !doc.date.equals(date)) {
@@ -131,7 +163,6 @@ public class SortServlet extends HttpServlet {
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
                 if (doctors.get(j).compareTo(doctors.get(j + 1)) > 0) {
-                    // Swap doctors
                     Doctor temp = doctors.get(j);
                     doctors.set(j, doctors.get(j + 1));
                     doctors.set(j + 1, temp);
