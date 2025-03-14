@@ -1,12 +1,29 @@
 package controller;
 
-import java.io.*;
-import java.util.*;
-import jakarta.servlet.*;
-import jakarta.servlet.http.*;
 import com.google.gson.Gson;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SortServlet extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(SortServlet.class.getName());
+
+    private static final String DOCTORS_FILE = "/data/doctors.txt";
+    private static final String AVAILABILITY_FILE = "/data/doctors_availability.txt";
+    private static final String NAME = "name";
+    private static final String SPECIALTY = "specialty";
+    private static final String MORNING = "morning";
+    private static final String AFTERNOON = "afternoon";
+    private static final String EVENING = "evening";
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     static class Doctor implements Comparable<Doctor> {
         String username;
@@ -27,7 +44,11 @@ public class SortServlet extends HttpServlet {
 
         @Override
         public int compareTo(Doctor other) {
-            return this.name.compareToIgnoreCase(other.name); // Case-insensitive sorting by name
+            int nameComparison = this.name.compareToIgnoreCase(other.name);
+            if (nameComparison != 0) return nameComparison;
+            int specialtyComparison = this.specialty.compareToIgnoreCase(other.specialty);
+            if (specialtyComparison != 0) return specialtyComparison;
+            return this.date.compareTo(other.date);
         }
     }
 
@@ -73,10 +94,9 @@ public class SortServlet extends HttpServlet {
         out.flush();
     }
 
-    // Load doctor details: username -> {name, specialty}
-    private Map<String, Map<String, String>> loadDoctorDetails(HttpServletRequest request) {
+    private Map<String, Map<String, String>> loadDoctorDetails(HttpServletRequest request) throws ServletException {
         Map<String, Map<String, String>> doctorDetails = new HashMap<>();
-        String doctorsPath = request.getServletContext().getRealPath("/data/doctors.txt");
+        String doctorsPath = request.getServletContext().getRealPath(DOCTORS_FILE);
 
         try (BufferedReader br = new BufferedReader(new FileReader(doctorsPath))) {
             String line;
@@ -84,32 +104,31 @@ public class SortServlet extends HttpServlet {
                 String[] parts = line.split(",");
                 if (parts.length >= 4) {
                     Map<String, String> details = new HashMap<>();
-                    details.put("name", parts[2].trim());
-                    details.put("specialty", parts[3].trim());
+                    details.put(NAME, parts[2].trim());
+                    details.put(SPECIALTY, parts[3].trim());
                     doctorDetails.put(parts[0].trim(), details);
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading doctor details from " + DOCTORS_FILE, e);
+            throw new ServletException("Error loading doctor details", e); //Propagate error to container
         }
         return doctorDetails;
     }
 
-    // Map specialties to doctor names
     private Map<String, List<String>> loadSpecialtiesAndDoctors(Map<String, Map<String, String>> doctorDetails) {
         Map<String, List<String>> specialtyDoctors = new HashMap<>();
         for (Map.Entry<String, Map<String, String>> entry : doctorDetails.entrySet()) {
-            String specialty = entry.getValue().get("specialty");
-            String doctorName = entry.getValue().get("name");
+            String specialty = entry.getValue().get(SPECIALTY);
+            String doctorName = entry.getValue().get(NAME);
             specialtyDoctors.computeIfAbsent(specialty, k -> new ArrayList<>()).add(doctorName);
         }
         return specialtyDoctors;
     }
 
-    // Load full doctor availability
-    private List<Doctor> loadDoctors(HttpServletRequest request, Map<String, Map<String, String>> doctorDetails) {
+    private List<Doctor> loadDoctors(HttpServletRequest request, Map<String, Map<String, String>> doctorDetails) throws ServletException {
         List<Doctor> doctors = new ArrayList<>();
-        String availabilityPath = request.getServletContext().getRealPath("/data/doctors_availability.txt");
+        String availabilityPath = request.getServletContext().getRealPath(AVAILABILITY_FILE);
 
         try (BufferedReader br = new BufferedReader(new FileReader(availabilityPath))) {
             String line;
@@ -120,8 +139,8 @@ public class SortServlet extends HttpServlet {
                     if (details != null) {
                         doctors.add(new Doctor(
                                 parts[0].trim(),         // username
-                                details.get("name"),     // name
-                                details.get("specialty"), // specialty
+                                details.get(NAME),     // name
+                                details.get(SPECIALTY), // specialty
                                 parts[1].trim(),         // date
                                 parts[2].trim(),         // startTime
                                 parts[3].trim()          // endTime
@@ -130,7 +149,8 @@ public class SortServlet extends HttpServlet {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Error loading doctors from " + AVAILABILITY_FILE, e);
+            throw new ServletException("Error loading doctor availability", e); //Propagate error to container
         }
         return doctors;
     }
@@ -153,9 +173,11 @@ public class SortServlet extends HttpServlet {
             }
             if (time != null && !time.isEmpty()) {
                 int startHour = Integer.parseInt(doc.startTime.split(":")[0]);
-                if (time.equals("morning") && (startHour < 8 || startHour >= 12)) {
+                if (time.equalsIgnoreCase("morning") && (startHour < 8 || startHour >= 12)) {
                     matches = false;
-                } else if (time.equals("afternoon") && (startHour < 12 || startHour >= 17)) {
+                } else if (time.equalsIgnoreCase("afternoon") && (startHour < 12 || startHour >= 17)) {
+                    matches = false;
+                } else if (time.equalsIgnoreCase("evening") && (startHour < 17)) {
                     matches = false;
                 }
             }
@@ -165,5 +187,16 @@ public class SortServlet extends HttpServlet {
             }
         }
         return filtered;
+    }
+
+    private boolean isValidDate(String date) {
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
+        sdf.setLenient(false);  // Strict date checking
+        try {
+            sdf.parse(date);
+            return true;
+        } catch (ParseException e) {
+            return false;
+        }
     }
 }
