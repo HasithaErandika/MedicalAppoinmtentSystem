@@ -1,0 +1,279 @@
+[33mcommit e0108ef50406a5152962006d611dd817b7986cef[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m)[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Mar 14 21:19:00 2025 +0530
+
+    Sorting Alg
+
+[33mcommit 18af25da1f120efaff69dfe6de7b457d1d4b3de1[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Mar 14 20:37:48 2025 +0530
+
+    Updated 2.6
+
+[33mcommit 86d5fcf4d70cf2f31951b6cffeaabd5481087cb3[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Mar 14 18:46:50 2025 +0530
+
+    Updated 2.5
+
+[33mcommit 7888b07e46818c8883421df8adf049e65de4d020[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Mar 14 18:34:26 2025 +0530
+
+    Updated 2.5
+
+[33mcommit 97cad13dfe03d4e58fe3642c41193cdbcc435d77[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Mar 14 13:11:25 2025 +0530
+
+    Updated 2.5
+
+[33mcommit 9bcd3e0f1ff2628738f0bd5aa076aa39a43d83bc[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 11 10:14:08 2025 +0530
+
+    Updated 2.4
+
+[33mcommit 34972d51d4cb1c22cedf7aed895f5ac8c4222410[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Mon Mar 10 12:32:13 2025 +0530
+
+    Updated 2.3
+
+[33mcommit f018759769805e69ceb8c824c45da7606be94c7c[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Mon Mar 10 11:29:34 2025 +0530
+
+    Updated 2.3
+
+[33mcommit 7129a06101649ec83bec98c51202c735c84126d9[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Mon Mar 10 10:34:09 2025 +0530
+
+    Updated 2.2
+
+[33mcommit d8e3f199d1621bea6e3607b5cc2abefb2215f16b[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Mon Mar 10 09:35:27 2025 +0530
+
+    Updated 2.1
+
+[33mcommit 98928bf7898239b9b74875e0649d82608b032861[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Mon Mar 10 08:50:12 2025 +0530
+
+    Updated 2.0
+
+[33mcommit b77f9481a997a7372451489943a004e5dafe69e1[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Wed Mar 5 11:40:25 2025 +0530
+
+    Updated 2.0
+
+[33mcommit 460125e2ada6a8e37c469ff88df8f215e408966a[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 19:05:27 2025 +0530
+
+    Updated
+
+[33mcommit e4f5df15e4caad66fcd582b2ae10b0de75cad9c9[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 18:40:36 2025 +0530
+
+    Admin dashboard creation and update logging and logout handlings
+
+[33mcommit fed1237f61a78689b472f4581ced888909deee24[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 18:30:15 2025 +0530
+
+    Updated
+
+[33mcommit d8dc74c3be4be734e9dfc15004951b987d55bcb1[m
+Merge: d3c390c c725297
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 17:40:05 2025 +0530
+
+    Merge remote-tracking branch 'origin/master'
+    
+    # Conflicts:
+    #       README.md
+
+[33mcommit d3c390c78e715dcb09f8c182d7cb56b635386de0[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 17:39:41 2025 +0530
+
+    Making the basic dashboards... Need to implement more
+
+[33mcommit c7252979b8c83c030c390bd4f4714b2544ca4f27[m
+Author: Hasitha Erandika <165554609+HasithaErandika@users.noreply.github.com>
+Date:   Tue Mar 4 17:38:44 2025 +0530
+
+    Create README.md
+
+[33mcommit 014ca5c3e8580128713dae9fad5c41b8a6734a5b[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 17:32:00 2025 +0530
+
+    Making the basic dashboards... Need to implement more
+
+[33mcommit 5688a4f2d08e83a26593f277dbadf1a8910b6c9c[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 17:10:39 2025 +0530
+
+    Config the backend logging
+
+[33mcommit 55ea4974269ec5c57626efcc97e8b63bf4e36c5f[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 16:42:04 2025 +0530
+
+    add data manually to the text files
+
+[33mcommit 408b4ad90a9268a4b1150e4efa32f2a07b8904a8[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 16:41:44 2025 +0530
+
+    Create the doctor dashboard
+
+[33mcommit aa934f1b2bca72911536aaac6ac050ee10035380[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 16:41:29 2025 +0530
+
+    Create new file to save admins
+
+[33mcommit 5df85f956793b6911e8d19c7318da22a1a3506ad[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 16:41:03 2025 +0530
+
+    Set up to hosting by TomCat Server Login, POM,WEB XML files
+
+[33mcommit e3f17df8ee2c8617be17bf394ef0a3ab52080ae3[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 15:14:20 2025 +0530
+
+    assemble the structurul parts of index.jsp
+
+[33mcommit 4a990dd5813715008df9731dd9774f1bde418ef9[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Tue Mar 4 08:49:32 2025 +0530
+
+    assemble the structurul parts of index.jsp
+
+[33mcommit 77e09001a37a7b06d1a83fb82e121a82fbc7ab05[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:25:57 2025 +0530
+
+    making the basic index page
+
+[33mcommit 2ea38813c3ede410a76f3aca7c8fbf7f83e71ff0[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:15:28 2025 +0530
+
+    encodings
+
+[33mcommit 0a00f03e8d0b05ad6c0354853b0f494de0be2cd6[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:15:13 2025 +0530
+
+    encodings
+
+[33mcommit 358a2108459d103a8e4691d24ae339523f2d1891[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:14:59 2025 +0530
+
+    Patient registration
+
+[33mcommit 427763cae1b96061959f1e3c4c0602104aa9b75b[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:14:45 2025 +0530
+
+    Custom styles
+
+[33mcommit 84ec1541d2217a762bac2fdc20cd13120203fe2b[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:14:27 2025 +0530
+
+    Patient profile page
+
+[33mcommit e420db00462a57576d3869736897bdcc7e850e4b[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:14:16 2025 +0530
+
+    Login page (User/Admin switch)
+
+[33mcommit e906619d19eb0bb651e51dba23a5b40166baf7b3[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:14:06 2025 +0530
+
+    Patient class
+
+[33mcommit a3daa08e48a89b0f484257f282704eed74fbefda[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:13:54 2025 +0530
+
+    Login process (User/Admin)
+
+[33mcommit 04a93ff39f7288b71fa261ed7592e4026b778470[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:13:39 2025 +0530
+
+    File read/write logic (CRUD operations)
+
+[33mcommit 8fb99312703f1b602f3f2a56705e4f8332b58ebe[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:13:23 2025 +0530
+
+    Appointment scheduling logic
+
+[33mcommit 2cba63fc03dd0693de14f332187bacef6b6078f7[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:13:06 2025 +0530
+
+    Book/Cancel appointments
+
+[33mcommit c48f86e143c3bb8f644af6e04fad769a27d9e890[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:12:55 2025 +0530
+
+    Doctor class
+
+[33mcommit 7563a281c85ee13134f254ead23ec3bfab5047ad[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:12:34 2025 +0530
+
+    Admin Dashboard
+
+[33mcommit 0cc30ed5f5f348523c9c2c69104ead146a1cf87a[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:12:09 2025 +0530
+
+    Any custom JavaScript
+
+[33mcommit d33f1bfb964bfe4ec07fa05657d2a7bc5e7729b4[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:11:54 2025 +0530
+
+    Data Storage (Text Files inside webapp)
+
+[33mcommit 2211b28bcc8cd4446bcea7a3a9d59b2fc9721553[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:11:30 2025 +0530
+
+    Appointment Booking Form
+
+[33mcommit 7962cc0109fa58dd4a3326aabe126d2ca1bebb65[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:11:16 2025 +0530
+
+    Book/Cancel appointments
+
+[33mcommit 5a06c7c2922a09e54251b850106c7635b4e9e6b7[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 20:10:53 2025 +0530
+
+    Admin dashboard actions
+
+[33mcommit 21244fd50adeaffd084e75bd7f790ddd2e3d1535[m
+Author: Hasitha Erandika <wickramasinghe.erandika@gmail.com>
+Date:   Fri Feb 28 18:13:25 2025 +0530
+
+    Initialize
