@@ -28,3 +28,4 @@ patient27,pass789,Samith Abeykoon,patient27@hospital.net,0778449061,2002-01-08
 patient28,pass890,Vidura Weerasinghe,patient28@hospital.net,0778449062,1976-03-19
 patient29,pass901,Isuru Liyanage,patient29@hospital.net,0778449063,1989-09-03
 patient30,pass012,Kavindi Jayasundara,patient310@hospital.net,0778449064,1995-12-25
+patient31,Pass123456,Hasitha Erandika,admin@a2zengineering.net,0778449035,2005-01-11

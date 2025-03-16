@@ -1,36 +1,23 @@
+
+---
+
 # Medical Appointment Scheduling System
 
-## Project Overview
-The **Medical Appointment Scheduling System** is a web-based application designed to streamline the process of booking and managing medical appointments. It allows **patients** to register, log in, and schedule appointments with doctors, while **admins** can oversee all users, doctors, and appointments. The system uses **file handling** for data storage (no database) and incorporates **priority queues** for emergency appointments and **bubble sort** for organizing appointment schedules.
+## Overview
+The **Medical Appointment Scheduling System** is a web-based application developed as a 1st-year, 2nd-semester student project using Java Servlets and JSPs. It enables patients to book medical appointments, admins to manage system data, and incorporates priority queues for emergency scheduling and bubble sort for ordering appointments—all without a database, using plain text files for storage.
 
-This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic frontends, and basic algorithms, making it an excellent showcase of full-stack development skills.
+### Key Features
+- **Role-Based Access**: Supports Patients (book appointments), Admins (manage system), and placeholder for Doctors.
+- **Appointment Management**: Book, edit, cancel appointments with priority (emergency vs. normal).
+- **Doctor Availability**: Admins manage doctor schedules; patients see available slots.
+- **File-Based Storage**: Data stored in `.txt` files (patients, doctors, appointments).
+- **Sorting**: Uses bubble sort to order appointments by date/time.
+- **Priority Queues**: Prioritizes emergency appointments using `PriorityQueue`.
 
----
-
-## Features
-
-### Patient Features
-- Register and log in to the system.
-- Book appointments with available doctors by selecting date and time.
-- Cancel existing appointments.
-- View personal appointment history.
-
-### Admin Features
-- Log in with admin credentials.
-- Manage doctors (add, edit, remove).
-- View and sort all appointments by date/time using bubble sort.
-- Search appointments by patient name or date.
-- Prioritize emergency appointments using a priority queue.
-
-### Doctor Features (Optional)
-- View personal appointment schedule.
-
-### Technical Highlights
-- **File-Based Storage**: Data stored in `patients.txt`, `doctors.txt`, and `appointments.txt`.
-- **Priority Queue**: Ensures critical patients are scheduled first.
-- **Bubble Sort**: Orders appointments chronologically for admin views.
-
----
+### Project Goals
+- Implement **priority queues** to handle emergency appointments.
+- Use **bubble sort** for sorting appointments (academic requirement).
+- Demonstrate **file handling** for CRUD operations without a database.
 
 ## Project Structure
 ```
@@ -41,65 +28,105 @@ This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic fr
 │   │   │   ├── 📁 model                   # Data/Entity Classes (Encapsulation + OOP)
 │   │   │   │   ├── Patient.java           # Patient details (id, name, age, etc.)
 │   │   │   │   ├── Doctor.java            # Doctor details (name, specialization)
-│   │   │   │   ├── Appoinment.java       # Appointment object (priority, time, doctor, patient)
+│   │   │   │   ├── Appointment.java       # Appointment object (priority, time, doctor, patient)
 │   │   │   ├── 📁 service                  # Business Logic Layer
 │   │   │   │   ├── AppointmentService.java # Appointment scheduling & sorting (Bubble Sort)
 │   │   │   │   ├── FileHandler.java        # All file read/write CRUD methods
-│   │   │   │   ├── DoctorAvailabilityService.java        # search doctor availability
+│   │   │   │   ├── DoctorAvailabilityService.java # Search doctor availability
+│   │   │   │   ├── BackupService.java    # Get a back up from the Admin Panel
+│   │   │   │   ├── AuditService.java # Make Audits
 │   │   │   ├── 📁 controller               # Servlets (Handles HTTP Requests)
 │   │   │   │   ├── LoginServlet.java       # Handles user/admin login
 │   │   │   │   ├── RegisterServlet.java    # Handles patient registration
 │   │   │   │   ├── AppointmentServlet.java # Handles booking/canceling
 │   │   │   │   ├── AdminServlet.java       # Admin dashboard (view/manage data)
-│   │   │   │   ├── DataManagementServlet.java       
-│   │   │   │   ├── DoctorScheduleServlet.java       
-│   │   │   │   ├── ManageDoctorsServlet.java       
-│   │   │   │   ├── ManagePatientsServlet.java      
-│   │   │   │   ├── UserServlet.java       
+│   │   │   │   ├── DataManagementServlet.java # Backup and log management
+│   │   │   │   ├── DoctorScheduleServlet.java # Doctor availability management
+│   │   │   │   ├── ManageDoctorsServlet.java  # CRUD for doctors
+│   │   │   │   ├── ManagePatientsServlet.java # CRUD for patients
+│   │   │   │   ├── UserServlet.java        # Patient dashboard
 │   │   ├── 📁 webapp                       # All frontend files (UI Pages + Data)
 │   │   │   ├── 📁 pages                    # All JSP Pages
-│   │   │   │   ├── index.jsp               # Home page (like The Odin Project)
-│   │   │   │   ├── login.jsp               # Combined Login page (User/Admin)
-│   │   │   │   ├── adminDashboard.jsp           # Admin Dashboard
-│   │   │   │   ├── doctorDashboard.jsp     # Doctor Dashboard (if needed)
-│   │   │   │   ├── appointment.jsp         # Appointment Booking Page
-│   │   │   │   ├── userProfile.jsp             # Patient profile (view appointments)
-│   │   │   │   ├── error.jsp                # Display errors (invalid login, etc.)
-│   │   │   │   ├── dataManagement.jsp               
-│   │   │   │   ├── doctorSchedule.jsp                 
-│   │   │   │   ├── manageDoctors.jsp               
-│   │   │   │   ├── managePatients.jsp 
-│   │   │   │   ├── register.jsp                 
-│   │   │   ├── 📁 assets                    # Static files (CSS, JS, Images)
-│   │   │   │   ├── styles.css               # Custom styles
-│   │   │   │   ├── script.js                 # Optional JS
+│   │   │   │   ├── index.jsp               # Home page (doctor search)
+│   │   │   │   ├── login.jsp               # Combined login page (user/admin)
+│   │   │   │   ├── adminDashboard.jsp      # Admin dashboard
+│   │   │   │   ├── doctorDashboard.jsp     # Doctor dashboard (placeholder)
+│   │   │   │   ├── appointment.jsp         # Appointment management
+│   │   │   │   ├── userProfile.jsp         # Patient profile (view appointments)
+│   │   │   │   ├── error.jsp               # Display errors
+│   │   │   │   ├── dataManagement.jsp      # Backup and audit logs
+│   │   │   │   ├── doctorSchedule.jsp      # Doctor schedule management
+│   │   │   │   ├── manageDoctors.jsp       # Manage doctor records
+│   │   │   │   ├── managePatients.jsp      # Manage patient records
+│   │   │   │   ├── register.jsp            # Patient registration
+│   │   │   ├── 📁 assets                   # Static files (CSS, JS, Images)
+│   │   │   │   ├── styles.css              # Custom styles
+│   │   │   │   ├── script.js               # Optional JS
 │   │   │   ├── WEB-INF
-│   │   │   │   ├── web.xml                   # Servlet Mappings
-│   │   │   ├── 📁 data                      # All system data (stored in plain files)
-│   │   │   │   ├── patients.txt              # Patient records
-│   │   │   │   ├── doctors.txt               # Doctor records
-│   │   │   │   ├── appointments.txt          # Appointments
-│   │   │   │   ├── audit.txt                 # Admin credentials (username/password)
-│   │   │   │   ├── doctors_availability.txt        
+│   │   │   │   ├── web.xml                 # Servlet mappings
+│   │   │   ├── 📁 data                     # All system data (stored in plain files)
+│   │   │   │   ├── patients.txt            # Patient records
+│   │   │   │   ├── doctors.txt             # Doctor records
+│   │   │   │   ├── appointments.txt        # Appointments
+│   │   │   │   ├── audit.txt               # Admin credentials and logs
+│   │   │   │   ├── doctors_availability.txt # Doctor schedules
 │── 📁 target                               # Maven build output (ignore)
 │── 📄 pom.xml                              # Maven Config (dependencies)
-│── 📄 README.md                            # Project description
+│── 📄 README.md                            # This file
 │── 📄 report.pdf                           # Final documentation (diagrams + Git log)
 │── 📄 .gitignore                           # Ignore files like target/, .idea/
 ```
 
+## Technologies Used
+- **Backend**: Java (Servlets, JSTL)
+- **Frontend**: JSP, HTML, CSS, JavaScript (AJAX, modals)
+- **Build Tool**: Maven
+- **Storage**: Plain text files (`.txt`)
+- **External Libraries**: Font Awesome (icons)
 
----
+## How It Works
+
+### User Roles and Flow
+1. **Patients**:
+    - **Register**: Via `register.jsp` → `RegisterServlet` → `patients.txt`.
+    - **Login**: Via `login.jsp` → `LoginServlet`.
+    - **Book Appointment**: Via `userProfile.jsp` or `index.jsp` → `AppointmentServlet`.
+    - **View Appointments**: On `userProfile.jsp`.
+
+2. **Admins**:
+    - **Login**: Via `login.jsp` → `LoginServlet` (checks `audit.txt`).
+    - **Dashboard**: `adminDashboard.jsp` → `AdminServlet` (stats, sorted appointments).
+    - **Manage Appointments**: `appointment.jsp` → `AppointmentServlet`.
+    - **Manage Doctors**: `manageDoctors.jsp` → `ManageDoctorsServlet`.
+    - **Manage Patients**: `managePatients.jsp` → `ManagePatientsServlet`.
+    - **Set Schedules**: `doctorSchedule.jsp` → `DoctorScheduleServlet`.
+    - **Data Management**: `dataManagement.jsp` → `DataManagementServlet` (backups, logs).
+
+3. **Doctors**:
+    - No direct UI; availability managed by admins.
+
+### Data Flow
+- **Frontend**: JSPs send HTTP requests to servlets.
+- **Controller**: Servlets process requests, call service classes.
+- **Service**: Business logic (e.g., `AppointmentService`) uses `FileHandler` for file I/O.
+- **Model**: Data stored as objects (e.g., `Patient`) and serialized to `.txt` files.
+
+### Example: Booking an Appointment
+1. Patient logs in (`login.jsp` → `LoginServlet`).
+2. Goes to `userProfile.jsp`, selects doctor/date.
+3. AJAX call to `AppointmentServlet` (`getTimeSlots`) fetches slots from `doctors_availability.txt` via `DoctorAvailabilityService`.
+4. Submits booking (`AppointmentServlet` → `AppointmentService`).
+5. `AppointmentService` assigns ID, sets priority, and writes to `appointments.txt`.
+6. Admin views sorted list in `appointment.jsp`.
 
 ## Setup Instructions
 
 ### Prerequisites
-- **Java**: JDK 11 or higher
-- **Maven**: 3.6.x or higher (bundled with IntelliJ or installed manually)
-- **IDE**: IntelliJ IDEA (recommended for Smart Tomcat plugin)
-- **Web Server**: Apache Tomcat 10.1.x (Jakarta EE 9 compatible)
+- **Java**: JDK 8 or higher
+- **Maven**: For dependency management
+- **Servlet Container**: Apache Tomcat 9.x or similar
 
-### Installation
+### Steps
 1. **Clone the Repository**:
    ```bash
    git clone <repository-url>
@@ -107,123 +134,110 @@ This project demonstrates core Java concepts (OOP, Servlets), JSP for dynamic fr
    ```
 
 2. **Install Dependencies**:
-    - Open the project in IntelliJ IDEA.
-    - Open `pom.xml` and let IntelliJ sync dependencies, or run:
+    - Ensure `pom.xml` includes:
+      ```xml
+      <dependencies>
+          <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
+            <scope>provided</scope>
+          </dependency>
+          <dependency>
+            <groupId>jakarta.servlet.jsp.jstl</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <version>2.0.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.glassfish.web</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl</artifactId>
+            <version>2.0.0</version>
+          </dependency>
+          <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>3.8.1</version>
+            <scope>test</scope>
+          </dependency>
+          <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.10.1</version>
+          </dependency>
+        </dependencies>
+      ```
+    - Run:
       ```bash
       mvn clean install
       ```
 
-3. **Configure Tomcat**:
-    - In IntelliJ: `Run > Edit Configurations` > Add "Smart Tomcat".
-    - Select Tomcat 10.1.x installation directory.
-    - Deploy `MedicalAppointmentSystem:war exploded`.
-    - Set "Application context" to `/MedicalAppointmentSystem`.
+3. **Deploy to Tomcat**:
+    - Copy the generated `.war` file from `target/` to `Tomcat/webapps/`.
+    - Start Tomcat:
+      ```bash
+      <tomcat-dir>/bin/startup.sh  # Linux/Mac
+      <tomcat-dir>/bin/startup.bat # Windows
+      ```
 
-4. **Populate Data Files**:
-    - Add sample data to `src/main/webapp/data/`:
-        - `patients.txt`: `patient1,pass123,John Doe,30,555-1234`
-        - `doctors.txt`: `doctor1,pass456,Dr. Smith,Cardiology`
-        - `admins.txt`: `admin1,pass789`
+4. **Access the Application**:
+    - Open `http://localhost:8080/MedicalAppointmentSystem` in a browser.
 
-5. **Run the Application**:
-    - Click the "Run" button in IntelliJ (▶️).
-    - Access at: `http://localhost:8080/MedicalAppointmentSystem/`.
-
----
+5. **Initial Data**:
+    - Populate `data/` files manually or via the app:
+        - `patients.txt`: `id,name,age,contact,password,dob`
+        - `doctors.txt`: `id,name,specialization,contact`
+        - `audit.txt`: `admin,admin123` (default admin credentials)
 
 ## Usage
-1. **Home Page (`index.jsp`)**:
-    - Hover over "Login" in the navbar.
-    - Select "Patient Login," "Doctor Login," or "Admin Login" from the dropdown.
+- **Patient**:
+    - Register at `/pages/register.jsp`.
+    - Login at `/pages/login.jsp`.
+    - Book appointments via `/pages/userProfile.jsp`.
 
-2. **Login Page (`login.jsp`)**:
-    - **Patient**: Enter `patient1`/`pass123` for a green-themed interface.
-    - **Doctor**: Enter `doctor1`/`pass456` for a blue-themed interface.
-    - **Admin**: Enter `admin1`/`pass789` for an orange-themed interface.
-    - Submit to log in (redirects to respective dashboards, not yet implemented).
+- **Admin**:
+    - Login at `/pages/login.jsp` (e.g., `admin/admin123`).
+    - View dashboard at `/pages/adminDashboard.jsp`.
+    - Manage data via respective JSPs (`manageDoctors.jsp`, etc.).
 
-3. **Admin Dashboard** (planned):
-    - View and manage appointments, doctors, and patients.
+## Project Highlights
+- **Priority Queues**: `AppointmentService.java` uses `PriorityQueue` to prioritize emergencies (`priority=1`).
+- **Bubble Sort**: Implemented in `AppointmentService.java`:
+  ```java
+  public List<Appointment> getSortedAppointments() {
+      List<Appointment> list = getAllAppointments();
+      for (int i = 0; i < list.size() - 1; i++) {
+          for (int j = 0; j < list.size() - i - 1; j++) {
+              if (list.get(j).getDateTime().isAfter(list.get(j + 1).getDateTime())) {
+                  Appointment temp = list.get(j);
+                  list.set(j, list.get(j + 1));
+                  list.set(j + 1, temp);
+              }
+          }
+      }
+      return list;
+  }
+  ```
+- **File Handling**: `FileHandler.java` manages all `.txt` file operations with synchronized methods.
 
----
+## Limitations
+- **No Doctor UI**: Doctors can’t log in or manage schedules.
+- **Security**: Plain-text passwords (recommend hashing with `SecurityUtil`).
+- **Scalability**: File-based storage lacks concurrency control for multi-user scenarios.
 
-## Technologies Used
-| Component         | Technology/Concept           |
-|-------------------|------------------------------|
-| **Backend**       | Java (Servlets, OOP)         |
-| **Frontend**      | JSP, CSS, Font Awesome       |
-| **Storage**       | File Handling (`.txt` files) |
-| **Algorithms**    | Priority Queue, Bubble Sort  |
-| **Build Tool**    | Maven                        |
-| **Server**        | Apache Tomcat 10.1 (Smart Tomcat) |
+## Future Improvements
+- Add doctor login and dashboard (`doctorDashboard.jsp`).
+- Implement password hashing.
+- Replace file storage with a lightweight database (e.g., SQLite).
+- Enhance UI with more interactivity (e.g., real-time updates).
 
----
-
-## Current Status
-- **Completed**:
-    - Home page (`index.jsp`) with role selection.
-    - Role-specific login interfaces (`login.jsp`).
-    - Login functionality (`LoginServlet`) with file-based authentication.
-- **Pending**:
-    - Patient profile page (`profile.jsp`).
-    - Doctor dashboard (`doctorDashboard.jsp`).
-    - Admin dashboard (`dashboard.jsp`).
-    - Appointment booking, cancellation, and management features.
-    - Priority queue and bubble sort implementation.
-
----
-
-## Troubleshooting
-- **404 Error ("File Not Found")**:
-    - Ensure `index.jsp` and `login.jsp` are in `src/main/webapp/pages/`.
-    - Verify `target/MedicalAppointmentSystem/` contains all JSPs and `WEB-INF/classes/controller/LoginServlet.class`.
-    - Check IntelliJ Tomcat config: "Application context" = `/MedicalAppointmentSystem`.
-
-- **Servlet Not Found**:
-    - Confirm `LoginServlet.java` is in `src/main/java/controller/` with `package controller;`.
-    - Remove `@WebServlet` annotation if present to rely on `web.xml`.
-
-- **File Access Errors**:
-    - Update `LoginServlet` file paths to use `request.getServletContext().getRealPath("/data/")`.
-
----
-
-## Future Enhancements
-- Implement full CRUD operations for appointments.
-- Add registration functionality for patients.
-- Create dashboards for patients, doctors, and admins.
-- Enhance security with password hashing.
-- Replace file storage with a database (e.g., MySQL).
-
----
-
-## Contributing
-1. Fork the repository.
-2. Create a branch: `git checkout -b feature-name`.
-3. Commit changes: `git commit -m "Add feature"`.
-4. Push to your fork: `git push origin feature-name`.
-5. Submit a pull request.
-
----
+## Contributors
+- Ashen Geeth
+- Thilina Senevirathne
+- Kaushalya Alwis
+- Abhishek Bogahawaththa
+- Maleesha Wickramaarachchi
 
 ## License
-This project is unlicensed and free for educational use. Please attribute the original author if reused.
+This project is for educational purposes and not licensed for commercial use.
 
 ---
-
-## Contact
-For questions or feedback, feel free to reach out via email or GitHub issues.
-
----
-
-```
-### How to Use
-1. **Copy the Content**: Copy the above text into a file named `README.md` in your project’s root directory (`MedicalAppointmentSystem/`).
-2. **Customize**:
-   - Replace `<repository-url>` with your actual GitHub repo URL if applicable.
-   - Update the "Contact" section with your email or GitHub handle.
-   - Add any additional sections (e.g., screenshots, credits) if desired.
-3. **Preview**: Use a Markdown viewer (e.g., IntelliJ’s Markdown plugin or GitHub) to ensure it renders correctly.
-
-This `README.md` provides a professional, structured overview of your project in proper Markdown syntax. Let me know if you’d like to add more details or adjust anything!
-```
