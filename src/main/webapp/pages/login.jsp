@@ -6,16 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediSchedule - Login</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-patient: #48bb78; /* Green for Patient */
-            --primary-doctor: #2c5282;  /* Blue for Doctor */
-            --primary-admin: #ed8936;   /* Orange for Admin */
-            --bg-light: #f7fafc;
-            --text-light: #2d3748;
-            --card-bg: #ffffff;
-            --shadow: 0 6px 20px rgba(0,0,0,0.08);
-            --error: #e53e3e;
+            --primary-patient: #34C759; /* Vibrant green for patients */
+            --primary-doctor: #2C6EBF;  /* Trustworthy blue for doctors */
+            --primary-admin: #F59E0B;   /* Warm amber for admins */
+            --bg-light: #F0F4F8;        /* Softer background */
+            --text-primary: #1F2A44;    /* Darker text for contrast */
+            --text-secondary: #64748B;  /* Muted text for labels */
+            --card-bg: #FFFFFF;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            --error: #EF4444;           /* Bright red for errors */
+            --border-radius: 12px;
         }
 
         * {
@@ -25,168 +28,153 @@
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
-            background-color: var(--bg-light);
-            color: var(--text-light);
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, var(--bg-light) 0%, rgba(44, 110, 191, 0.05) 100%);
+            color: var(--text-primary);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 2rem;
+            padding: 1.5rem;
         }
 
         .login-container {
             background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 15px;
+            padding: 3rem 2.5rem;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             width: 100%;
-            max-width: 450px;
+            max-width: 480px;
             text-align: center;
-            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
         }
 
         .login-header {
-            margin-bottom: 2rem;
+            margin-bottom: 2.5rem;
         }
 
         .login-header .logo {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 700;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
         }
 
         .login-header h1 {
-            font-size: 1.5rem;
-            margin-top: 0.5rem;
+            font-size: 1.75rem;
+            font-weight: 600;
         }
 
-        /* Patient Styling */
-        .patient .login-header .logo, .patient h1 {
-            color: var(--primary-patient);
-        }
-        .patient .login-btn {
-            background: var(--primary-patient);
-        }
-        .patient .login-btn:hover {
-            background: #38a169;
-        }
+        /* Role-Specific Styling */
+        .patient .logo, .patient h1 { color: var(--primary-patient); }
+        .patient .login-btn { background: var(--primary-patient); }
+        .patient .login-btn:hover { background: #2DB84C; }
+        .patient .form-input:focus { border-color: var(--primary-patient); box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.2); }
+        .patient .back-link:hover { color: var(--primary-patient); }
 
-        /* Doctor Styling */
-        .doctor .login-header .logo, .doctor h1 {
-            color: var(--primary-doctor);
-        }
-        .doctor .login-btn {
-            background: var(--primary-doctor);
-        }
-        .doctor .login-btn:hover {
-            background: #2b6cb0;
-        }
+        .doctor .logo, .doctor h1 { color: var(--primary-doctor); }
+        .doctor .login-btn { background: var(--primary-doctor); }
+        .doctor .login-btn:hover { background: #255DA3; }
+        .doctor .form-input:focus { border-color: var(--primary-doctor); box-shadow: 0 0 0 3px rgba(44, 110, 191, 0.2); }
+        .doctor .back-link:hover { color: var(--primary-doctor); }
 
-        /* Admin Styling */
-        .admin .login-header .logo, .admin h1 {
-            color: var(--primary-admin);
-        }
-        .admin .login-btn {
-            background: var(--primary-admin);
-        }
-        .admin .login-btn:hover {
-            background: #dd6b20;
-        }
+        .admin .logo, .admin h1 { color: var(--primary-admin); }
+        .admin .login-btn { background: var(--primary-admin); }
+        .admin .login-btn:hover { background: #D97706; }
+        .admin .form-input:focus { border-color: var(--primary-admin); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+        .admin .back-link:hover { color: var(--primary-admin); }
 
         .form-group {
-            margin-bottom: 1.5rem;
+            position: relative;
+            margin-bottom: 1.75rem;
             text-align: left;
         }
 
         .form-group label {
-            display: block;
+            font-size: 0.95rem;
             font-weight: 500;
+            color: var(--text-secondary);
             margin-bottom: 0.5rem;
-            color: var(--text-light);
+            display: block;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #e2e8f0;
+            padding: 1rem 1rem 1rem 2.75rem; /* Space for icon */
+            border: 1px solid #D1D5DB;
             border-radius: 8px;
             font-size: 1rem;
+            background: #F9FAFB;
             transition: all 0.3s ease;
         }
 
         .form-input:focus {
-            border-color: var(--primary-patient); /* Default, overridden by role */
-            box-shadow: 0 0 0 3px rgba(72, 187, 120, 0.2);
             outline: none;
+            background: #FFFFFF;
         }
 
-        .doctor .form-input:focus {
-            border-color: var(--primary-doctor);
-            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.2);
-        }
-
-        .admin .form-input:focus {
-            border-color: var(--primary-admin);
-            box-shadow: 0 0 0 3px rgba(237, 137, 54, 0.2);
+        .form-group i {
+            position: absolute;
+            left: 1rem;
+            top: 2.75rem;
+            color: var(--text-secondary);
+            font-size: 1.1rem;
         }
 
         .login-btn {
             width: 100%;
-            padding: 0.9rem;
+            padding: 1rem;
             border: none;
-            border-radius: 25px;
-            color: white;
-            font-size: 1rem;
+            border-radius: var(--border-radius);
+            color: #FFFFFF;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             transition: all 0.3s ease;
         }
 
         .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         .error-message {
             color: var(--error);
-            margin-top: 1rem;
+            margin-top: 1.25rem;
             font-size: 0.9rem;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.75rem;
+            border-radius: 8px;
         }
 
         .back-link {
-            margin-top: 1.5rem;
+            margin-top: 2rem;
             display: block;
-            color: var(--text-light);
+            color: var(--text-secondary);
             text-decoration: none;
             font-size: 0.95rem;
             transition: all 0.3s ease;
         }
 
-        .back-link:hover {
-            color: var(--primary-patient); /* Default, overridden by role */
-        }
-
-        .doctor .back-link:hover {
-            color: var(--primary-doctor);
-        }
-
-        .admin .back-link:hover {
-            color: var(--primary-admin);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 480px) {
             .login-container {
-                padding: 1.5rem;
+                padding: 2rem;
                 max-width: 100%;
             }
+            .login-header .logo { font-size: 1.75rem; }
+            .login-header h1 { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -210,8 +198,7 @@
         iconClass = "fas fa-shield-alt";
         title = "Admin Login";
     } else {
-        // Default to a generic login if role is invalid
-        containerClass = "patient";
+        containerClass = "patient"; // Default to patient if role is invalid
         iconClass = "fas fa-heartbeat";
         title = "Login";
     }
@@ -226,10 +213,12 @@
     <form action="<%=request.getContextPath()%>/login" method="post">
         <div class="form-group">
             <label for="username">Username</label>
+            <i class="fas fa-user"></i>
             <input type="text" id="username" name="username" class="form-input" placeholder="Enter username" required>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
+            <i class="fas fa-lock"></i>
             <input type="password" id="password" name="password" class="form-input" placeholder="Enter password" required>
         </div>
         <input type="hidden" name="role" value="<%= role %>">
