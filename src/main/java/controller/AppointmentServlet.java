@@ -34,7 +34,7 @@ public class AppointmentServlet extends HttpServlet {
         doctorFileHandler = new FileHandler(basePath + "doctors.txt");
         patientFileHandler = new FileHandler(basePath + "patients.txt");
     }
-
+//
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
