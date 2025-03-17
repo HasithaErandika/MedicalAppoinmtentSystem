@@ -17,42 +17,45 @@ public class LogoutServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         HttpSession session = request.getSession(false); // Get existing session, don't create new
-        String username = "unknown";
-        String role = "unknown";
 
         if (session != null) {
+            // Capture username and role before invalidation
+            String username = (String) session.getAttribute("username");
+            String role = (String) session.getAttribute("role");
+            String safeUsername = (username != null) ? username : "unknown";
+            String safeRole = (role != null) ? role : "unknown";
+
+            logger.log(Level.INFO, "Logout initiated for user: {0}, role: {1}",
+                    new Object[]{safeUsername, safeRole});
+
             try {
-                // Retrieve attributes immediately and store them
-                username = (String) session.getAttribute("username");
-                role = (String) session.getAttribute("role");
-
-                // Log the logout attempt with retrieved values
-                logger.log(Level.INFO, "Logout attempt for user: {0}, role: {1}",
-                        new Object[]{username != null ? username : "unknown", role != null ? role : "unknown"});
-
                 // Invalidate the session
                 session.invalidate();
                 logger.log(Level.INFO, "Session successfully invalidated for user: {0}, role: {1}",
-                        new Object[]{username != null ? username : "unknown", role != null ? role : "unknown"});
+                        new Object[]{safeUsername, safeRole});
             } catch (IllegalStateException e) {
-                // Handle case where session was already invalidated
-                logger.log(Level.WARNING, "Session was already invalidated for user: {0}, role: {1}. Error: {2}",
-                        new Object[]{username, role, e.getMessage()});
+                logger.log(Level.WARNING, "Session already invalidated for user: {0}, role: {1}",
+                        new Object[]{safeUsername, safeRole});
+                // No need to rethrow; proceed to redirect
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Unexpected error during logout: {0}", e.getMessage());
-                throw new ServletException("Logout failed due to an unexpected error.", e);
+                logger.log(Level.SEVERE, "Unexpected error during logout for user: {0}, role: {1}",
+                        new Object[]{safeUsername, safeRole});
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Logout failed due to a server error.");
+                return;
             }
         } else {
-            logger.log(Level.INFO, "No active session found for logout.");
+            logger.log(Level.INFO, "No active session found for logout request.");
         }
 
-        // Redirect to index.jsp regardless of session state
+        // Always redirect to index.jsp after logout attempt
         response.sendRedirect(request.getContextPath() + "/pages/index.jsp");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        doPost(request, response); // Delegate GET to POST for consistency
+        // Handle GET requests by delegating to doPost for consistency
+        logger.log(Level.INFO, "GET request received for logout; delegating to POST handling.");
+        doPost(request, response);
     }
 }
