@@ -94,7 +94,7 @@ The **Medical Appointment Scheduling System** is a web-based application develop
     - **View Appointments**: On `userProfile.jsp`.
 
 2. **Admins**:
-    - **Login**: Via `login.jsp` → `LoginServlet` (checks `audit.txt`).
+    - **Login**: Via `login.jsp` → `LoginServlet` (checks `admins.txt`).
     - **Dashboard**: `adminDashboard.jsp` → `AdminServlet` (stats, sorted appointments).
     - **Manage Appointments**: `appointment.jsp` → `AppointmentServlet`.
     - **Manage Doctors**: `manageDoctors.jsp` → `ManageDoctorsServlet`.
