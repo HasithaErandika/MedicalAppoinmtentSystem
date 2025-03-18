@@ -27,37 +27,31 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
         String role = request.getParameter("role");
 
-        response.setContentType("text/plain");
-
-        // Input validation
         if (username == null || password == null || role == null ||
                 username.trim().isEmpty() || password.trim().isEmpty() || role.trim().isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("All fields are required.");
+            request.setAttribute("error", "All fields are required.");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
             return;
         }
 
         try {
             if (validateCredentials(username.trim(), password.trim(), role.trim(), request)) {
-                HttpSession session = request.getSession();
+                HttpSession session = request.getSession(true); // Create new session
                 session.setAttribute("username", username);
                 session.setAttribute("role", role);
                 session.setMaxInactiveInterval(30 * 60); // 30 minutes timeout
 
-                response.setStatus(HttpServletResponse.SC_OK);
-                response.getWriter().write("Login successful");
+                // Redirect based on role
+                String redirectUrl = getRedirectUrl(role);
+                response.sendRedirect(request.getContextPath() + redirectUrl);
             } else {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("Invalid username or password.");
+                request.setAttribute("error", "Invalid username or password.");
+                request.getRequestDispatcher("/login.jsp").forward(request, response);
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error accessing user data file", e);
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.getWriter().write("Unable to process login. Please try again later.");
-        } catch (IllegalArgumentException e) {
-            logger.log(Level.WARNING, "Invalid role detected", e);
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().write("Invalid role specified.");
+            request.setAttribute("error", "Unable to process login. Please try again later.");
+            request.getRequestDispatcher("/login.jsp").forward(request, response);
         }
     }
 
@@ -87,7 +81,7 @@ public class LoginServlet extends HttpServlet {
 
     private String getFilePath(String role, HttpServletRequest request) {
         String basePath = getBasePath(request);
-        switch (role) {
+        switch (role.toLowerCase()) {
             case "patient":
                 return basePath + "patients.txt";
             case "doctor":
@@ -96,6 +90,19 @@ public class LoginServlet extends HttpServlet {
                 return basePath + "admins.txt";
             default:
                 return null;
+        }
+    }
+
+    private String getRedirectUrl(String role) {
+        switch (role.toLowerCase()) {
+            case "patient":
+                return "/pages/userProfile.jsp";
+            case "doctor":
+                return "/pages/doctorDashboard.jsp";
+            case "admin":
+                return "/pages/adminDashboard.jsp";
+            default:
+                return "/index.jsp"; // Fallback
         }
     }
 }

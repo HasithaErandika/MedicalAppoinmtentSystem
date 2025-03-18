@@ -6,18 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediSchedule - Login</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-patient: #48BB78; /* Green for Patient */
-            --primary-doctor: #2C5282;  /* Blue for Doctor */
-            --primary-admin: #ED8936;   /* Orange for Admin */
-            --bg-light: #F7FAFC;
-            --text-primary: #2D3748;
-            --text-secondary: #718096;
+            --primary-patient: #34C759;
+            --primary-doctor: #2C6EBF;
+            --primary-admin: #F59E0B;
+            --bg-light: #F0F4F8;
+            --text-primary: #1F2A44;
+            --text-secondary: #64748B;
             --card-bg: #FFFFFF;
-            --shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
-            --error: #E53E3E;
-            --input-bg: #F9FAFB;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            --error: #EF4444;
+            --border-radius: 12px;
         }
 
         * {
@@ -28,7 +29,7 @@
 
         body {
             font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, var(--bg-light) 0%, #E2E8F0 100%);
+            background: linear-gradient(135deg, var(--bg-light) 0%, rgba(44, 110, 191, 0.05) 100%);
             color: var(--text-primary);
             min-height: 100vh;
             display: flex;
@@ -39,32 +40,13 @@
 
         .login-container {
             background: var(--card-bg);
-            padding: 3rem;
-            border-radius: 20px;
+            padding: 3rem 2.5rem;
+            border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             width: 100%;
             max-width: 480px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
             animation: fadeIn 0.5s ease;
-        }
-
-        .login-header {
-            margin-bottom: 2.5rem;
-            position: relative;
-        }
-
-        .login-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: 50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(74, 144, 226, 0.1) 0%, transparent 70%);
-            transform: translateX(-50%);
-            z-index: -1;
         }
 
         .login-header .logo {
@@ -74,121 +56,97 @@
             justify-content: center;
             align-items: center;
             gap: 0.75rem;
-            transition: transform 0.3s ease;
-        }
-
-        .login-header .logo:hover {
-            transform: scale(1.05);
+            margin-bottom: 0.75rem;
         }
 
         .login-header h1 {
             font-size: 1.75rem;
             font-weight: 600;
-            margin-top: 0.75rem;
-            color: inherit;
         }
 
-        /* Role-specific Styling */
-        .patient { --primary: var(--primary-patient); }
-        .doctor { --primary: var(--primary-doctor); }
-        .admin { --primary: var(--primary-admin); }
-
-        .patient .login-header .logo, .patient h1 { color: var(--primary-patient); }
-        .doctor .login-header .logo, .doctor h1 { color: var(--primary-doctor); }
-        .admin .login-header .logo, .admin h1 { color: var(--primary-admin); }
-
+        .patient .logo, .patient h1 { color: var(--primary-patient); }
         .patient .login-btn { background: var(--primary-patient); }
-        .patient .login-btn:hover { background: #38A169; }
+        .patient .login-btn:hover { background: #2DB84C; }
+        .patient .form-input:focus { border-color: var(--primary-patient); box-shadow: 0 0 0 3px rgba(52, 199, 89, 0.2); }
+        .patient .back-link:hover { color: var(--primary-patient); }
+
+        .doctor .logo, .doctor h1 { color: var(--primary-doctor); }
         .doctor .login-btn { background: var(--primary-doctor); }
-        .doctor .login-btn:hover { background: #2B6CB0; }
+        .doctor .login-btn:hover { background: #255DA3; }
+        .doctor .form-input:focus { border-color: var(--primary-doctor); box-shadow: 0 0 0 3px rgba(44, 110, 191, 0.2); }
+        .doctor .back-link:hover { color: var(--primary-doctor); }
+
+        .admin .logo, .admin h1 { color: var(--primary-admin); }
         .admin .login-btn { background: var(--primary-admin); }
-        .admin .login-btn:hover { background: #DD6B20; }
+        .admin .login-btn:hover { background: #D97706; }
+        .admin .form-input:focus { border-color: var(--primary-admin); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2); }
+        .admin .back-link:hover { color: var(--primary-admin); }
 
         .form-group {
+            position: relative;
             margin-bottom: 1.75rem;
             text-align: left;
-            position: relative;
         }
 
         .form-group label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            color: var(--text-primary);
             font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            display: block;
         }
 
         .form-input {
             width: 100%;
-            padding: 0.9rem 1rem;
-            border: 1px solid #E2E8F0;
-            border-radius: 10px;
-            background: var(--input-bg);
+            padding: 1rem 1rem 1rem 2.75rem;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
             font-size: 1rem;
+            background: #F9FAFB;
             transition: all 0.3s ease;
         }
 
         .form-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 8px rgba(72, 187, 120, 0.15);
-            background: #FFFFFF;
             outline: none;
+            background: #FFFFFF;
         }
 
-        .form-input::placeholder {
-            color: var(--text-secondary);
-        }
-
-        .toggle-password {
+        .form-group i {
             position: absolute;
-            right: 1rem;
-            top: 60%;
-            transform: translateY(-50%);
-            cursor: pointer;
+            left: 1rem;
+            top: 2.75rem;
             color: var(--text-secondary);
-            transition: color 0.3s ease;
-        }
-
-        .toggle-password:hover {
-            color: var(--primary);
+            font-size: 1.1rem;
         }
 
         .login-btn {
             width: 100%;
             padding: 1rem;
             border: none;
-            border-radius: 50px;
+            border-radius: var(--border-radius);
             color: #FFFFFF;
-            font-size: 1rem;
+            font-size: 1.05rem;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             transition: all 0.3s ease;
         }
 
         .login-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .login-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
         }
 
         .error-message {
             color: var(--error);
-            margin-top: 1rem;
+            margin-top: 1.25rem;
             font-size: 0.9rem;
-            background: rgba(229, 62, 62, 0.1);
-            padding: 0.5rem 1rem;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.75rem;
             border-radius: 8px;
-            animation: slideIn 0.3s ease;
         }
 
         .back-link {
@@ -200,30 +158,15 @@
             transition: all 0.3s ease;
         }
 
-        .back-link:hover {
-            color: var(--primary);
-            text-decoration: underline;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 480px) {
-            .login-container {
-                padding: 2rem;
-                max-width: 100%;
-                margin: 1rem;
-            }
-            .login-header .logo { font-size: 1.5rem; }
-            .login-header h1 { font-size: 1.25rem; }
-        }
-
-        /* Animations */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        @media (max-width: 480px) {
+            .login-container { padding: 2rem; max-width: 100%; }
+            .login-header .logo { font-size: 1.75rem; }
+            .login-header h1 { font-size: 1.5rem; }
         }
     </style>
 </head>
@@ -247,7 +190,7 @@
         iconClass = "fas fa-shield-alt";
         title = "Admin Login";
     } else {
-        containerClass = "patient";
+        containerClass = "patient"; // Default to patient
         iconClass = "fas fa-heartbeat";
         title = "Login";
     }
@@ -259,48 +202,26 @@
         </div>
         <h1><%= title %></h1>
     </div>
-    <form action="<%=request.getContextPath()%>/login" method="post" id="loginForm">
+    <form action="<%=request.getContextPath()%>/login" method="post">
         <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" class="form-input" placeholder="Enter your username" required>
+            <i class="fas fa-user"></i>
+            <input type="text" id="username" name="username" class="form-input" placeholder="Enter username" required>
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" class="form-input" placeholder="Enter your password" required>
-            <i class="fas fa-eye toggle-password" onclick="togglePassword()"></i>
+            <i class="fas fa-lock"></i>
+            <input type="password" id="password" name="password" class="form-input" placeholder="Enter password" required>
         </div>
-        <input type="hidden" name="role" value="<%= role %>">
-        <button type="submit" class="login-btn" id="loginBtn">
+        <input type="hidden" name="role" value="<%= role != null ? role : "patient" %>">
+        <button type="submit" class="login-btn">
             <i class="fas fa-sign-in-alt"></i> Login
         </button>
     </form>
     <% String error = (String) request.getAttribute("error"); if (error != null) { %>
     <p class="error-message"><%= error %></p>
     <% } %>
-    <a href="<%=request.getContextPath()%>/pages/index.jsp" class="back-link">Back to Home</a>
+    <a href="<%=request.getContextPath()%>/index.jsp" class="back-link">Back to Home</a>
 </div>
-
-<script>
-    function togglePassword() {
-        const passwordInput = document.getElementById('password');
-        const toggleIcon = document.querySelector('.toggle-password');
-        if (passwordInput.type === 'password') {
-            passwordInput.type = 'text';
-            toggleIcon.classList.remove('fa-eye');
-            toggleIcon.classList.add('fa-eye-slash');
-        } else {
-            passwordInput.type = 'password';
-            toggleIcon.classList.remove('fa-eye-slash');
-            toggleIcon.classList.add('fa-eye');
-        }
-    }
-
-    const form = document.getElementById('loginForm');
-    const loginBtn = document.getElementById('loginBtn');
-    form.addEventListener('submit', () => {
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Logging in...';
-    });
-</script>
 </body>
 </html>
