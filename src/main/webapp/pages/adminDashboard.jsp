@@ -417,7 +417,7 @@
                     break;
                 }
             }
-            row.style.display = found ? '' : 'none';
+            row.style.display = found ? '' : 'none';//
         }
         updatePagination();
     }
