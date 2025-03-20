@@ -694,6 +694,7 @@
             })
             .catch(error => console.error('Booking error:', error));
     }
+    //test
 </script>
 </body>
 </html>
