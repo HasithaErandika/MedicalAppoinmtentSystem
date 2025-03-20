@@ -221,7 +221,7 @@
     <% String error = (String) request.getAttribute("error"); if (error != null) { %>
     <p class="error-message"><%= error %></p>
     <% } %>
-    <a href="<%=request.getContextPath()%>/index.jsp" class="back-link">Back to Home</a>
+    <a href="<%=request.getContextPath()%>/pages/index.jsp" class="back-link">Back to Home</a>
 </div>
 </body>
 </html>
