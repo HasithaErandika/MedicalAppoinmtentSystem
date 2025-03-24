@@ -14,21 +14,24 @@
             --secondary: #26A69A;      /* Teal */
             --accent: #EF5350;         /* Soft Red */
             --bg-light: #F5F6F5;       /* Light Gray */
-            --text-primary: #333333;   /* Dark Gray */
+            --text-primary: #2D3748;   /* Darker Gray */
             --card-bg: #FFFFFF;        /* White */
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-            --hover: #F9FAFB;
-            --danger: #EF5350;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --hover: #EDF2F7;          /* Light Blue-Gray */
+            --danger: #EF5350;         /* Red */
+            --success: #38A169;        /* Green */
+            --border: #E2E8F0;         /* Light Border */
         }
 
         /* Base Styles */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
             background: var(--bg-light);
             color: var(--text-primary);
-            min-height: 100vh;
+            line-height: 1.6;
             display: flex;
+            min-height: 100vh;
             overflow-x: hidden;
         }
 
@@ -40,47 +43,47 @@
             position: fixed;
             padding: 2rem 1rem;
             transition: width 0.3s ease;
-            z-index: 1000;
             box-shadow: var(--shadow);
+            z-index: 1000;
         }
         .sidebar.collapsed { width: 80px; }
         .sidebar .logo {
-            font-size: 1.75rem;
+            font-size: 1.5rem;
             font-weight: 700;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
+            gap: 0.75rem;
             color: var(--primary);
+            margin-bottom: 2.5rem;
         }
         .sidebar.collapsed .logo span { display: none; }
         .sidebar ul { list-style: none; }
         .sidebar ul li a {
-            color: var(--text-primary);
-            text-decoration: none;
             display: flex;
             align-items: center;
             gap: 0.75rem;
             padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            text-decoration: none;
             border-radius: 8px;
             transition: all 0.3s ease;
+            font-size: 1rem;
         }
-        .sidebar ul li a:hover,
-        .sidebar ul li a.active {
+        .sidebar ul li a:hover, .sidebar ul li a.active {
             background: var(--primary);
             color: #FFFFFF;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
         }
         .sidebar.collapsed ul li a span { display: none; }
         .toggle-btn {
             background: none;
             border: none;
             color: var(--primary);
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             cursor: pointer;
             position: absolute;
-            top: 1rem;
+            top: 1.5rem;
             right: 1rem;
-            transition: all 0.3s ease;
         }
         .toggle-btn:hover { color: var(--secondary); }
 
@@ -95,8 +98,8 @@
 
         /* Header */
         .header {
-            background: var(--primary);
-            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--primary), #357ABD);
+            padding: 1.5rem 2rem;
             border-radius: 12px;
             color: #FFFFFF;
             display: flex;
@@ -106,21 +109,22 @@
             margin-bottom: 2rem;
         }
         .header h1 {
-            font-size: 1.8rem;
+            font-size: 1.75rem;
             font-weight: 600;
         }
         .logout-btn {
             background: var(--secondary);
             color: #FFFFFF;
             border: none;
-            padding: 0.6rem 1.2rem;
+            padding: 0.6rem 1.5rem;
             border-radius: 20px;
             cursor: pointer;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
         }
         .logout-btn:hover {
             background: #00897B;
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
 
         /* Dashboard Grid */
@@ -138,26 +142,24 @@
             text-align: center;
             transition: all 0.3s ease;
             cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            border-left: 4px solid var(--secondary);
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         }
         .card i {
-            font-size: 2.2rem;
+            font-size: 2rem;
             color: var(--secondary);
             margin-bottom: 0.75rem;
         }
         .card h3 {
-            font-size: 1.1rem;
+            font-size: 1rem;
             font-weight: 500;
-            margin-bottom: 0.5rem;
             color: var(--text-primary);
         }
         .card p {
-            font-size: 1.6rem;
+            font-size: 1.75rem;
             font-weight: 700;
             color: var(--primary);
         }
@@ -165,7 +167,7 @@
         /* Table Section */
         .table-section {
             background: var(--card-bg);
-            padding: 1.5rem;
+            padding: 2rem;
             border-radius: 12px;
             box-shadow: var(--shadow);
         }
@@ -178,6 +180,7 @@
         .table-header h2 {
             font-size: 1.5rem;
             color: var(--primary);
+            font-weight: 600;
         }
         .table-actions {
             display: flex;
@@ -185,115 +188,185 @@
             align-items: center;
         }
         .search-bar {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
             background: #FFFFFF;
-            border: 1px solid #E0E0E0;
+            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 0.25rem 0.75rem;
-        }
-        .search-bar input {
-            padding: 0.5rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            width: 200px;
+            display: flex;
+            align-items: center;
             transition: all 0.3s ease;
         }
-        .search-bar input:focus {
-            outline: none;
+        .search-bar:focus-within {
+            border-color: var(--primary);
             box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
         }
-        .search-bar i {
-            color: var(--text-primary);
+        .search-bar input {
+            border: none;
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            width: 220px;
+            background: transparent;
         }
-        .export-btn {
-            padding: 0.6rem 1rem;
-            background: var(--secondary);
-            color: #FFFFFF;
+        .search-bar input:focus { outline: none; }
+        .search-bar i { color: var(--text-primary); }
+        .btn {
+            padding: 0.6rem 1.2rem;
             border: none;
             border-radius: 8px;
             cursor: pointer;
+            font-size: 0.9rem;
             transition: all 0.3s ease;
+        }
+        .export-btn {
+            background: var(--secondary);
+            color: #FFFFFF;
         }
         .export-btn:hover {
             background: #00897B;
-            transform: scale(1.05);
+            transform: translateY(-2px);
         }
         .appointments-table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
         }
         .appointments-table th,
         .appointments-table td {
             padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #E0E0E0;
+            border-bottom: 1px solid var(--border);
         }
         .appointments-table th {
             background: var(--primary);
             color: #FFFFFF;
             font-weight: 600;
-            cursor: pointer;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
         .appointments-table th:hover {
             background: #357ABD;
+            cursor: pointer;
         }
         .appointments-table tr:hover {
             background: var(--hover);
         }
-        .priority-emergency {
-            color: var(--danger);
-            font-weight: 600;
+        .priority-emergency { color: var(--danger); font-weight: 600; }
+        .action-btn {
+            padding: 0.4rem 0.8rem;
+            margin: 0 0.25rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.3s ease;
         }
+        .cancel-btn { background: var(--danger); color: #FFFFFF; }
+        .cancel-btn:hover { background: #C62828; }
+        .edit-btn { background: var(--primary); color: #FFFFFF; }
+        .edit-btn:hover { background: #357ABD; }
 
         /* Pagination */
         .pagination {
             margin-top: 1.5rem;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
         }
         .pagination button {
             padding: 0.5rem 1rem;
-            margin: 0 0.25rem;
             background: var(--primary);
             color: #FFFFFF;
             border: none;
-            border-radius: 5px;
+            border-radius: 6px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
-        .pagination button:hover:not(:disabled) {
-            background: #357ABD;
-        }
+        .pagination button:hover:not(:disabled) { background: #357ABD; }
         .pagination button:disabled {
-            background: #E0E0E0;
+            background: var(--border);
+            color: #A0AEC0;
             cursor: not-allowed;
         }
 
-        /* Error Message */
-        .error-message {
-            color: var(--danger);
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+        .modal-content h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        .modal-content label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .modal-content .btn {
+            width: 100%;
+            padding: 0.75rem;
+        }
+        .close-modal {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* Messages */
+        .message {
             padding: 1rem;
-            background: #FEE2E2;
             border-radius: 8px;
             margin-bottom: 1rem;
+            text-align: center;
         }
+        .error-message { background: #FEE2E2; color: var(--danger); }
+        .success-message { background: #D4EDDA; color: var(--success); }
 
         /* Responsive Design */
         @media (max-width: 768px) {
             .sidebar { width: 80px; }
-            .sidebar .logo span,
-            .sidebar ul li a span { display: none; }
-            .main-content { margin-left: 80px; }
+            .sidebar .logo span, .sidebar ul li a span { display: none; }
+            .main-content { margin-left: 80px; padding: 1rem; }
             .dashboard-grid { grid-template-columns: 1fr; }
-            .table-actions { flex-direction: column; gap: 0.5rem; }
+            .table-actions { flex-direction: column; gap: 0.75rem; }
+            .appointments-table { font-size: 0.9rem; }
         }
         @media (max-width: 480px) {
-            .main-content { padding: 1rem; }
             .search-bar input { width: 150px; }
-            .appointments-table th,
-            .appointments-table td { padding: 0.75rem; font-size: 0.85rem; }
+            .appointments-table th, .appointments-table td { padding: 0.5rem; font-size: 0.8rem; }
+            .action-btn { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
         }
     </style>
 </head>
@@ -326,11 +399,12 @@
         </form>
     </div>
 
-    <% if (request.getAttribute("error") != null) { %>
-    <div class="error-message">
-        <%= request.getAttribute("error") %>
-    </div>
-    <% } %>
+    <c:if test="${not empty error}">
+        <div class="message error-message">${error}</div>
+    </c:if>
+    <c:if test="${not empty message}">
+        <div class="message success-message">${message}</div>
+    </c:if>
 
     <div class="dashboard-grid">
         <div class="card" onclick="window.location.href='<%=request.getContextPath()%>/AdminServlet'">
@@ -363,7 +437,7 @@
                     <input type="text" id="searchInput" placeholder="Search appointments..." onkeyup="searchTable()">
                     <i class="fas fa-search"></i>
                 </div>
-                <button class="export-btn" onclick="exportTable()">Export to CSV</button>
+                <button class="btn export-btn" onclick="exportTable()">Export to CSV</button>
             </div>
         </div>
         <table class="appointments-table" id="appointmentsTable">
@@ -374,23 +448,56 @@
                 <th onclick="sortTable(2)">Doctor ID <i class="fas fa-sort"></i></th>
                 <th onclick="sortTable(3)">Date & Time <i class="fas fa-sort"></i></th>
                 <th onclick="sortTable(4)">Priority <i class="fas fa-sort"></i></th>
+                <th>Actions</th>
             </tr>
             </thead>
             <tbody id="appointmentsBody">
             <c:forEach var="appt" items="${sortedAppointments}" varStatus="loop">
                 <tr class="appointment-row" data-page="${(loop.index div 5) + 1}">
-                    <td id="${appt.id}">${appt.id}</td>
+                    <td>${appt.id}</td>
                     <td>${appt.patientId}</td>
                     <td>${appt.doctorId}</td>
                     <td>${appt.dateTime}</td>
                     <td class="${appt.priority == 1 ? 'priority-emergency' : ''}">
                             ${appt.priority == 1 ? 'Emergency' : 'Normal'}
                     </td>
+                    <td>
+                        <button class="action-btn edit-btn" onclick="openEditModal('${appt.id}', '${appt.patientId}', '${appt.doctorId}', '${appt.dateTime}', '${appt.priority}')">Edit</button>
+                        <form action="<%=request.getContextPath()%>/AdminServlet" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to cancel this appointment?');">
+                            <input type="hidden" name="action" value="cancelAppointment">
+                            <input type="hidden" name="appointmentId" value="${appt.id}">
+                            <button type="submit" class="action-btn cancel-btn">Cancel</button>
+                        </form>
+                    </td>
                 </tr>
             </c:forEach>
             </tbody>
         </table>
         <div class="pagination" id="pagination"></div>
+    </div>
+
+    <!-- Edit Appointment Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeEditModal()">&times;</button>
+            <h2>Edit Appointment</h2>
+            <form id="editForm" action="<%=request.getContextPath()%>/AdminServlet" method="post">
+                <input type="hidden" name="action" value="updateAppointment">
+                <input type="hidden" name="appointmentId" id="editId">
+                <label for="editPatientId">Patient ID</label>
+                <input type="text" name="patientId" id="editPatientId" required>
+                <label for="editDoctorId">Doctor ID</label>
+                <input type="text" name="doctorId" id="editDoctorId" required>
+                <label for="editDateTime">Date & Time (yyyy-MM-dd HH:mm)</label>
+                <input type="text" name="dateTime" id="editDateTime" required>
+                <label for="editPriority">Priority</label>
+                <select name="priority" id="editPriority" required>
+                    <option value="1">Emergency</option>
+                    <option value="2">Normal</option>
+                </select>
+                <button type="submit" class="btn" style="background: var(--success);">Update Appointment</button>
+            </form>
+        </div>
     </div>
 </div>
 
@@ -417,8 +524,9 @@
                     break;
                 }
             }
-            row.style.display = found ? '' : 'none';//
+            row.style.display = found ? '' : 'none';
         }
+        currentPage = 1;
         updatePagination();
     }
 
@@ -435,8 +543,8 @@
                 let cmpX = x.innerHTML.toLowerCase();
                 let cmpY = y.innerHTML.toLowerCase();
                 if (n === 0 || n === 4) {
-                    cmpX = parseInt(cmpX) || cmpX;
-                    cmpY = parseInt(cmpY) || cmpY;
+                    cmpX = parseInt(cmpX) || (cmpX === 'emergency' ? 1 : 2);
+                    cmpY = parseInt(cmpY) || (cmpY === 'emergency' ? 1 : 2);
                 }
                 if (dir === "asc" ? cmpX > cmpY : cmpX < cmpY) {
                     shouldSwitch = true;
@@ -461,7 +569,10 @@
         const pagination = document.getElementById('pagination');
         pagination.innerHTML = '';
 
-        if (totalPages <= 1) return;
+        if (totalPages <= 1) {
+            showPage();
+            return;
+        }
 
         const prevBtn = document.createElement('button');
         prevBtn.innerText = 'Previous';
@@ -487,48 +598,49 @@
     }
 
     function showPage() {
-        const rows = document.getElementsByClassName('appointment-row');
-        for (let row of rows) {
-            const page = parseInt(row.getAttribute('data-page'));
-            row.style.display = (page === currentPage && row.style.display !== 'none') ? '' : 'none';
-        }
-        updatePaginationButtons();
-    }
-
-    function updatePaginationButtons() {
-        const buttons = document.getElementById('pagination').getElementsByTagName('button');
-        const totalPages = Math.ceil(Array.from(document.getElementsByClassName('appointment-row')).filter(row => row.style.display !== 'none').length / ITEMS_PER_PAGE);
-        buttons[0].disabled = currentPage === 1; // Previous
-        buttons[buttons.length - 1].disabled = currentPage === totalPages; // Next
-        for (let i = 1; i < buttons.length - 1; i++) {
-            buttons[i].disabled = parseInt(buttons[i].innerText) === currentPage;
-        }
+        const rows = Array.from(document.getElementsByClassName('appointment-row'));
+        const start = (currentPage - 1) * ITEMS_PER_PAGE;
+        const end = start + ITEMS_PER_PAGE;
+        rows.forEach((row, index) => {
+            row.style.display = (index >= start && index < end && row.style.display !== 'none') ? '' : 'none';
+        });
     }
 
     function exportTable() {
         const table = document.getElementById('appointmentsTable');
-        let csv = [];
+        let csv = ['ID,Patient ID,Doctor ID,Date & Time,Priority'];
         for (let row of table.rows) {
-            if (row.style.display !== 'none') {
+            if (row.style.display !== 'none' && row.parentNode.tagName === 'TBODY') {
                 let rowData = [];
                 for (let cell of row.cells) {
                     rowData.push('"' + cell.innerText.replace(/"/g, '""') + '"');
                 }
-                csv.push(rowData.join(','));
+                csv.push(rowData.slice(0, 5).join(',')); // Exclude Actions column
             }
         }
         const csvContent = 'data:text/csv;charset=utf-8,' + csv.join('\n');
         const link = document.createElement('a');
         link.setAttribute('href', encodeURI(csvContent));
-        link.setAttribute('download', 'appointments.csv');
+        link.setAttribute('download', 'appointments_' + new Date().toISOString().slice(0,10) + '.csv');
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    }
+
+    function openEditModal(id, patientId, doctorId, dateTime, priority) {
+        document.getElementById('editId').value = id;
+        document.getElementById('editPatientId').value = patientId;
+        document.getElementById('editDoctorId').value = doctorId;
+        document.getElementById('editDateTime').value = dateTime;
+        document.getElementById('editPriority').value = priority;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
     }
 
     window.onload = () => updatePagination();
 </script>
 </body>
 </html>
-
-//test
