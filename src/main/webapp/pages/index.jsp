@@ -8,28 +8,25 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #2C6EBF; /* Softer blue for professionalism */
-            --secondary: #1A937C; /* Rich teal for trust */
-            --accent: #E63946; /* Warm red for urgency */
-            --bg-light: #F8FAFC; /* Light gray-blue for clean background */
-            --text-primary: #1F2A44; /* Darker gray for readability */
-            --text-secondary: #64748B; /* Muted gray for secondary text */
+            --primary: #2C6EBF;
+            --secondary: #1A937C;
+            --accent: #E63946;
+            --bg-light: #F8FAFC;
+            --text-primary: #1F2A44;
+            --text-secondary: #64748B;
             --card-bg: #FFFFFF;
-            --shadow: 0 6px 20px rgba(0, 0, 0, 0.08); /* Softer shadow */
-            --register-btn: #34C759; /* Vibrant green for registration */
-            --border-radius: 12px; /* Consistent rounding */
+            --shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            --register-btn: #34C759;
+            --border-radius: 12px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: 'Inter', 'Segoe UI', Arial, sans-serif; /* Modern font */
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
             background: var(--bg-light);
             color: var(--text-primary);
             line-height: 1.7;
         }
         .container { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
-
-        /* Navigation */
         nav {
             background: var(--primary);
             position: fixed;
@@ -111,8 +108,6 @@
             background: var(--secondary);
             color: #FFFFFF;
         }
-
-        /* Hero Section */
         .hero {
             background: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef') center/cover no-repeat;
             padding: 9rem 2rem 7rem;
@@ -138,7 +133,6 @@
             font-size: 3rem;
             font-weight: 700;
             margin-bottom: 1.25rem;
-            animation: slideUp 0.8s ease;
         }
         .hero p {
             font-size: 1.2rem;
@@ -152,7 +146,6 @@
             border-radius: var(--border-radius);
             text-decoration: none;
             font-weight: 600;
-            font-size: 1.05rem;
             transition: all 0.3s ease;
         }
         .cta-btn:hover {
@@ -160,8 +153,6 @@
             transform: translateY(-3px);
             box-shadow: var(--shadow);
         }
-
-        /* Search Section */
         .search-section {
             margin: -4rem 1.5rem 5rem;
             position: relative;
@@ -182,9 +173,7 @@
         .form-grid {
             display: grid;
             gap: 1.25rem;
-        }
-        @media (min-width: 768px) {
-            .form-grid { grid-template-columns: repeat(4, 1fr); }
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
         }
         .form-group label {
             display: block;
@@ -199,13 +188,27 @@
             border: 1px solid #D1D5DB;
             border-radius: 8px;
             font-size: 1rem;
-            background: #F9FAFB;
+            background: #FFFFFF !important; /* Force white background */
+            color: #000000 !important; /* Force black text */
             transition: all 0.3s ease;
+            appearance: none; /* Reset to none for better control */
+            -webkit-appearance: none; /* Reset for Safari/Chrome */
+            -moz-appearance: none; /* Reset for Firefox */
+            min-height: 40px; /* Ensure dropdown options have enough space */
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23000000%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E'); /* Custom dropdown arrow */
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 12px;
         }
         .form-input:focus {
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(44, 110, 191, 0.15);
             outline: none;
+        }
+        .form-input option {
+            color: #000000 !important; /* Force black text for options */
+            background: #FFFFFF !important; /* Force white background for options */
+            padding: 5px; /* Add padding for better readability */
         }
         .search-btn {
             background: var(--primary);
@@ -224,8 +227,6 @@
             transform: translateY(-2px);
             box-shadow: var(--shadow);
         }
-
-        /* Popup */
         .popup {
             display: none;
             position: fixed;
@@ -258,7 +259,6 @@
             background: none;
             border: none;
             color: var(--text-secondary);
-            transition: color 0.2s ease;
         }
         .close-btn:hover { color: var(--accent); }
         .results-grid {
@@ -305,24 +305,22 @@
             background: #16725F;
             transform: translateY(-2px);
         }
-
-        /* Features */
-        .features { padding: 5rem 0; }
-        .features h2 {
+        .features, .specialties { padding: 5rem 0; }
+        .features h2, .specialties h2 {
             text-align: center;
             font-size: 2.25rem;
             margin-bottom: 3.5rem;
             color: var(--primary);
             font-weight: 600;
         }
-        .features-grid {
+        .features-grid, .specialties-grid {
             display: grid;
             gap: 2rem;
         }
         @media (min-width: 768px) {
-            .features-grid { grid-template-columns: repeat(3, 1fr); }
+            .features-grid, .specialties-grid { grid-template-columns: repeat(3, 1fr); }
         }
-        .feature-card {
+        .feature-card, .specialty-card {
             background: var(--card-bg);
             padding: 2.5rem;
             border-radius: var(--border-radius);
@@ -330,7 +328,7 @@
             box-shadow: var(--shadow);
             transition: all 0.3s ease;
         }
-        .feature-card:hover {
+        .feature-card:hover, .specialty-card:hover {
             transform: translateY(-10px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
@@ -339,54 +337,11 @@
             color: var(--secondary);
             margin-bottom: 1.25rem;
         }
-        .feature-card h3 {
-            font-size: 1.35rem;
-            margin-bottom: 0.75rem;
-        }
-        .feature-card p { color: var(--text-secondary); }
-
-        /* Specialties */
-        .specialties {
-            padding: 5rem 0;
-            background: linear-gradient(180deg, var(--bg-light) 60%, rgba(44, 110, 191, 0.05) 100%);
-        }
-        .specialties h2 {
-            text-align: center;
-            font-size: 2.25rem;
-            margin-bottom: 3.5rem;
-            color: var(--primary);
-            font-weight: 600;
-        }
-        .specialties-grid {
-            display: grid;
-            gap: 2rem;
-        }
-        @media (min-width: 768px) {
-            .specialties-grid { grid-template-columns: repeat(3, 1fr); }
-        }
-        .specialty-card {
-            background: var(--card-bg);
-            border-radius: var(--border-radius);
-            overflow: hidden;
-            box-shadow: var(--shadow);
-            transition: all 0.3s ease;
-        }
-        .specialty-card:hover { transform: translateY(-10px); }
         .specialty-card img {
             width: 100%;
             height: 200px;
             object-fit: cover;
         }
-        .specialty-card-content {
-            padding: 1.75rem;
-        }
-        .specialty-card-content h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.75rem;
-        }
-        .specialty-card-content p { color: var(--text-secondary); }
-
-        /* Footer */
         footer {
             background: var(--primary);
             color: #FFFFFF;
@@ -404,14 +359,8 @@
             margin-left: 1.75rem;
             text-decoration: none;
             font-size: 0.95rem;
-            transition: color 0.2s ease;
         }
         .footer-links a:hover { color: var(--secondary); }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(25px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
     </style>
 </head>
 <body>
@@ -492,11 +441,10 @@
     </div>
 </section>
 
-<!-- Popup for Results -->
 <div class="popup" id="resultsPopup">
     <div class="popup-content">
         <button class="close-btn" onclick="closePopup()">×</button>
-        <h2>Available Doctors (Sorted by Name)</h2>
+        <h2>Available Time Slots (Sorted by Date & Time)</h2>
         <div class="results-grid" id="resultsContainer"></div>
     </div>
 </div>
@@ -538,18 +486,33 @@
     let allAvailability = [];
 
     window.onload = function() {
-        document.getElementById('resultsContainer').innerHTML = '<p class="loading">Loading specialties...</p>';
-        fetch('<%=request.getContextPath()%>/SortServlet')
-            .then(response => response.json())
+        console.log('Loading specialties...');
+        document.getElementById('resultsContainer').innerHTML = '<p>Loading specialties...</p>';
+        fetch('<%=request.getContextPath()%>/SortServlet', {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error('Failed to fetch specialties: ' + response.statusText + ' - ' + text);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('Initial load:', data);
-                allSpecialties = data.specialties; // Already sorted by Set in SortServlet
+                console.log('Specialties data:', data);
+                allSpecialties = data.specialties || [];
+                if (allSpecialties.length === 0) {
+                    console.warn('No specialties found in the response.');
+                }
                 populateSpecialties();
                 document.getElementById('resultsContainer').innerHTML = '';
             })
             .catch(error => {
-                console.error('Initial load error:', error);
-                document.getElementById('resultsContainer').innerHTML = '<p class="error">Failed to load specialties. Please try again.</p>';
+                console.error('Error loading specialties:', error);
+                document.getElementById('resultsContainer').innerHTML = '<p>Error loading specialties: ' + error.message + '</p>';
             });
     };
 
@@ -559,33 +522,52 @@
         allSpecialties.forEach(specialty => {
             specialtySelect.innerHTML += `<option value="${specialty}">${specialty}</option>`;
         });
+        console.log('Specialty dropdown populated with:', allSpecialties);
     }
 
     function updateDoctors() {
         const specialty = document.getElementById('specialty').value;
         const doctorSelect = document.getElementById('doctor');
-        doctorSelect.innerHTML = '<option value="">Loading doctors...</option>';
+        doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
 
         if (!specialty) {
-            doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+            console.log('No specialty selected, clearing doctor dropdown.');
             updateDates();
             return;
         }
 
-        fetch('<%=request.getContextPath()%>/SortServlet?specialty=' + encodeURIComponent(specialty))
-            .then(response => response.json())
+        console.log('Fetching doctors for specialty:', specialty);
+        fetch('<%=request.getContextPath()%>/SortServlet?specialty=' + encodeURIComponent(specialty), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(response => {
+                console.log('Doctors response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error('Failed to fetch doctors: ' + response.statusText + ' - ' + text);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('Doctors for specialty:', data);
-                allDoctors = data.doctors; // Sorted alphabetically by SortServlet
-                doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
-                allDoctors.forEach(doctor => {
-                    doctorSelect.innerHTML += `<option value="${doctor}">${doctor}</option>`;
-                });
+                console.log('Doctors data:', data);
+                allDoctors = data.doctors || [];
+                if (allDoctors.length === 0) {
+                    console.warn('No doctors found for specialty:', specialty);
+                    doctorSelect.innerHTML = '<option value="">No doctors available</option>';
+                } else {
+                    doctorSelect.innerHTML = '<option value="">Select Doctor</option>';
+                    allDoctors.forEach(doctor => {
+                        doctorSelect.innerHTML += `<option value="${doctor}">${doctor}</option>`;
+                    });
+                    console.log('Doctor dropdown populated with:', allDoctors);
+                }
                 updateDates();
             })
             .catch(error => {
                 console.error('Error loading doctors:', error);
-                doctorSelect.innerHTML = '<option value="">Error loading doctors</option>';
+                doctorSelect.innerHTML = '<option value="">Error loading doctors: ' + error.message + '</option>';
             });
     }
 
@@ -593,29 +575,47 @@
         const specialty = document.getElementById('specialty').value;
         const doctor = document.getElementById('doctor').value;
         const dateSelect = document.getElementById('date');
-        dateSelect.innerHTML = '<option value="">Loading dates...</option>';
+        dateSelect.innerHTML = '<option value="">Select Date</option>';
 
         if (!specialty || !doctor) {
-            dateSelect.innerHTML = '<option value="">Select Date</option>';
+            console.log('Specialty or doctor not selected, clearing date dropdown.');
             return;
         }
 
+        console.log('Fetching availability for specialty:', specialty, 'and doctor:', doctor);
         fetch('<%=request.getContextPath()%>/SortServlet?specialty=' + encodeURIComponent(specialty) +
-            '&doctor=' + encodeURIComponent(doctor))
-            .then(response => response.json())
+            '&doctor=' + encodeURIComponent(doctor), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(response => {
+                console.log('Availability response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error('Failed to fetch availability: ' + response.statusText + ' - ' + text);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
-                console.log('Availability:', data);
-                allAvailability = data.availability; // Sorted by name in SortServlet
-                dateSelect.innerHTML = '<option value="">Select Date</option>';
-                const uniqueDates = [...new Set(allAvailability.map(avail => avail.date))];
-                uniqueDates.sort(); // Sort dates for better UX
-                uniqueDates.forEach(date => {
-                    dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
-                });
+                console.log('Availability data:', data);
+                allAvailability = data.availability || [];
+                if (allAvailability.length === 0) {
+                    console.warn('No availability found for specialty:', specialty, 'and doctor:', doctor);
+                    dateSelect.innerHTML = '<option value="">No dates available</option>';
+                } else {
+                    const uniqueDates = [...new Set(allAvailability.map(avail => avail.date))];
+                    uniqueDates.sort();
+                    dateSelect.innerHTML = '<option value="">Select Date</option>';
+                    uniqueDates.forEach(date => {
+                        dateSelect.innerHTML += `<option value="${date}">${date}</option>`;
+                    });
+                    console.log('Date dropdown populated with:', uniqueDates);
+                }
             })
             .catch(error => {
                 console.error('Error loading dates:', error);
-                dateSelect.innerHTML = '<option value="">Error loading dates</option>';
+                dateSelect.innerHTML = '<option value="">Error loading dates: ' + error.message + '</option>';
             });
     }
 
@@ -632,8 +632,9 @@
             return;
         }
 
+        console.log('Searching with params:', { specialty, doctor, date, time });
         const resultsContainer = document.getElementById('resultsContainer');
-        resultsContainer.innerHTML = '<p class="loading">Searching for doctors...</p>';
+        resultsContainer.innerHTML = '<p>Searching...</p>';
         document.getElementById('resultsPopup').style.display = 'flex';
 
         fetch('<%=request.getContextPath()%>/SortServlet?' + new URLSearchParams({
@@ -641,16 +642,27 @@
             doctor: doctor,
             date: date,
             time: time
-        }))
-            .then(response => response.json())
+        }), {
+            method: 'GET',
+            headers: { 'Accept': 'application/json' }
+        })
+            .then(response => {
+                console.log('Search response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error('Failed to fetch search results: ' + response.statusText + ' - ' + text);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
                 console.log('Search results:', data);
                 resultsContainer.innerHTML = '';
 
                 if (!data.availability || data.availability.length === 0) {
-                    resultsContainer.innerHTML = '<p>No doctors found matching your criteria.</p>';
+                    resultsContainer.innerHTML = '<p>No available time slots found.</p>';
                 } else {
-                    data.availability.forEach(doc => { // Data is already sorted by name from SortServlet
+                    data.availability.forEach(doc => {
                         const card = `
                             <div class="result-card">
                                 <h3>${doc.name}</h3>
@@ -664,11 +676,12 @@
                         `;
                         resultsContainer.innerHTML += card;
                     });
+                    console.log('Sorted time slots displayed:', data.availability);
                 }
             })
             .catch(error => {
                 console.error('Search error:', error);
-                resultsContainer.innerHTML = '<p class="error">Error loading results. Please try again.</p>';
+                resultsContainer.innerHTML = '<p>Error loading results: ' + error.message + '</p>';
             });
     }
 
@@ -677,22 +690,39 @@
     }
 
     function bookAppointment(username, date, time) {
-        console.log('Booking:', { username, date, time });
+        <% if (session.getAttribute("username") == null) { %>
+        alert("Please log in as a patient to book an appointment.");
+        window.location.href = '<%=request.getContextPath()%>/pages/login.jsp?role=patient';
+        return;
+        <% } %>
+        console.log('Booking appointment:', { username, date, time });
         fetch('<%=request.getContextPath()%>/AppointmentServlet', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: username, date: date, time: time })
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ doctorUsername: username, date: date, time: time })
         })
-            .then(response => response.json())
+            .then(response => {
+                console.log('Booking response status:', response.status);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error('Failed to book appointment: ' + response.statusText + ' - ' + text);
+                    });
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('Booking response:', data);
                 if (data.success) {
                     alert('Appointment booked successfully!');
                     closePopup();
                 } else {
-                    alert('Failed to book appointment: ' + data.message);
+                    alert('Failed to book: ' + data.message);
                 }
             })
-            .catch(error => console.error('Booking error:', error));
+            .catch(error => {
+                console.error('Booking error:', error);
+                alert('Error booking appointment: ' + error.message);
+            });
     }
 </script>
 </body>
