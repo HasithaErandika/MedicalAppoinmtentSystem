@@ -1,5 +1,6 @@
 package controller;
 
+import com.google.gson.Gson;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,7 +10,10 @@ import service.AppointmentService;
 import service.DoctorAvailabilityService;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -43,7 +47,7 @@ public class AppointmentServlet extends HttpServlet {
 
         List<Appointment> appointments;
         if ("admin".equals(role)) {
-            appointments = appointmentService.getSortedAppointments(); // Admin sees all sorted
+            appointments = appointmentService.getSortedAppointments();
         } else {
             appointments = appointmentService.getAllAppointments().stream()
                     .filter(appt -> appt.getPatientId().equals(username))
@@ -64,32 +68,33 @@ public class AppointmentServlet extends HttpServlet {
             return;
         }
 
-        String action = request.getParameter("action");
-        LOGGER.info("User " + username + " (" + role + ") posted action: " + action);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        Map<String, Object> responseData = new HashMap<>();
+        Gson gson = new Gson();
 
         try {
-            if ("book".equals(action) && !"admin".equals(role)) {
-                String doctorId = request.getParameter("doctorId");
-                String dateTime = request.getParameter("dateTime");
-                boolean isEmergency = "on".equals(request.getParameter("isEmergency"));
-                if (!availabilityService.isTimeSlotAvailable(doctorId, dateTime)) {
-                    throw new IllegalStateException("Time slot not available");
-                }
-                appointmentService.bookAppointment(username, doctorId, dateTime, isEmergency);
-                request.setAttribute("message", "Appointment booked successfully!");
-            } else if ("cancel".equals(action)) {
-                int appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
-                appointmentService.cancelAppointment(appointmentId);
-                request.setAttribute("message", "Appointment canceled successfully!");
+            String doctorUsername = request.getParameter("doctorUsername");
+            String date = request.getParameter("date");
+            String time = request.getParameter("time");
+            String dateTime = date + " " + time;
+
+            if (!availabilityService.isTimeSlotAvailable(doctorUsername, dateTime)) {
+                responseData.put("success", false);
+                responseData.put("message", "Time slot not available");
+            } else {
+                appointmentService.bookAppointment(username, doctorUsername, dateTime, false); // Assuming non-emergency from index.js
+                responseData.put("success", true);
             }
-        } catch (IllegalStateException e) {
+        } catch (IllegalArgumentException | IOException e) {
             LOGGER.log(Level.WARNING, "Booking error for " + username + ": " + e.getMessage());
-            request.setAttribute("error", "Error: " + e.getMessage());
-        } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "IO error during " + action + " for " + username, e);
-            request.setAttribute("error", "Server error: " + e.getMessage());
+            responseData.put("success", false);
+            responseData.put("message", "Error: " + e.getMessage());
         }
 
-        doGet(request, response); // Refresh page
+        try (PrintWriter out = response.getWriter()) {
+            out.print(gson.toJson(responseData));
+            out.flush();
+        }
     }
 }

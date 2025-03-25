@@ -5,26 +5,24 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import service.AppointmentService;
-import service.DoctorAvailabilityService;
 import java.io.*;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SortServlet extends HttpServlet {
+
     private static final Logger LOGGER = Logger.getLogger(SortServlet.class.getName());
     private static final String DOCTORS_FILE = "/data/doctors.txt";
     private static final String AVAILABILITY_FILE = "/data/doctors_availability.txt";
     private static final String NAME = "name";
     private static final String SPECIALTY = "specialty";
-    private Map<String, Map<String, String>> cachedDoctorDetails;
-    private Map<String, List<String>> cachedSpecialtyDoctors;
-    private AppointmentService appointmentService;
-    private DoctorAvailabilityService availabilityService;
+    private static final String DATE_FORMAT = "yyyy-MM-dd";
 
-    static class Doctor {
+    static class Doctor implements Comparable<Doctor> {
         String username;
         String name;
         String specialty;
@@ -35,7 +33,7 @@ public class SortServlet extends HttpServlet {
         Doctor(String username, String name, String specialty, String date, String startTime, String endTime) {
             this.username = username;
             this.name = name;
-            this.specialty = specialty.toLowerCase();
+            this.specialty = specialty;
             this.date = date;
             this.startTime = startTime;
             this.endTime = endTime;
@@ -45,26 +43,26 @@ public class SortServlet extends HttpServlet {
             try {
                 return LocalTime.parse(startTime);
             } catch (DateTimeParseException e) {
-                LOGGER.warning("Invalid start time: " + startTime + " for doctor " + name);
-                return null;
+                LOGGER.warning("Invalid start time format: " + startTime + ", defaulting to 00:00");
+                return LocalTime.of(0, 0);
             }
         }
-    }
 
-    @Override
-    public void init() throws ServletException {
-        String doctorsPath = getServletContext().getRealPath(DOCTORS_FILE);
-        String appointmentsPath = getServletContext().getRealPath("/data/appointments.txt");
-        String availabilityPath = getServletContext().getRealPath(AVAILABILITY_FILE);
-        cachedDoctorDetails = loadDoctorDetails(doctorsPath);
-        cachedSpecialtyDoctors = loadSpecialtiesAndDoctors(cachedDoctorDetails);
-        try {
-            appointmentService = new AppointmentService(appointmentsPath);
-            availabilityService = new DoctorAvailabilityService(availabilityPath, appointmentService);
-        } catch (IOException e) {
-            throw new ServletException("Failed to initialize services", e);
+        public LocalTime getEndTimeAsLocalTime() {
+            try {
+                return LocalTime.parse(endTime);
+            } catch (DateTimeParseException e) {
+                LOGGER.warning("Invalid end time format: " + endTime + ", defaulting to 00:00");
+                return LocalTime.of(0, 0);
+            }
         }
-        LOGGER.info("Servlet initialized with " + cachedDoctorDetails.size() + " doctors.");
+
+        @Override
+        public int compareTo(Doctor other) {
+            int dateComparison = this.date.compareTo(other.date);
+            if (dateComparison != 0) return dateComparison;
+            return this.getStartTimeAsLocalTime().compareTo(other.getStartTimeAsLocalTime());
+        }
     }
 
     @Override
@@ -78,87 +76,76 @@ public class SortServlet extends HttpServlet {
         String date = request.getParameter("date");
         String time = request.getParameter("time");
 
-        LOGGER.info("Request received: specialty=" + specialty + ", doctor=" + doctorName + ", date=" + date + ", time=" + time);
+        LOGGER.info("Request params - specialty: " + specialty + ", doctor: " + doctorName + ", date: " + date + ", time: " + time);
 
-        List<Doctor> allDoctors = loadDoctors(request.getServletContext().getRealPath(AVAILABILITY_FILE), cachedDoctorDetails);
+        Map<String, Map<String, String>> doctorDetails = loadDoctorDetails(request);
+        Map<String, List<String>> specialtyDoctors = loadSpecialtiesAndDoctors(doctorDetails);
+        List<Doctor> allDoctors = loadDoctors(request, doctorDetails);
 
         Map<String, Object> responseData = new HashMap<>();
-        responseData.put("specialties", new ArrayList<>(cachedSpecialtyDoctors.keySet()));
-        responseData.put("doctors", new ArrayList<>());
-        responseData.put("availability", new ArrayList<>());
+        List<String> specialties = new ArrayList<>(specialtyDoctors.keySet());
+        Collections.sort(specialties, String.CASE_INSENSITIVE_ORDER);
+        responseData.put("specialties", specialties);
 
-        if (specialty != null && !specialty.trim().isEmpty()) {
-            List<String> doctorsForSpecialty = cachedSpecialtyDoctors.getOrDefault(specialty.toLowerCase(), new ArrayList<>());
-            Collections.sort(doctorsForSpecialty);
-            responseData.put("doctors", doctorsForSpecialty);
-
-            List<Doctor> filteredDoctors = filterDoctors(allDoctors, specialty, doctorName, date, time);
-            bubbleSortDoctors(filteredDoctors);
-            List<Doctor> availableDoctors = new ArrayList<>();
-            for (Doctor doc : filteredDoctors) {
-                String dateTime = doc.date + " " + doc.startTime;
-                if (availabilityService.isTimeSlotAvailable(doc.username, dateTime)) {
-                    availableDoctors.add(doc);
+        if (specialty == null || specialty.trim().isEmpty()) {
+            responseData.put("doctors", new ArrayList<>());
+            responseData.put("availability", new ArrayList<>());
+        } else {
+            String specialtyLower = specialty.toLowerCase();
+            List<String> doctorsForSpecialty = null;
+            for (String key : specialtyDoctors.keySet()) {
+                if (key.equalsIgnoreCase(specialtyLower)) {
+                    doctorsForSpecialty = specialtyDoctors.get(key);
+                    break;
                 }
             }
-            responseData.put("availability", availableDoctors);
+            if (doctorsForSpecialty == null) {
+                doctorsForSpecialty = new ArrayList<>();
+            }
+            LOGGER.info("Doctors for specialty '" + specialtyLower + "': " + doctorsForSpecialty);
+            Collections.sort(doctorsForSpecialty, String.CASE_INSENSITIVE_ORDER);
+            responseData.put("doctors", doctorsForSpecialty);
+
+            List<Doctor> filteredDoctors = filterDoctors(allDoctors, specialtyLower, doctorName, date, time);
+            Collections.sort(filteredDoctors);
+            responseData.put("availability", filteredDoctors);
         }
 
         Gson gson = new Gson();
         String jsonResponse = gson.toJson(responseData);
+        LOGGER.info("Response JSON: " + jsonResponse);
         try (PrintWriter out = response.getWriter()) {
             out.print(jsonResponse);
             out.flush();
         }
     }
 
-    private void bubbleSortDoctors(List<Doctor> doctors) {
-        int n = doctors.size();
-        for (int i = 0; i < n - 1; i++) {
-            for (int j = 0; j < n - i - 1; j++) {
-                Doctor current = doctors.get(j);
-                Doctor next = doctors.get(j + 1);
-                int dateCompare = current.date.compareTo(next.date);
-                if (dateCompare > 0) {
-                    swap(doctors, j, j + 1);
-                } else if (dateCompare == 0) {
-                    LocalTime t1 = current.getStartTimeAsLocalTime();
-                    LocalTime t2 = next.getStartTimeAsLocalTime();
-                    if (t1 != null && t2 != null && t1.isAfter(t2)) {
-                        swap(doctors, j, j + 1);
-                    }
-                }
-            }
-        }
-    }
-
-    private void swap(List<Doctor> doctors, int i, int j) {
-        Doctor temp = doctors.get(i);
-        doctors.set(i, doctors.get(j));
-        doctors.set(j, temp);
-    }
-
-    private Map<String, Map<String, String>> loadDoctorDetails(String doctorsPath) throws ServletException {
+    private Map<String, Map<String, String>> loadDoctorDetails(HttpServletRequest request) throws ServletException {
         Map<String, Map<String, String>> doctorDetails = new HashMap<>();
+        String doctorsPath = request.getServletContext().getRealPath(DOCTORS_FILE);
+
         File file = new File(doctorsPath);
         if (!file.exists()) {
-            LOGGER.severe("doctors.txt file not found at: " + doctorsPath);
-            throw new ServletException("doctors.txt file not found");
+            LOGGER.severe("Doctors file not found at: " + doctorsPath);
+            throw new ServletException("Doctors file not found");
         }
+
         try (BufferedReader br = new BufferedReader(new FileReader(doctorsPath))) {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length >= 4) {
                     Map<String, String> details = new HashMap<>();
-                    details.put(NAME, parts[1].trim()); // Assuming format: id,name,specialization,contact
-                    details.put(SPECIALTY, parts[2].trim().toLowerCase());
+                    details.put(NAME, parts[2].trim());
+                    details.put(SPECIALTY, parts[3].trim());
                     doctorDetails.put(parts[0].trim(), details);
                 }
             }
         } catch (IOException e) {
-            throw new ServletException("Error loading doctors.txt", e);
+            LOGGER.log(Level.SEVERE, "Error loading doctor details", e);
+            throw new ServletException("Error loading doctor details", e);
         }
+        LOGGER.info("Loaded doctor details: " + doctorDetails);
         return doctorDetails;
     }
 
@@ -169,16 +156,20 @@ public class SortServlet extends HttpServlet {
             String doctorName = entry.getValue().get(NAME);
             specialtyDoctors.computeIfAbsent(specialty, k -> new ArrayList<>()).add(doctorName);
         }
+        LOGGER.info("Specialty to doctors mapping: " + specialtyDoctors);
         return specialtyDoctors;
     }
 
-    private List<Doctor> loadDoctors(String availabilityPath, Map<String, Map<String, String>> doctorDetails) throws ServletException {
+    private List<Doctor> loadDoctors(HttpServletRequest request, Map<String, Map<String, String>> doctorDetails) throws ServletException {
         List<Doctor> doctors = new ArrayList<>();
+        String availabilityPath = request.getServletContext().getRealPath(AVAILABILITY_FILE);
+
         File file = new File(availabilityPath);
         if (!file.exists()) {
-            LOGGER.severe("doctors_availability.txt file not found at: " + availabilityPath);
-            throw new ServletException("doctors_availability.txt file not found");
+            LOGGER.severe("Availability file not found at: " + availabilityPath);
+            throw new ServletException("Availability file not found");
         }
+
         try (BufferedReader br = new BufferedReader(new FileReader(availabilityPath))) {
             String line;
             while ((line = br.readLine()) != null) {
@@ -186,56 +177,61 @@ public class SortServlet extends HttpServlet {
                 if (parts.length >= 4) {
                     Map<String, String> details = doctorDetails.get(parts[0].trim());
                     if (details != null) {
-                        doctors.add(new Doctor(parts[0].trim(), details.get(NAME), details.get(SPECIALTY), parts[1].trim(), parts[2].trim(), parts[3].trim()));
+                        doctors.add(new Doctor(
+                                parts[0].trim(),         // username
+                                details.get(NAME),       // name
+                                details.get(SPECIALTY),  // specialty
+                                parts[1].trim(),         // date
+                                parts[2].trim(),         // startTime
+                                parts[3].trim()          // endTime
+                        ));
+                    } else {
+                        LOGGER.warning("No doctor details found for username: " + parts[0].trim());
                     }
                 }
             }
         } catch (IOException e) {
-            throw new ServletException("Error loading doctors_availability.txt", e);
+            LOGGER.log(Level.SEVERE, "Error loading doctor availability", e);
+            throw new ServletException("Error loading doctor availability", e);
         }
+        LOGGER.info("Loaded doctors availability: " + doctors.size() + " entries");
         return doctors;
     }
 
     private List<Doctor> filterDoctors(List<Doctor> doctors, String specialty, String doctorName, String date, String time) {
-        // ... existing filter logic from your original code ...
         List<Doctor> filtered = new ArrayList<>();
         LocalTime now = LocalTime.now();
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd");
-        String today = sdf.format(new Date());
+        String today = new SimpleDateFormat(DATE_FORMAT).format(new Date());
 
         for (Doctor doc : doctors) {
             boolean matches = true;
 
-            if (specialty != null && !specialty.isEmpty() && !doc.specialty.equals(specialty)) {
+            if (specialty != null && !specialty.trim().isEmpty() && !doc.specialty.equalsIgnoreCase(specialty)) {
                 matches = false;
             }
-            if (doctorName != null && !doctorName.isEmpty() && !doc.name.equalsIgnoreCase(doctorName)) {
+            if (doctorName != null && !doctorName.trim().isEmpty() && !doc.name.equalsIgnoreCase(doctorName)) {
                 matches = false;
             }
-            if (date != null && !date.isEmpty() && !doc.date.equals(date)) {
+            if (date != null && !date.trim().isEmpty() && !doc.date.equals(date)) {
                 matches = false;
             }
-            if (date != null && date.equals(today) && doc.getStartTimeAsLocalTime() != null && doc.getStartTimeAsLocalTime().isBefore(now)) {
-                matches = false;
-            }
-            if (time != null && !time.isEmpty() && doc.getStartTimeAsLocalTime() != null) {
+            if (time != null && !time.trim().isEmpty() && doc.getStartTimeAsLocalTime() != null) {
                 LocalTime start = doc.getStartTimeAsLocalTime();
                 switch (time) {
-                    case "morning":
-                        if (start.isBefore(LocalTime.of(8, 0)) || start.isAfter(LocalTime.of(12, 0))) matches = false;
-                        break;
-                    case "afternoon":
-                        if (start.isBefore(LocalTime.of(12, 0)) || start.isAfter(LocalTime.of(17, 0))) matches = false;
-                        break;
-                    default:
-                        LOGGER.warning("Unknown time filter: " + time);
+                    case "morning": if (start.isBefore(LocalTime.of(8, 0)) || start.isAfter(LocalTime.of(12, 0))) matches = false; break;
+                    case "afternoon": if (start.isBefore(LocalTime.of(12, 0)) || start.isAfter(LocalTime.of(17, 0))) matches = false; break;
+                    default: LOGGER.warning("Unknown time filter: " + time);
                 }
+            }
+            if (date != null && date.equals(today) && doc.getStartTimeAsLocalTime().isBefore(now)) {
+                matches = false;
             }
 
             if (matches) {
                 filtered.add(doc);
             }
         }
+        LOGGER.info("Filtered doctors for specialty '" + specialty + "' and doctor '" + doctorName + "': " + filtered.size() + " entries");
         return filtered;
     }
 }
