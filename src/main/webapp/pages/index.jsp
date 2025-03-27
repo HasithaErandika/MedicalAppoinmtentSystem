@@ -136,6 +136,12 @@
 </footer>
 
 <script>
+    window.contextPath = "<%=request.getContextPath()%>";
+    <% if (session.getAttribute("username") != null) { %>
+    document.body.dataset.loggedIn = "true";
+    <% } else { %>
+    document.body.dataset.loggedIn = "false";
+    <% } %>
 </script>
 <script src="<%=request.getContextPath()%>/assets/js/index.js?ver=<%=System.currentTimeMillis()%>"></script>
 </body>
