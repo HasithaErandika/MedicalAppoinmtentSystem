@@ -27,7 +27,7 @@ public class SortServlet extends HttpServlet {
         String name;
         String specialty;
         String date;
-        String startTime; // Keep as String to avoid parsing issues in constructor
+        String startTime;
         String endTime;
 
         Doctor(String username, String name, String specialty, String date, String startTime, String endTime) {
@@ -74,25 +74,39 @@ public class SortServlet extends HttpServlet {
         String specialty = request.getParameter("specialty");
         String doctorName = request.getParameter("doctor");
         String date = request.getParameter("date");
+        String time = request.getParameter("time");
 
-        LOGGER.info("Request params - specialty: " + specialty + ", doctor: " + doctorName + ", date: " + date);
+        LOGGER.info("Request params - specialty: " + specialty + ", doctor: " + doctorName + ", date: " + date + ", time: " + time);
 
         Map<String, Map<String, String>> doctorDetails = loadDoctorDetails(request);
         Map<String, List<String>> specialtyDoctors = loadSpecialtiesAndDoctors(doctorDetails);
         List<Doctor> allDoctors = loadDoctors(request, doctorDetails);
 
         Map<String, Object> responseData = new HashMap<>();
-        responseData.put("specialties", new ArrayList<>(specialtyDoctors.keySet()));
+        List<String> specialties = new ArrayList<>(specialtyDoctors.keySet());
+        Collections.sort(specialties, String.CASE_INSENSITIVE_ORDER);
+        responseData.put("specialties", specialties);
 
         if (specialty == null || specialty.trim().isEmpty()) {
             responseData.put("doctors", new ArrayList<>());
             responseData.put("availability", new ArrayList<>());
         } else {
-            List<String> doctorsForSpecialty = specialtyDoctors.getOrDefault(specialty, new ArrayList<>());
+            String specialtyLower = specialty.toLowerCase();
+            List<String> doctorsForSpecialty = null;
+            for (String key : specialtyDoctors.keySet()) {
+                if (key.equalsIgnoreCase(specialtyLower)) {
+                    doctorsForSpecialty = specialtyDoctors.get(key);
+                    break;
+                }
+            }
+            if (doctorsForSpecialty == null) {
+                doctorsForSpecialty = new ArrayList<>();
+            }
+            LOGGER.info("Doctors for specialty '" + specialtyLower + "': " + doctorsForSpecialty);
             Collections.sort(doctorsForSpecialty, String.CASE_INSENSITIVE_ORDER);
             responseData.put("doctors", doctorsForSpecialty);
 
-            List<Doctor> filteredDoctors = filterDoctors(allDoctors, specialty, doctorName, date);
+            List<Doctor> filteredDoctors = filterDoctors(allDoctors, specialtyLower, doctorName, date, time);
             Collections.sort(filteredDoctors);
             responseData.put("availability", filteredDoctors);
         }
@@ -100,14 +114,21 @@ public class SortServlet extends HttpServlet {
         Gson gson = new Gson();
         String jsonResponse = gson.toJson(responseData);
         LOGGER.info("Response JSON: " + jsonResponse);
-        PrintWriter out = response.getWriter();
-        out.print(jsonResponse);
-        out.flush();
+        try (PrintWriter out = response.getWriter()) {
+            out.print(jsonResponse);
+            out.flush();
+        }
     }
 
     private Map<String, Map<String, String>> loadDoctorDetails(HttpServletRequest request) throws ServletException {
         Map<String, Map<String, String>> doctorDetails = new HashMap<>();
         String doctorsPath = request.getServletContext().getRealPath(DOCTORS_FILE);
+
+        File file = new File(doctorsPath);
+        if (!file.exists()) {
+            LOGGER.severe("Doctors file not found at: " + doctorsPath);
+            throw new ServletException("Doctors file not found");
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(doctorsPath))) {
             String line;
@@ -124,6 +145,7 @@ public class SortServlet extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Error loading doctor details", e);
             throw new ServletException("Error loading doctor details", e);
         }
+        LOGGER.info("Loaded doctor details: " + doctorDetails);
         return doctorDetails;
     }
 
@@ -134,12 +156,19 @@ public class SortServlet extends HttpServlet {
             String doctorName = entry.getValue().get(NAME);
             specialtyDoctors.computeIfAbsent(specialty, k -> new ArrayList<>()).add(doctorName);
         }
+        LOGGER.info("Specialty to doctors mapping: " + specialtyDoctors);
         return specialtyDoctors;
     }
 
     private List<Doctor> loadDoctors(HttpServletRequest request, Map<String, Map<String, String>> doctorDetails) throws ServletException {
         List<Doctor> doctors = new ArrayList<>();
         String availabilityPath = request.getServletContext().getRealPath(AVAILABILITY_FILE);
+
+        File file = new File(availabilityPath);
+        if (!file.exists()) {
+            LOGGER.severe("Availability file not found at: " + availabilityPath);
+            throw new ServletException("Availability file not found");
+        }
 
         try (BufferedReader br = new BufferedReader(new FileReader(availabilityPath))) {
             String line;
@@ -153,9 +182,11 @@ public class SortServlet extends HttpServlet {
                                 details.get(NAME),       // name
                                 details.get(SPECIALTY),  // specialty
                                 parts[1].trim(),         // date
-                                parts[2].trim(),         // startTime (as String)
-                                parts[3].trim()          // endTime (as String)
+                                parts[2].trim(),         // startTime
+                                parts[3].trim()          // endTime
                         ));
+                    } else {
+                        LOGGER.warning("No doctor details found for username: " + parts[0].trim());
                     }
                 }
             }
@@ -163,10 +194,11 @@ public class SortServlet extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Error loading doctor availability", e);
             throw new ServletException("Error loading doctor availability", e);
         }
+        LOGGER.info("Loaded doctors availability: " + doctors.size() + " entries");
         return doctors;
     }
 
-    private List<Doctor> filterDoctors(List<Doctor> doctors, String specialty, String doctorName, String date) {
+    private List<Doctor> filterDoctors(List<Doctor> doctors, String specialty, String doctorName, String date, String time) {
         List<Doctor> filtered = new ArrayList<>();
         LocalTime now = LocalTime.now();
         String today = new SimpleDateFormat(DATE_FORMAT).format(new Date());
@@ -183,14 +215,23 @@ public class SortServlet extends HttpServlet {
             if (date != null && !date.trim().isEmpty() && !doc.date.equals(date)) {
                 matches = false;
             }
+            if (time != null && !time.trim().isEmpty() && doc.getStartTimeAsLocalTime() != null) {
+                LocalTime start = doc.getStartTimeAsLocalTime();
+                switch (time) {
+                    case "morning": if (start.isBefore(LocalTime.of(8, 0)) || start.isAfter(LocalTime.of(12, 0))) matches = false; break;
+                    case "afternoon": if (start.isBefore(LocalTime.of(12, 0)) || start.isAfter(LocalTime.of(17, 0))) matches = false; break;
+                    default: LOGGER.warning("Unknown time filter: " + time);
+                }
+            }
             if (date != null && date.equals(today) && doc.getStartTimeAsLocalTime().isBefore(now)) {
-                matches = false; // Exclude past slots for today
+                matches = false;
             }
 
             if (matches) {
                 filtered.add(doc);
             }
         }
+        LOGGER.info("Filtered doctors for specialty '" + specialty + "' and doctor '" + doctorName + "': " + filtered.size() + " entries");
         return filtered;
     }
 }
