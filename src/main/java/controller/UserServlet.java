@@ -17,9 +17,12 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import com.google.gson.Gson;
 
+import jakarta.servlet.annotation.WebServlet;
+
+@WebServlet("/user") // Mapping to /user; adjust if different in your web.xml
 public class UserServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(UserServlet.class.getName());
-    private static final String USER_ROLE = "user"; // Assuming 'user' role for patients
+    private static final String USER_ROLE = "patient"; // Updated to match login.jsp role for patients
     private AppointmentService appointmentService;
     private DoctorAvailabilityService availabilityService;
     private FileHandler doctorFileHandler;
@@ -43,9 +46,12 @@ public class UserServlet extends HttpServlet {
         // Check user authentication
         String username = (String) request.getSession().getAttribute("username");
         String role = (String) request.getSession().getAttribute("role");
+
+        LOGGER.info("Session - username: " + username + ", role: " + role); // Debugging log
+
         if (username == null || !USER_ROLE.equals(role)) {
-            LOGGER.info("Unauthorized access attempt by: " + (username != null ? username : "anonymous"));
-            response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=user");
+            LOGGER.info("Unauthorized access attempt by: " + (username != null ? username : "anonymous") + " with role: " + role);
+            response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=patient"); // Updated role to patient
             return;
         }
 
@@ -125,8 +131,11 @@ public class UserServlet extends HttpServlet {
         // Check user authentication
         String username = (String) request.getSession().getAttribute("username");
         String role = (String) request.getSession().getAttribute("role");
+
+        LOGGER.info("Session - username: " + username + ", role: " + role); // Debugging log
+
         if (username == null || !USER_ROLE.equals(role)) {
-            response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=user");
+            response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=patient"); // Updated role to patient
             return;
         }
 

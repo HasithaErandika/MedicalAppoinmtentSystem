@@ -1,265 +1,171 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediSchedule - Patient Dashboard</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --primary: #4F46E5; /* Indigo */
-            --secondary: #10B981; /* Emerald */
-            --accent: #F43F5E; /* Rose */
-            --bg-light: #F3F4F6; /* Gray-100 */
-            --card-bg: #FFFFFF;
-            --text-dark: #111827; /* Gray-900 */
-            --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            --hover: #E0E7FF; /* Light Indigo */
-        }
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-light);
-            color: var(--text-dark);
-            min-height: 100vh;
-            display: flex;
-        }
-        .sidebar {
-            background: var(--card-bg);
-            box-shadow: var(--shadow);
-            transition: width 0.3s ease;
-            width: 260px;
-            position: fixed;
-            height: 100vh;
-            z-index: 1000;
-        }
-        .sidebar.collapsed { width: 80px; }
-        .sidebar .logo { color: var(--primary); font-weight: 700; font-size: 1.5rem; }
-        .sidebar nav a {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .sidebar nav a:hover, .sidebar nav a.active {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.03);
-        }
-        .sidebar.collapsed span { display: none; }
-        .main-content { margin-left: 260px; transition: margin-left 0.3s ease; }
-        .main-content.expanded { margin-left: 80px; }
-        .dashboard-card {
-            background: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: var(--shadow);
-            padding: 2rem;
-            transition: all 0.3s ease;
-        }
-        .dashboard-card:hover { box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15); }
-        .form-group select, .form-group input {
-            border: 1px solid #E5E7EB;
-            border-radius: 8px;
-            padding: 0.75rem;
-            width: 100%;
-            transition: all 0.3s ease;
-        }
-        .form-group select:focus, .form-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 8px rgba(79, 70, 229, 0.2);
-            outline: none;
-        }
-        .time-slot {
-            padding: 0.75rem;
-            border-radius: 8px;
-            cursor: pointer;
-            border: 1px solid #E5E7EB;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        .time-slot:hover { background: var(--hover); }
-        .time-slot.selected { background: var(--primary); color: white; border-color: var(--primary); }
-        .btn-primary {
-            background: var(--primary);
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            color: white;
-            transition: all 0.3s ease;
-        }
-        .btn-primary:hover { background: #4338CA; transform: translateY(-2px); }
-        .avatar {
-            background: var(--primary);
-            color: white;
-            border-radius: 50%;
-            width: 48px;
-            height: 48px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 1.25rem;
-        }
-        .message { padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem; }
-        .message.success { background: #D1FAE5; color: var(--secondary); }
-        .message.error { background: #FEE2E2; color: var(--accent); }
-        table { border-collapse: separate; border-spacing: 0; }
-        th { background: var(--primary); color: white; font-weight: 600; position: sticky; top: 0; z-index: 10; }
-        td { border-bottom: 1px solid #E5E7EB; }
-        tr:hover { background: var(--hover); }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-        }
-        .modal-content {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: var(--shadow);
-            width: 90%;
-            max-width: 500px;
-        }
-        .close-modal {
-            position: absolute;
-            top: 1rem;
-            right: 1rem;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-dark);
-        }
-
-        @media (max-width: 768px) {
-            .sidebar { width: 80px; }
-            .sidebar span { display: none; }
-            .main-content { margin-left: 80px; padding: 1rem; }
-            .dashboard-card { padding: 1.5rem; }
-        }
-    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/userProfile.css">
 </head>
+
 <body>
+
 <%
+    // Session checks and defaults
     String username = (String) session.getAttribute("username");
     String role = (String) session.getAttribute("role");
-    if (username == null || !"user".equals(role)) { // Adjusted to match UserServlet's USER_ROLE
-        response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=user");
+
+    if (username == null || !"patient".equals(role)) {
+        response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=patient");
         return;
     }
+
+    // User profile data
+    String fullName = (String) session.getAttribute("fullName") != null ? (String) session.getAttribute("fullName") : "John Doe";
+    String email = (String) session.getAttribute("email") != null ? (String) session.getAttribute("email") : "john.doe@example.com";
+    String phone = (String) session.getAttribute("phone") != null ? (String) session.getAttribute("phone") : "123-456-7890";
 %>
-<div class="sidebar p-6" id="sidebar">
-    <button class="absolute top-4 right-4 text-primary text-xl" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
-    <div class="logo mb-10 flex items-center"><i class="fas fa-heartbeat mr-3"></i><span>MediSchedule</span></div>
+
+<!-- Sidebar Section -->
+<div class="sidebar" id="sidebar">
+    <button class="absolute top-5 right-5 text-primary text-xl hover:text-primary-hover transition-all duration-300" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+    <div class="logo"><i class="fas fa-heartbeat"></i><span>MediSchedule</span></div>
     <nav>
         <ul>
-            <li class="mb-4"><a href="<%=request.getContextPath()%>/UserServlet" class="block p-3 rounded-lg active"><i class="fas fa-calendar-check mr-3"></i><span>Book Appointment</span></a></li>
-            <li class="mb-4"><a href="#" onclick="toggleAppointments()" class="block p-3 rounded-lg"><i class="fas fa-list mr-3"></i><span>My Appointments</span></a></li>
-            <li><form action="<%=request.getContextPath()%>/LogoutServlet" method="post"><a href="#" onclick="this.parentNode.submit();" class="block p-3 rounded-lg"><i class="fas fa-sign-out-alt mr-3"></i><span>Logout</span></a></form></li>
+            <li class="mb-4"><a href="<%= request.getContextPath() %>/user" class="active"><i class="fas fa-calendar-check"></i><span>Book Appointment</span></a></li>
+            <li class="mb-4"><a href="#" onclick="toggleAppointments()"><i class="fas fa-list"></i><span>My Appointments</span></a></li>
+            <li class="mb-4"><a href="#" onclick="toggleUserDetails()"><i class="fas fa-user"></i><span>User Details</span></a></li>
+            <li><form action="<%= request.getContextPath() %>/LogoutServlet" method="post"><a href="#" onclick="this.parentNode.submit();"><i class="fas fa-sign-out-alt"></i><span>Logout</span></a></form></li>
         </ul>
     </nav>
 </div>
 
-<div class="main-content p-8 flex-1" id="main-content">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex items-center justify-between mb-8">
-            <div class="flex items-center">
-                <div class="avatar mr-4"><%= username.charAt(0) %></div>
-                <h1 class="text-2xl font-bold">Hello, <%= username %>!</h1>
+<!-- Main Content Section -->
+<div class="main-content" id="main-content">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Header Section -->
+        <div class="flex items-center justify-between mb-10">
+            <div class="flex items-center gap-5">
+                <div class="avatar"><%= username.charAt(0) %></div>
+                <h1 class="text-3xl font-extrabold tracking-tight">Welcome, <%= username %>!</h1>
             </div>
-            <div class="text-gray-600 text-sm"><%= new java.text.SimpleDateFormat("MMMM dd, yyyy").format(new java.util.Date()) %></div>
+            <div class="text-secondary text-sm font-medium"><%= new java.text.SimpleDateFormat("MMMM dd, yyyy").format(new java.util.Date()) %></div>
         </div>
 
+        <!-- Message Display (if any) -->
         <c:if test="${not empty message}">
-            <div class="message ${messageType} flex items-center">
-                <i class="fas ${messageType == 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'} mr-2"></i>
+            <div class="message ${messageType}">
+                <i class="fas ${messageType == 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
                     ${message}
             </div>
         </c:if>
 
-        <div class="dashboard-card">
-            <h2 class="text-xl font-semibold text-primary mb-6">Schedule Your Appointment</h2>
-            <form action="<%=request.getContextPath()%>/UserServlet" method="post" id="bookForm" class="space-y-6">
+        <!-- Book Appointment Section -->
+        <div class="dashboard-card" id="bookAppointmentSection">
+            <h2 class="text-2xl font-bold text-primary mb-8">Schedule Your Appointment</h2>
+            <form action="<%= request.getContextPath() %>/user" method="post" id="bookForm" class="space-y-8">
                 <input type="hidden" name="action" value="book">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <div class="form-group">
-                        <label class="block font-medium mb-2 text-gray-700">Specialty</label>
-                        <select id="specialty" name="specialty" class="w-full" onchange="updateDoctors()">
-                            <option value="">Select Specialty</option>
-                        </select>
+                        <label>Specialty</label>
+                        <select id="specialty" name="specialty" onchange="updateDoctors()"></select>
                     </div>
                     <div class="form-group">
-                        <label class="block font-medium mb-2 text-gray-700">Doctor</label>
-                        <select id="doctorId" name="doctorId" class="w-full" onchange="updateAvailability()">
-                            <option value="">Select Doctor</option>
-                        </select>
+                        <label>Doctor</label>
+                        <select id="doctorId" name="doctorId" onchange="updateAvailability()"></select>
                     </div>
                     <div class="form-group">
-                        <label class="block font-medium mb-2 text-gray-700">Date</label>
-                        <input type="text" id="date" name="date" class="w-full" placeholder="Select a date" required>
+                        <label>Date</label>
+                        <input type="text" id="date" name="date" placeholder="Select a date" required>
                     </div>
                     <div class="form-group">
-                        <label class="block font-medium mb-2 text-gray-700">Time Slot</label>
-                        <div id="timeSlots" class="grid grid-cols-2 gap-2"></div>
+                        <label>Time Slot</label>
+                        <div id="timeSlots" class="grid grid-cols-2 gap-3"></div>
                         <input type="hidden" id="timeSlot" name="timeSlot" required>
                     </div>
                 </div>
-                <div class="flex items-center space-x-4">
-                    <input type="checkbox" id="isEmergency" name="isEmergency" class="h-5 w-5 text-primary focus:ring-primary rounded">
-                    <label for="isEmergency" class="text-gray-700">Emergency Booking</label>
+                <div class="flex items-center gap-5">
+                    <input type="checkbox" id="isEmergency" name="isEmergency" class="h-6 w-6 text-primary rounded focus:ring-primary">
+                    <label for="isEmergency" class="text-secondary font-medium">Emergency Booking</label>
                 </div>
-                <button type="submit" class="btn-primary"><i class="fas fa-calendar-plus mr-2"></i>Book Appointment</button>
+                <button type="submit" class="btn-primary"><i class="fas fa-calendar-plus mr-3"></i>Book Appointment</button>
             </form>
         </div>
 
-        <div class="dashboard-card mt-8 hidden" id="appointmentsSection">
-            <h2 class="text-xl font-semibold text-primary mb-6">Your Upcoming Appointments</h2>
+        <!-- Upcoming Appointments Section -->
+        <div class="dashboard-card mt-10 hidden" id="appointmentsSection">
+            <h2 class="text-2xl font-bold text-primary mb-8">Your Upcoming Appointments</h2>
             <div class="overflow-x-auto">
-                <table class="w-full text-left" id="appointmentsTable">
+                <table>
                     <thead>
                     <tr>
-                        <th class="p-4 rounded-tl-lg" onclick="sortTable(0)">ID <i class="fas fa-sort"></i></th>
-                        <th class="p-4" onclick="sortTable(1)">Doctor <i class="fas fa-sort"></i></th>
-                        <th class="p-4" onclick="sortTable(2)">Date & Time <i class="fas fa-sort"></i></th>
-                        <th class="p-4 rounded-tr-lg" onclick="sortTable(3)">Priority <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(0)">ID <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(1)">Doctor <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(2)">Date & Time <i class="fas fa-sort"></i></th>
+                        <th onclick="sortTable(3)">Priority <i class="fas fa-sort"></i></th>
                     </tr>
                     </thead>
                     <tbody>
                     <c:forEach var="appt" items="${appointments}">
-                        <tr class="border-b">
-                            <td class="p-4">${appt.id}</td>
-                            <td class="p-4">${appt.doctorId}</td>
-                            <td class="p-4">${appt.dateTime}</td>
-                            <td class="p-4 ${appt.priority == 1 ? 'text-red-600 font-semibold' : 'text-gray-600'}">${appt.priority == 1 ? 'Emergency' : 'Normal'}</td>
+                        <tr>
+                            <td>${appt.id}</td>
+                            <td>${appt.doctorId}</td>
+                            <td>${appt.dateTime}</td>
+                            <td class="${appt.priority == 1 ? 'text-error font-semibold' : 'text-secondary'}">${appt.priority == 1 ? 'Emergency' : 'Normal'}</td>
                         </tr>
                     </c:forEach>
                     </tbody>
                 </table>
             </div>
         </div>
+
+        <!-- User Details Section -->
+        <div class="dashboard-card mt-10 hidden" id="userDetailsSection">
+            <h2 class="text-2xl font-bold text-primary mb-8">Your Details</h2>
+            <form action="<%= request.getContextPath() %>/user" method="post" id="detailsForm" class="space-y-8 relative">
+                <div class="progress" id="detailsProgress"></div>
+                <input type="hidden" name="action" value="updateDetails">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" value="<%= username %>" disabled class="bg-gray-100 cursor-not-allowed text-secondary">
+                    </div>
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" name="fullName" value="<%= fullName %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="email" name="email" value="<%= email %>" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="tel" id="phone" name="phone" value="<%= phone %>" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" required>
+                    </div>
+                </div>
+                <div class="flex justify-end gap-5">
+                    <button type="button" class="btn-secondary" onclick="toggleUserDetails()">Cancel</button>
+                    <button type="submit" class="btn-primary" id="saveDetailsBtn"><i class="fas fa-save mr-3"></i>Save Changes</button>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <!-- Confirmation Modal -->
+    <!-- Confirmation Modal for Booking -->
     <div class="modal" id="confirmModal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeModal()">×</button>
-            <h2 class="text-xl font-semibold text-primary mb-4">Confirm Booking</h2>
-            <p id="confirmMessage" class="mb-6 text-gray-700"></p>
-            <div class="flex justify-end space-x-4">
-                <button class="btn-primary bg-gray-500 hover:bg-gray-600" onclick="closeModal()">Cancel</button>
+            <h2 class="text-2xl font-bold text-primary mb-6">Confirm Booking</h2>
+            <p id="confirmMessage" class="mb-8 text-secondary font-medium leading-relaxed"></p>
+            <div class="flex justify-end gap-5">
+                <button class="btn-secondary" onclick="closeModal()">Cancel</button>
                 <button class="btn-primary" onclick="submitBooking()">Confirm</button>
             </div>
         </div>
@@ -275,9 +181,28 @@
         mainContent.classList.toggle('expanded');
     }
 
+    function showSection(sectionId, tabName) {
+        const sections = ['bookAppointmentSection', 'appointmentsSection', 'userDetailsSection'];
+        sections.forEach(id => document.getElementById(id).classList.add('hidden'));
+        document.getElementById(sectionId).classList.remove('hidden');
+        updateSidebarActive(tabName);
+    }
+
     function toggleAppointments() {
-        const section = document.getElementById('appointmentsSection');
-        section.classList.toggle('hidden');
+        showSection('appointmentsSection', 'My Appointments');
+    }
+
+    function toggleUserDetails() {
+        showSection('userDetailsSection', 'User Details');
+    }
+
+    function updateSidebarActive(tabName) {
+        document.querySelectorAll('.sidebar nav a').forEach(link => {
+            link.classList.remove('active');
+            if (link.querySelector('span')?.textContent === tabName) {
+                link.classList.add('active');
+            }
+        });
     }
 
     function updateDoctors() {
@@ -289,11 +214,10 @@
             fetch(`<%=request.getContextPath()%>/SortServlet?specialty=${encodeURIComponent(specialty)}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log('Doctors:', data);
                     if (data.doctors && data.doctors.length > 0) {
                         data.doctors.forEach(name => {
                             const option = document.createElement('option');
-                            option.value = name; // Use name as value for now; adjust if doctorId is needed
+                            option.value = name;
                             option.text = name;
                             doctorSelect.appendChild(option);
                         });
@@ -316,10 +240,9 @@
         timeSlotsDiv.innerHTML = '';
 
         if (doctorName && date) {
-            fetch(`<%=request.getContextPath()%>/UserServlet?action=getTimeSlots&doctorId=${encodeURIComponent(doctorName)}&date=${encodeURIComponent(date)}`)
+            fetch(`<%=request.getContextPath()%>/user?action=getTimeSlots&doctorId=${encodeURIComponent(doctorName)}&date=${encodeURIComponent(date)}`)
                 .then(response => response.json())
                 .then(slots => {
-                    console.log('Time Slots:', slots);
                     if (slots && slots.length > 0) {
                         slots.forEach(slot => {
                             const div = document.createElement('div');
@@ -333,18 +256,18 @@
                             timeSlotsDiv.appendChild(div);
                         });
                     } else {
-                        timeSlotsDiv.innerHTML = '<p class="text-gray-500">No available slots</p>';
+                        timeSlotsDiv.innerHTML = '<p class="text-secondary font-medium">No available slots</p>';
                     }
                 })
                 .catch(error => {
                     console.error('Error fetching time slots:', error);
-                    timeSlotsDiv.innerHTML = '<p class="text-red-500">Error loading slots</p>';
+                    timeSlotsDiv.innerHTML = '<p class="text-error font-medium">Error loading slots</p>';
                 });
         }
     }
 
     function sortTable(n) {
-        const table = document.getElementById('appointmentsTable');
+        const table = document.querySelector('#appointmentsSection table');
         let rows, switching = true, i, shouldSwitch, dir = "asc", switchcount = 0;
         while (switching) {
             switching = false;
@@ -391,14 +314,14 @@
         }
 
         document.getElementById('confirmMessage').innerHTML = `
-            Specialty: ${specialty}<br>
-            Doctor: ${doctorId}<br>
-            Date: ${date}<br>
-            Time: ${timeSlot}<br>
-            Emergency: ${isEmergency ? 'Yes' : 'No'}
+            <strong class="text-primary">Specialty:</strong> ${specialty}<br>
+            <strong class="text-primary">Doctor:</strong> ${doctorId}<br>
+            <strong class="text-primary">Date:</strong> ${date}<br>
+            <strong class="text-primary">Time:</strong> ${timeSlot}<br>
+            <strong class="text-primary">Emergency:</strong> ${isEmergency ? 'Yes' : 'No'}
         `;
         document.getElementById('confirmModal').style.display = 'flex';
-        return false; // Prevent form submission until confirmed
+        return false;
     }
 
     function closeModal() {
@@ -406,8 +329,14 @@
     }
 
     function submitBooking() {
-        document.getElementById('bookForm').onsubmit = null; // Remove confirmation
+        document.getElementById('bookForm').onsubmit = null;
         document.getElementById('bookForm').submit();
+    }
+
+    function showProgressBar(formId, progressId) {
+        const progress = document.getElementById(progressId);
+        progress.style.width = '100%';
+        setTimeout(() => progress.style.width = '0', 1000);
     }
 
     window.onload = () => {
@@ -415,6 +344,7 @@
             .then(response => response.json())
             .then(data => {
                 const specialtySelect = document.getElementById('specialty');
+                specialtySelect.innerHTML = '<option value="">Select Specialty</option>';
                 if (data.specialties && data.specialties.length > 0) {
                     data.specialties.forEach(specialty => {
                         const option = document.createElement('option');
@@ -438,6 +368,14 @@
         });
 
         document.getElementById('bookForm').onsubmit = openConfirmModal;
+        document.getElementById('detailsForm').onsubmit = (e) => {
+            e.preventDefault();
+            showProgressBar('detailsForm', 'detailsProgress');
+            setTimeout(() => document.getElementById('detailsForm').submit(), 300);
+        };
+
+        // Initially show Book Appointment section
+        showSection('bookAppointmentSection', 'Book Appointment');
     };
 </script>
 </body>
