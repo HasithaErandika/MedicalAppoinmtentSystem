@@ -99,5 +99,9 @@
     <servlet-name>UserServlet</servlet-name>
     <url-pattern>/UserServlet</url-pattern>
   </servlet-mapping>
+  <error-page>
+    <error-code>400</error-code>
+    <location>/pages/error.jsp</location>
+  </error-page>
 
 </web-app>
