@@ -30,7 +30,7 @@ public class LoginServlet extends HttpServlet {
         if (username == null || password == null || role == null ||
                 username.trim().isEmpty() || password.trim().isEmpty() || role.trim().isEmpty()) {
             request.setAttribute("error", "All fields are required.");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/pages/login.jsp").forward(request, response);
             return;
         }
 
