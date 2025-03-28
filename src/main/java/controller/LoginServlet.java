@@ -96,7 +96,7 @@ public class LoginServlet extends HttpServlet {
     private String getRedirectUrl(String role) {
         switch (role.toLowerCase()) {
             case "patient":
-                return "/pages/userProfile.jsp";
+                return "/pages/userProfile/userProfile.jsp";
             case "doctor":
                 return "/pages/doctorDashboard.jsp";
             case "admin":
