@@ -206,30 +206,72 @@ tr:hover {
     margin-bottom: 1.5rem;
 }
 
+ .form-group {
+     margin-bottom: 1.5rem; /* Increased margin for better spacing */
+ }
+
 .form-group label {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem; /* Increased margin for label spacing */
     color: var(--text-primary);
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
+    display: block; /* Ensures label takes full width */
+    transition: color 0.2s ease-in-out; /* Smooth color transition */
 }
 
-.form-group input {
+.form-group input,
+.form-group textarea,
+.form-group select { /* Apply styles to textarea and select */
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.875rem 1rem; /* Adjusted padding */
     border: 1px solid var(--border);
-    border-radius: 8px;
-    font-size: 0.9rem;
+    border-radius: 10px; /* Consistent border-radius */
+    font-size: 1rem;
     background: #FFFFFF;
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    outline: none; /* Remove default outline */
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
     border-color: var(--primary);
-    box-shadow: 0 0 0 2px;
-    outline: none;
+    box-shadow: 0 0 0 2px ;
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder { /* Style placeholders */
+    color: var(--text-muted);
+    opacity: 0.8; /* Slightly reduced opacity */
+}
+
+.form-group textarea {
+    resize: vertical; /* Allow vertical resizing for textareas */
+    min-height: 120px; /* Minimum height for textareas */
+}
+
+.form-group select {
+    appearance: none; /* Remove default select styling */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666666'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Custom dropdown arrow */
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    background-size: 16px;
+}
+
+.form-group select:focus {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234A90E2'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Change arrow color on focus */
+}
+
+.form-group.error input,
+.form-group.error textarea,
+.form-group.error select { /* Style error state */
+    border-color: var(--accent);
+}
+
+.form-group .error-message {
+    color: var(--accent);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
 }
 
 /* Animations */
