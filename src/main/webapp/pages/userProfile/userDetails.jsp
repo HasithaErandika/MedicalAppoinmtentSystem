@@ -3,7 +3,9 @@
 
 <section class="dashboard-card user-details" id="userDetailsSection" aria-labelledby="user-details-title">
     <header class="section-header">
-        <h2 id="user-details-title">Your Profile Details</h2>
+        <h2 id="user-details-title">
+            <i class="fas fa-user" aria-hidden="true"></i> Your Profile Details
+        </h2>
     </header>
 
     <!-- Read-only View -->
@@ -12,7 +14,7 @@
             <dl class="details-list">
                 <div class="detail-item">
                     <dt class="detail-label">Username</dt>
-                    <dd class="detail-value">${sessionScope.username}</dd>
+                    <dd class="detail-value"><c:out value="${sessionScope.username != null ? sessionScope.username : 'N/A'}" /></dd>
                 </div>
                 <div class="detail-item">
                     <dt class="detail-label">Password</dt>
@@ -20,19 +22,19 @@
                 </div>
                 <div class="detail-item">
                     <dt class="detail-label">Full Name</dt>
-                    <dd class="detail-value">${sessionScope.fullname}</dd>
+                    <dd class="detail-value"><c:out value="${sessionScope.fullname != null ? sessionScope.fullname : 'N/A'}" /></dd>
                 </div>
                 <div class="detail-item">
                     <dt class="detail-label">Email</dt>
-                    <dd class="detail-value">${sessionScope.email}</dd>
+                    <dd class="detail-value"><c:out value="${sessionScope.email != null ? sessionScope.email : 'N/A'}" /></dd>
                 </div>
                 <div class="detail-item">
                     <dt class="detail-label">Phone</dt>
-                    <dd class="detail-value">${sessionScope.phone}</dd>
+                    <dd class="detail-value"><c:out value="${sessionScope.phone != null ? sessionScope.phone : 'N/A'}" /></dd>
                 </div>
                 <div class="detail-item">
                     <dt class="detail-label">Birthday</dt>
-                    <dd class="detail-value">${sessionScope.birthday}</dd>
+                    <dd class="detail-value"><c:out value="${sessionScope.birthday != null ? sessionScope.birthday : 'N/A'}" /></dd>
                 </div>
             </dl>
             <div class="action-buttons">
@@ -51,37 +53,38 @@
             <div class="form-grid">
                 <div class="form-field">
                     <label for="username" class="form-label">Username</label>
-                    <input type="text" id="username" name="username" value="${sessionScope.username}" class="form-input" disabled>
+                    <input type="text" id="username" name="username" value="${sessionScope.username}" class="form-input" disabled aria-describedby="username-info">
+                    <span class="info-text" id="username-info">Username cannot be changed</span>
                 </div>
                 <div class="form-field">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" id="password" name="password" value="${sessionScope.password}" class="form-input" required aria-describedby="password-error">
+                    <input type="password" id="password" name="password" value="${sessionScope.password}" class="form-input" required aria-required="true" aria-describedby="password-error">
                     <span class="error-text" id="password-error" aria-live="polite"></span>
                 </div>
                 <div class="form-field">
                     <label for="fullName" class="form-label">Full Name</label>
-                    <input type="text" id="fullName" name="fullName" value="${sessionScope.fullname}" class="form-input" required aria-describedby="fullName-error">
+                    <input type="text" id="fullName" name="fullName" value="${sessionScope.fullname}" class="form-input" required aria-required="true" aria-describedby="fullName-error">
                     <span class="error-text" id="fullName-error" aria-live="polite"></span>
                 </div>
                 <div class="form-field">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" id="email" name="email" value="${sessionScope.email}" class="form-input" required aria-describedby="email-error">
+                    <input type="email" id="email" name="email" value="${sessionScope.email}" class="form-input" required aria-required="true" aria-describedby="email-error">
                     <span class="error-text" id="email-error" aria-live="polite"></span>
                 </div>
                 <div class="form-field">
                     <label for="phone" class="form-label">Phone</label>
-                    <input type="tel" id="phone" name="phone" value="${sessionScope.phone}" class="form-input" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required aria-describedby="phone-error">
-                    <span class="error-text" id="phone-error" aria-live="polite"></span>
+                    <input type="tel" id="phone" name="phone" value="${sessionScope.phone}" class="form-input" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required aria-required="true" aria-describedby="phone-error">
+                    <span class="error-text" id="phone-error" aria-live="polite">Format: XXX-XXX-XXXX</span>
                 </div>
                 <div class="form-field">
                     <label for="birthday" class="form-label">Birthday</label>
-                    <input type="date" id="birthday" name="birthday" value="${sessionScope.birthday}" class="form-input" required aria-describedby="birthday-error">
+                    <input type="date" id="birthday" name="birthday" value="${sessionScope.birthday}" class="form-input" required aria-required="true" aria-describedby="birthday-error">
                     <span class="error-text" id="birthday-error" aria-live="polite"></span>
                 </div>
             </div>
 
             <div class="action-buttons">
-                <button type="button" class="btn btn-secondary" onclick="loadSection('userDetails')" aria-label="Cancel Editing">Cancel</button>
+                <button type="button" id="cancelEditBtn" class="btn btn-secondary" aria-label="Cancel Editing">Cancel</button>
                 <button type="submit" class="btn btn-primary" aria-label="Save Profile Changes">
                     <i class="fas fa-save" aria-hidden="true"></i> Save Changes
                 </button>
@@ -113,6 +116,8 @@
         box-shadow: var(--shadow);
         padding: calc(var(--spacing-unit) * 2);
         transition: var(--transition);
+        max-width: 900px;
+        margin: 0 auto;
     }
 
     .section-header {
@@ -127,7 +132,11 @@
         color: var(--primary);
         display: flex;
         align-items: center;
-        gap: 0.5rem;
+        gap: 0.75rem;
+    }
+
+    .section-header h2 i {
+        color: var(--secondary);
     }
 
     .details-container {
@@ -205,10 +214,17 @@
         cursor: not-allowed;
     }
 
-    .error-text {
-        color: var(--accent);
+    .error-text, .info-text {
         font-size: 0.85rem;
         min-height: 1rem;
+    }
+
+    .error-text {
+        color: var(--accent);
+    }
+
+    .info-text {
+        color: var(--text-muted);
     }
 
     .action-buttons {

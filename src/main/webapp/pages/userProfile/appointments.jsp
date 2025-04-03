@@ -19,9 +19,12 @@
                     Doctor <i class="fas fa-sort" aria-hidden="true"></i>
                 </th>
                 <th scope="col" data-sort="2" class="sortable" onclick="sortTable(2)">
-                    Date & Time <i class="fas fa-sort" aria-hidden="true"></i>
+                    Token ID <i class="fas fa-sort" aria-hidden="true"></i> <!-- Added Token ID column -->
                 </th>
                 <th scope="col" data-sort="3" class="sortable" onclick="sortTable(3)">
+                    Date & Time <i class="fas fa-sort" aria-hidden="true"></i>
+                </th>
+                <th scope="col" data-sort="4" class="sortable" onclick="sortTable(4)">
                     Priority <i class="fas fa-sort" aria-hidden="true"></i>
                 </th>
             </tr>
@@ -261,9 +264,11 @@
 
             if (col === 0) { // ID (numeric)
                 return isAsc ? parseInt(x) - parseInt(y) : parseInt(y) - parseInt(x);
-            } else if (col === 2) { // Date & Time (date)
+            } else if (col === 2) { // Token ID (string)
+                return isAsc ? x.localeCompare(y) : y.localeCompare(x);
+            } else if (col === 3) { // Date & Time (date)
                 return isAsc ? new Date(x) - new Date(y) : new Date(y) - new Date(x);
-            } else if (col === 3) { // Priority (Emergency > Normal)
+            } else if (col === 4) { // Priority (Emergency > Normal)
                 const priorityOrder = { 'Emergency': 1, 'Normal': 0 };
                 return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x];
             } else { // Doctor (string)
@@ -310,6 +315,7 @@
                     <tr>
                         <td>${appt.id}</td>
                         <td>${appt.doctorId}</td>
+                        <td>${appt.tokenID}</td> <!-- Added Token ID -->
                         <td>${appt.dateTime}</td>
                         <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">
                             ${appt.priority == 1 ? 'Emergency' : 'Normal'}
@@ -320,7 +326,7 @@
             });
         } catch (error) {
             console.error("Error fetching appointments:", error);
-            table.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`;
+            table.innerHTML = `<tr><td colspan="5">Error: ${error.message}</td></tr>`; // Updated colspan to 5
             noAppointmentsMessage.style.display = 'none';
         }
     }

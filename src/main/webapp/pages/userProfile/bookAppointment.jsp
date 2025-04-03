@@ -45,6 +45,8 @@
                     <th scope="col">Date</th>
                     <th scope="col">Start Time</th>
                     <th scope="col">End Time</th>
+                    <th scope="col">Appointments Booked</th>
+                    <th scope="col">Your Token</th>
                     <th scope="col">Action</th>
                 </tr>
                 </thead>

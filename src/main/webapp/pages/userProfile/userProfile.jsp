@@ -14,13 +14,21 @@
     <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/userProfile.css">
 </head>
 <body>
-<!-- Authentication Check -->
+<!-- Authentication Check and Initial Data Fetch -->
 <c:if test="${empty sessionScope.username || sessionScope.role != 'patient'}">
     <c:redirect url="/pages/login.jsp?role=patient"/>
 </c:if>
 
+<!-- Fetch User Details if Not Already Set -->
+<c:if test="${empty sessionScope.fullname}">
+    <%
+        // Trigger UserServlet to set session attributes
+        response.sendRedirect(request.getContextPath() + "/user?action=init");
+    %>
+</c:if>
+
 <!-- Sidebar Navigation -->
-<aside class="sidebar" id="sidebar"  aria-label="Main navigation">
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
     <button class="sidebar-toggle" aria-label="Toggle sidebar" type="button">
         <i class="fas fa-bars"></i>
     </button>
@@ -67,8 +75,24 @@
     <div class="container">
         <header class="dashboard-header">
             <div class="user-info">
-                <div class="avatar" aria-hidden="true">${sessionScope.username.charAt(0)}</div>
-                <h1>Welcome, <span>${sessionScope.username}</span>!</h1>
+                <div class="avatar" aria-hidden="true">
+                    <c:out value="${not empty sessionScope.username ? sessionScope.username.substring(0, 1).toUpperCase() : 'U'}" />
+                </div>
+                <h1>Welcome,
+                    <span>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.fullname}">
+                                <c:out value="${sessionScope.fullname}" />
+                            </c:when>
+                            <c:when test="${not empty sessionScope.username}">
+                                <c:out value="${sessionScope.username}" />
+                            </c:when>
+                            <c:otherwise>
+                                User
+                            </c:otherwise>
+                        </c:choose>
+                    </span>!
+                </h1>
             </div>
             <time class="date" datetime="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
                 <%= new java.text.SimpleDateFormat("MMMM dd, yyyy").format(new java.util.Date()) %>
@@ -79,8 +103,10 @@
         <c:if test="${not empty message}">
             <div class="toast ${messageType}" role="alert" aria-live="assertive">
                 <i class="fas ${messageType == 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
-                <span>${message}</span>
+                <span><c:out value="${message}" /></span>
             </div>
+            <c:remove var="message" scope="request" />
+            <c:remove var="messageType" scope="request" />
         </c:if>
 
         <!-- Dynamic Content Section -->
