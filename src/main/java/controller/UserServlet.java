@@ -91,7 +91,7 @@ public class UserServlet extends HttpServlet {
         }
 
         // Fetch appointments and doctors (omitted for brevity)...
-        request.getRequestDispatcher("/pages/userProfile.jsp").forward(request, response);
+        request.getRequestDispatcher("/pages/userProfile/userProfile.jsp").forward(request, response);
     }
 
       @Override

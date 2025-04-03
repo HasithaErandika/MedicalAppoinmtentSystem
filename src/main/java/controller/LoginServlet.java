@@ -98,7 +98,7 @@ public class LoginServlet extends HttpServlet {
             case "patient":
                 return "/pages/userProfile/userProfile.jsp";
             case "doctor":
-                return "/pages/doctorDashboard.jsp";
+                return "/pages/doctorProfile/doctorDashboard.jsp";
             case "admin":
                 return "/pages/adminDashboard.jsp";
             default:
