@@ -68,12 +68,12 @@
     <url-pattern>/ManagePatientsServlet</url-pattern>
   </servlet-mapping>
   <servlet>
-    <servlet-name>AppointmentServlet</servlet-name>
-    <servlet-class>controller.AppointmentServlet</servlet-class>
+    <servlet-name>ManageAppointmentsServlet</servlet-name>
+    <servlet-class>controller.ManageAppointmentsServlet</servlet-class>
   </servlet>
   <servlet-mapping>
-    <servlet-name>AppointmentServlet</servlet-name>
-    <url-pattern>/AppointmentServlet</url-pattern>
+    <servlet-name>ManageAppointmentsServlet</servlet-name>
+    <url-pattern>/ManageAppointmentsServlet</url-pattern>
   </servlet-mapping>
   <servlet>
     <servlet-name>DoctorScheduleServlet</servlet-name>
@@ -99,5 +99,9 @@
     <servlet-name>UserServlet</servlet-name>
     <url-pattern>/UserServlet</url-pattern>
   </servlet-mapping>
+  <error-page>
+    <error-code>400</error-code>
+    <location>/pages/error.jsp</location>
+  </error-page>
 
 </web-app>
