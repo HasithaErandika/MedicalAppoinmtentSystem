@@ -111,7 +111,7 @@
     ];
     const appointments = [
         <c:forEach var="appt" items="${sortedAppointments}">
-        { id: '${appt.id}', patientId: '${appt.patientId}', doctorId: '${appt.doctorId}', dateTime: '${appt.dateTime}', priority: ${appt.priority} },
+        { id: '${appt.id}', patientId: '${appt.patientId}', doctorId: '${appt.doctorId}', tokenID: '${appt.tokenID}', dateTime: '${appt.dateTime}', priority: ${appt.priority} },
         </c:forEach>
     ];
 
@@ -136,6 +136,7 @@
             appt.id.toLowerCase().includes(input) ||
             appt.patientId.toLowerCase().includes(input) ||
             appt.doctorId.toLowerCase().includes(input) ||
+            appt.tokenID.toLowerCase().includes(input) || // Added tokenID to search
             appt.dateTime.toLowerCase().includes(input)
         );
     }
@@ -147,7 +148,7 @@
                 csv += `${item}\n`;
             } else {
                 const priority = item.priority === 1 ? 'Emergency' : 'Normal';
-                csv += `${item.id},${item.patientId},${item.doctorId},${item.dateTime},${priority}\n`;
+                csv += `${item.id},${item.patientId},${item.doctorId},${item.tokenID},${item.dateTime},${priority}\n`; // Added tokenID to CSV
             }
         });
         const link = document.createElement('a');
@@ -170,7 +171,7 @@
 
     function exportAppointments() {
         const filteredAppointments = searchAppointments();
-        exportToCSV(filteredAppointments, 'appointments', 'ID,Patient ID,Doctor ID,Date & Time,Priority');
+        exportToCSV(filteredAppointments, 'appointments', 'ID,Patient ID,Doctor ID,Token ID,Date & Time,Priority'); // Updated headers
     }
 
     document.addEventListener('DOMContentLoaded', function() {

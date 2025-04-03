@@ -41,7 +41,7 @@ public class UserServlet extends HttpServlet {
             LOGGER.info("Successfully initialized file handlers. Patients file: " + (basePath + "patients.txt"));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize services", e);
-            throw new ServletException("Failed to initialize UserServlet services", e);
+            throw new ServletException("Failed to initialize UserServlet diensten", e);
         }
     }
 
@@ -131,6 +131,7 @@ public class UserServlet extends HttpServlet {
                 String doctorId = request.getParameter("doctorId");
                 String date = request.getParameter("date");
                 String timeSlot = request.getParameter("timeSlot");
+                String tokenID = request.getParameter("tokenID"); // Added tokenID parameter
                 boolean isEmergency = "on".equals(request.getParameter("isEmergency"));
 
                 if (doctorId == null || date == null || timeSlot == null ||
@@ -138,13 +139,17 @@ public class UserServlet extends HttpServlet {
                     throw new IllegalArgumentException("Missing booking parameters");
                 }
 
+                if (tokenID == null || tokenID.trim().isEmpty()) {
+                    tokenID = generateTokenID(); // Generate a token if not provided
+                }
+
                 String dateTime = date + " " + timeSlot;
                 if (!availabilityService.isTimeSlotAvailable(doctorId, dateTime)) {
                     throw new IllegalStateException("Time slot unavailable");
                 }
 
-                appointmentService.bookAppointment(username, doctorId, dateTime, isEmergency);
-                request.setAttribute("message", "Appointment booked successfully!");
+                appointmentService.bookAppointment(username, doctorId, tokenID, dateTime, isEmergency); // Added tokenID
+                request.setAttribute("message", "Appointment booked successfully! Token: " + tokenID);
                 request.setAttribute("messageType", "success");
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Booking error: " + e.getMessage());
@@ -196,5 +201,10 @@ public class UserServlet extends HttpServlet {
         }
 
         doGet(request, response); // Refresh page
+    }
+
+    // Simple method to generate a unique tokenID
+    private String generateTokenID() {
+        return "TOK" + System.currentTimeMillis(); // Basic implementation, could be improved
     }
 }

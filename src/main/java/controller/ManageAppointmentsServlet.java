@@ -138,14 +138,20 @@ public class ManageAppointmentsServlet extends HttpServlet {
             String doctorUsername = request.getParameter("doctorUsername");
             String date = request.getParameter("date");
             String time = request.getParameter("time");
+            String tokenID = request.getParameter("tokenID"); // Added tokenID parameter
             String dateTime = date + " " + time;
+
+            if (tokenID == null || tokenID.trim().isEmpty()) {
+                tokenID = generateTokenID(); // Generate a token if not provided
+            }
 
             if (!availabilityService.isTimeSlotAvailable(doctorUsername, dateTime)) {
                 responseData.put("success", false);
                 responseData.put("message", "Time slot not available");
             } else {
-                appointmentService.bookAppointment(username, doctorUsername, dateTime, false); // Assuming non-emergency from index.js
+                appointmentService.bookAppointment(username, doctorUsername, tokenID, dateTime, false); // Added tokenID
                 responseData.put("success", true);
+                responseData.put("tokenID", tokenID); // Return the tokenID in response
             }
         } catch (IllegalArgumentException | IOException e) {
             LOGGER.log(Level.WARNING, "Booking error for " + username + ": " + e.getMessage());
@@ -157,5 +163,10 @@ public class ManageAppointmentsServlet extends HttpServlet {
             out.print(gson.toJson(responseData));
             out.flush();
         }
+    }
+
+    // Simple method to generate a unique tokenID
+    private String generateTokenID() {
+        return "TOK" + System.currentTimeMillis(); // Basic implementation, could be improved
     }
 }

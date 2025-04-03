@@ -56,7 +56,7 @@ public class AdminServlet extends HttpServlet {
         try {
             // Fetch data for dashboard
             List<Appointment> appointments = appointmentService.getAllAppointments();
-            List<Appointment> sortedAppointments = appointmentService.getSortedAppointments(); // Uses bubble sort
+            List<Appointment> sortedAppointments = appointmentService.getSortedAppointments();
             List<String> doctorLines = doctorFileHandler.readLines();
             List<String> patientLines = patientFileHandler.readLines();
 
@@ -68,7 +68,7 @@ public class AdminServlet extends HttpServlet {
                     (int) appointments.stream().filter(appt -> appt.getPriority() == 1).count() : 0;
 
             // Log dashboard data
-            LOGGER.info("Dashboard data for admin " + username + ": " +
+            LOGGER.info("Dashboard data for for admin " + username + ": " +
                     "Total Appointments=" + totalAppointments + ", " +
                     "Total Doctors=" + totalDoctors + ", " +
                     "Total Patients=" + totalPatients + ", " +
@@ -92,7 +92,7 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Handle potential POST requests (e.g., admin actions like canceling appointments)
+        // Handle POST requests (e.g., admin actions like canceling or updating appointments)
         String action = request.getParameter("action");
         String username = (String) request.getSession().getAttribute("username");
         if (username == null || !ADMIN_ROLE.equals(request.getSession().getAttribute("role"))) {
@@ -106,6 +106,21 @@ public class AdminServlet extends HttpServlet {
                 appointmentService.cancelAppointment(appointmentId);
                 LOGGER.info("Admin " + username + " canceled appointment ID: " + appointmentId);
                 request.setAttribute("message", "Appointment canceled successfully");
+            } else if ("updateAppointment".equals(action)) {
+                int appointmentId = Integer.parseInt(request.getParameter("appointmentId"));
+                String patientId = request.getParameter("patientId");
+                String doctorId = request.getParameter("doctorId");
+                String tokenID = request.getParameter("tokenID");
+                String dateTime = request.getParameter("dateTime");
+                int priority = Integer.parseInt(request.getParameter("priority"));
+
+                if (priority != 0 && priority != 1) {
+                    throw new IllegalArgumentException("Priority must be 0 (non-emergency) or 1 (emergency)");
+                }
+
+                appointmentService.updateAppointment(appointmentId, patientId, doctorId, tokenID, dateTime, priority);
+                LOGGER.info("Admin " + username + " updated appointment ID: " + appointmentId);
+                request.setAttribute("message", "Appointment updated successfully");
             }
         } catch (IllegalArgumentException | IOException e) {
             LOGGER.log(Level.WARNING, "Error processing action '" + action + "' for admin " + username, e);

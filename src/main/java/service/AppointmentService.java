@@ -35,24 +35,25 @@ public class AppointmentService {
         return fileHandler.readAppointments();
     }
 
-    public synchronized void bookAppointment(String patientId, String doctorId, String dateTime, boolean isEmergency) throws IOException {
-        if (patientId == null || doctorId == null || dateTime == null || patientId.trim().isEmpty() || doctorId.trim().isEmpty() || dateTime.trim().isEmpty()) {
-            throw new IllegalArgumentException("Invalid appointment details: patientId, doctorId, and dateTime must not be null or empty");
+    public synchronized void bookAppointment(String patientId, String doctorId, String tokenID, String dateTime, boolean isEmergency) throws IOException {
+        if (patientId == null || doctorId == null || tokenID == null || dateTime == null ||
+                patientId.trim().isEmpty() || doctorId.trim().isEmpty() || tokenID.trim().isEmpty() || dateTime.trim().isEmpty()) {
+            throw new IllegalArgumentException("Invalid appointment details: patientId, doctorId, tokenID, and dateTime must not be null or empty");
         }
         int newId = cachedAppointments.stream().mapToInt(Appointment::getId).max().orElse(0) + 1;
         int priority = isEmergency ? 1 : 2;
-        Appointment newAppointment = new Appointment(newId, patientId, doctorId, dateTime, priority);
+        Appointment newAppointment = new Appointment(newId, patientId, doctorId, tokenID, dateTime, priority);
         cachedAppointments.add(newAppointment);
         if (isEmergency) emergencyQueue.add(newAppointment);
         writeAppointments(cachedAppointments);
         LOGGER.info("Booked appointment: " + newAppointment);
     }
 
-    public synchronized void updateAppointment(int id, String patientId, String doctorId, String dateTime, int priority) throws IOException {
+    public synchronized void updateAppointment(int id, String patientId, String doctorId, String tokenID, String dateTime, int priority) throws IOException {
         boolean found = false;
         for (int i = 0; i < cachedAppointments.size(); i++) {
             if (cachedAppointments.get(i).getId() == id) {
-                cachedAppointments.set(i, new Appointment(id, patientId, doctorId, dateTime, priority));
+                cachedAppointments.set(i, new Appointment(id, patientId, doctorId, tokenID, dateTime, priority));
                 found = true;
                 break;
             }

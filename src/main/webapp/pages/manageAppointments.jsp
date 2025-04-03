@@ -66,6 +66,7 @@
                     <th>ID</th>
                     <th>Patient Name</th>
                     <th>Doctor Name</th>
+                    <th>Token ID</th> <!-- Added Token ID column -->
                     <th>Date & Time</th>
                     <th>Priority</th>
                     <th>Actions</th>
@@ -77,16 +78,17 @@
                         <td>${appt.id}</td>
                         <td>${appt.patientName}</td>
                         <td>${appt.doctorName}</td>
+                        <td>${appt.tokenID}</td> <!-- Added Token ID display -->
                         <td>${appt.dateTime}</td>
                         <td class="${appt.priority == 1 ? 'priority-emergency' : ''}">
                                 ${appt.priority == 1 ? 'Emergency' : 'Normal'}
                         </td>
                         <td>
-                            <button class="btn btn-edit" onclick="openEditModal(${appt.id}, '${appt.patientId}', '${appt.doctorId}', '${appt.dateTime.substring(0,10)}', '${appt.dateTime.substring(11)}', ${appt.priority == 1})">
+                            <button class="btn btn-edit" onclick="openEditModal(${appt.id}, '${appt.patientId}', '${appt.doctorId}', '${appt.tokenID}', '${appt.dateTime.substring(0,10)}', '${appt.dateTime.substring(11)}', ${appt.priority == 1})">
                                 <i class="ri-edit-line"></i> Edit
                             </button>
-                            <form action="<%=request.getContextPath()%>/AppointmentServlet" method="post" style="display:inline;" onsubmit="return confirmCancel()">
-                                <input type="hidden" name="action" value="cancel">
+                            <form action="<%=request.getContextPath()%>/AdminServlet" method="post" style="display:inline;" onsubmit="return confirmCancel()">
+                                <input type="hidden" name="action" value="cancelAppointment">
                                 <input type="hidden" name="appointmentId" value="${appt.id}">
                                 <button type="submit" class="btn btn-cancel"><i class="ri-close-line"></i> Cancel</button>
                             </form>
@@ -107,8 +109,8 @@
             <button class="modal-close" onclick="closeEditModal()">×</button>
         </div>
         <div class="modal-body">
-            <form id="editForm" action="<%=request.getContextPath()%>/ManageAppointmentsServlet" method="post" onsubmit="return validateForm()">
-                <input type="hidden" name="action" value="update">
+            <form id="editForm" action="<%=request.getContextPath()%>/AdminServlet" method="post" onsubmit="return validateForm()">
+                <input type="hidden" name="action" value="updateAppointment">
                 <input type="hidden" id="appointmentId" name="appointmentId">
                 <div class="form-group">
                     <i class="ri-user-line"></i>
@@ -131,6 +133,11 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <i class="ri-key-2-line"></i> <!-- Icon for Token ID -->
+                    <label>Token ID</label>
+                    <input type="text" id="tokenID" name="tokenID" required>
+                </div>
+                <div class="form-group">
                     <i class="ri-calendar-line"></i>
                     <label>Date</label>
                     <input type="date" id="date" name="date" required onchange="updateTimeSlots()" min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
@@ -143,7 +150,7 @@
                     </select>
                 </div>
                 <div class="form-group checkbox">
-                    <input type="checkbox" id="isEmergency" name="isEmergency">
+                    <input type="checkbox" id="isEmergency" name="priority" value="1">
                     <label for="isEmergency">Emergency</label>
                 </div>
                 <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Update Appointment</button>
@@ -153,10 +160,11 @@
 </div>
 
 <script>
-    function openEditModal(id, patientId, doctorId, date, timeSlot, isEmergency) {
+    function openEditModal(id, patientId, doctorId, tokenID, date, timeSlot, isEmergency) {
         document.getElementById('appointmentId').value = id;
         document.getElementById('patientId').value = patientId;
         document.getElementById('doctorId').value = doctorId;
+        document.getElementById('tokenID').value = tokenID; // Set Token ID
         document.getElementById('date').value = date;
         document.getElementById('isEmergency').checked = isEmergency;
 
@@ -205,11 +213,12 @@
     function validateForm() {
         const patientId = document.getElementById('patientId').value;
         const doctorId = document.getElementById('doctorId').value;
+        const tokenID = document.getElementById('tokenID').value; // Validate Token ID
         const date = document.getElementById('date').value;
         const timeSlot = document.getElementById('timeSlot').value;
 
-        if (!patientId || !doctorId || !date || !timeSlot) {
-            alert('Please fill in all required fields.');
+        if (!patientId || !doctorId || !tokenID || !date || !timeSlot) {
+            alert('Please fill in all required fields, including Token ID.');
             return false;
         }
         return true;
@@ -230,13 +239,15 @@
 
         for (let i = 1; i < tr.length; i++) {
             const td = tr[i].getElementsByTagName('td');
+            const id = td[0].textContent.toLowerCase();
             const patientName = td[1].textContent.toLowerCase();
             const doctorName = td[2].textContent.toLowerCase();
-            const dateTime = td[3].textContent;
+            const tokenID = td[3].textContent.toLowerCase(); // Added Token ID to search
+            const dateTime = td[4].textContent;
             const [datePart] = dateTime.split(' ');
             const [yearPart, monthPart, dayPart] = datePart.split('-');
 
-            let matchesSearch = patientName.includes(input) || doctorName.includes(input) || dateTime.includes(input);
+            let matchesSearch = id.includes(input) || patientName.includes(input) || doctorName.includes(input) || tokenID.includes(input) || dateTime.includes(input);
             let matchesYear = !year || yearPart === year;
             let matchesMonth = !month || monthPart === month;
             let matchesDay = !day || dayPart === day;
@@ -257,8 +268,8 @@
         const rows = Array.from(tbody.getElementsByTagName('tr'));
 
         rows.sort((a, b) => {
-            const dateTimeA = new Date(a.cells[3].textContent);
-            const dateTimeB = new Date(b.cells[3].textContent);
+            const dateTimeA = new Date(a.cells[4].textContent); // Updated index due to Token ID
+            const dateTimeB = new Date(b.cells[4].textContent);
             return dateTimeB - dateTimeA; // Newest first
         });
 

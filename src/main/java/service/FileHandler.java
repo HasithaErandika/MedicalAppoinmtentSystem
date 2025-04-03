@@ -28,21 +28,22 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length == 5) {
+                if (parts.length == 6) {  // Updated to expect 6 parts instead of 5
                     try {
                         Appointment appt = new Appointment(
                                 Integer.parseInt(parts[0].trim()), // id
                                 parts[1].trim(),                   // patientId
                                 parts[2].trim(),                   // doctorId
-                                parts[3].trim(),                   // dateTime
-                                Integer.parseInt(parts[4].trim())  // priority
+                                parts[3].trim(),                   // tokenID
+                                parts[4].trim(),                   // dateTime
+                                Integer.parseInt(parts[5].trim())  // priority
                         );
                         appointments.add(appt);
                     } catch (NumberFormatException e) {
                         LOGGER.log(Level.WARNING, "Invalid number format in line: " + line, e);
                     }
                 } else {
-                    LOGGER.warning("Skipping malformed line: " + line + " (Expected 5 parts, got " + parts.length + ")");
+                    LOGGER.warning("Skipping malformed line: " + line + " (Expected 6 parts, got " + parts.length + ")");
                 }
             }
         }
@@ -53,10 +54,11 @@ public class FileHandler {
     public void writeAppointments(List<Appointment> appointments) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Appointment appt : appointments) {
-                String line = String.format("%d,%s,%s,%s,%d",
+                String line = String.format("%d,%s,%s,%s,%s,%d",
                         appt.getId(),
                         appt.getPatientId(),
                         appt.getDoctorId(),
+                        appt.getTokenID(),         // Added tokenID
                         appt.getDateTime(),
                         appt.getPriority());
                 writer.write(line);
