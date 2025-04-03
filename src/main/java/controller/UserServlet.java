@@ -94,7 +94,7 @@ public class UserServlet extends HttpServlet {
         request.getRequestDispatcher("/pages/userProfile/userProfile.jsp").forward(request, response);
     }
 
-      @Override
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = (String) request.getSession().getAttribute("username");
         String role = (String) request.getSession().getAttribute("role");
