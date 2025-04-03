@@ -1,89 +1,89 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<section class="dashboard-card" id="userDetailsSection" aria-labelledby="user-details-title">
-    <h2 id="user-details-title">Your Profile Details</h2>
 
-    <%-- Success Message (if present) --%>
-    <c:if test="${not empty message}">
-        <div class="toast ${messageType}" id="toastMessage" role="alert" aria-live="assertive">
-            <i class="ri-${messageType == 'error' ? 'alert' : 'checkbox-circle'}-line"></i>
-                ${message}
-        </div>
-    </c:if>
+<section class="dashboard-card user-details" id="userDetailsSection" aria-labelledby="user-details-title">
+    <header class="section-header">
+        <h2 id="user-details-title">Your Profile Details</h2>
+    </header>
 
-    <%-- Read-only view (default) --%>
+    <!-- Read-only View -->
     <c:if test="${param.edit != 'true'}">
-        <div class="details-view card">
-            <div class="detail-row">
-                <span class="label">Username</span>
-                <span class="value">${sessionScope.username}</span>
-            </div>
-            <div class="detail-row">
-                <span class="label">Password</span>
-                <span class="value">••••••••</span> <%-- Masked for security --%>
-            </div>
-            <div class="detail-row">
-                <span class="label">Full Name</span>
-                <span class="value">${sessionScope.fullname}</span>
-            </div>
-            <div class="detail-row">
-                <span class="label">Email</span>
-                <span class="value">${sessionScope.email}</span>
-            </div>
-            <div class="detail-row">
-                <span class="label">Phone</span>
-                <span class="value">${sessionScope.phone}</span>
-            </div>
-            <div class="detail-row">
-                <span class="label">Birthday</span>
-                <span class="value">${sessionScope.birthday}</span>
-            </div>
-            <div class="form-actions">
-                <button type="button" id="editDetailsBtn" class="btn-primary" onclick="loadSection('userDetails', 'edit=true')">
-                    <i class="ri-edit-line"></i> Edit Details
+        <div class="details-container">
+            <dl class="details-list">
+                <div class="detail-item">
+                    <dt class="detail-label">Username</dt>
+                    <dd class="detail-value">${sessionScope.username}</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Password</dt>
+                    <dd class="detail-value">••••••••</dd> <!-- Masked for security -->
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Full Name</dt>
+                    <dd class="detail-value">${sessionScope.fullname}</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Email</dt>
+                    <dd class="detail-value">${sessionScope.email}</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Phone</dt>
+                    <dd class="detail-value">${sessionScope.phone}</dd>
+                </div>
+                <div class="detail-item">
+                    <dt class="detail-label">Birthday</dt>
+                    <dd class="detail-value">${sessionScope.birthday}</dd>
+                </div>
+            </dl>
+            <div class="action-buttons">
+                <button type="button" id="editDetailsBtn" class="btn btn-primary" aria-label="Edit Profile Details">
+                    <i class="fas fa-edit" aria-hidden="true"></i> Edit Profile
                 </button>
             </div>
         </div>
     </c:if>
 
-    <%-- Editable form (shown when edit=true) --%>
+    <!-- Editable Form -->
     <c:if test="${param.edit == 'true'}">
-        <form action="<%= request.getContextPath() %>/user" method="post" id="detailsForm" class="form-grid card" novalidate>
+        <form action="<%= request.getContextPath() %>/user" method="post" id="detailsForm" class="edit-form" novalidate>
             <input type="hidden" name="action" value="updateDetails">
-            <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" value="${sessionScope.username}" disabled aria-describedby="username-desc">
-                <small id="username-desc" class="form-hint">Username cannot be changed.</small>
+
+            <div class="form-grid">
+                <div class="form-field">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" id="username" name="username" value="${sessionScope.username}" class="form-input" disabled>
+                </div>
+                <div class="form-field">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" id="password" name="password" value="${sessionScope.password}" class="form-input" required aria-describedby="password-error">
+                    <span class="error-text" id="password-error" aria-live="polite"></span>
+                </div>
+                <div class="form-field">
+                    <label for="fullName" class="form-label">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" value="${sessionScope.fullname}" class="form-input" required aria-describedby="fullName-error">
+                    <span class="error-text" id="fullName-error" aria-live="polite"></span>
+                </div>
+                <div class="form-field">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" id="email" name="email" value="${sessionScope.email}" class="form-input" required aria-describedby="email-error">
+                    <span class="error-text" id="email-error" aria-live="polite"></span>
+                </div>
+                <div class="form-field">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="tel" id="phone" name="phone" value="${sessionScope.phone}" class="form-input" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" required aria-describedby="phone-error">
+                    <span class="error-text" id="phone-error" aria-live="polite"></span>
+                </div>
+                <div class="form-field">
+                    <label for="birthday" class="form-label">Birthday</label>
+                    <input type="date" id="birthday" name="birthday" value="${sessionScope.birthday}" class="form-input" required aria-describedby="birthday-error">
+                    <span class="error-text" id="birthday-error" aria-live="polite"></span>
+                </div>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" value="${sessionScope.password}" required aria-describedby="password-error">
-                <span class="error-message" id="password-error"></span>
-            </div>
-            <div class="form-group">
-                <label for="fullName">Full Name</label>
-                <input type="text" id="fullName" name="fullName" value="${sessionScope.fullname}" required aria-describedby="fullName-error">
-                <span class="error-message" id="fullName-error"></span>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="${sessionScope.email}" required aria-describedby="email-error">
-                <span class="error-message" id="email-error"></span>
-            </div>
-            <div class="form-group">
-                <label for="phone">Phone</label>
-                <input type="tel" id="phone" name="phone" value="${sessionScope.phone}" pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}" placeholder="123-456-7890" required aria-describedby="phone-error">
-                <span class="error-message" id="phone-error"></span>
-            </div>
-            <div class="form-group">
-                <label for="birthday">Birthday</label>
-                <input type="date" id="birthday" name="birthday" value="${sessionScope.birthday}" required aria-describedby="birthday-error">
-                <span class="error-message" id="birthday-error"></span>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="btn-secondary" onclick="loadSection('userDetails')">Cancel</button>
-                <button type="submit" class="btn-primary" aria-label="Save Changes">
-                    <i class="ri-save-line"></i> Save Changes
+
+            <div class="action-buttons">
+                <button type="button" class="btn btn-secondary" onclick="loadSection('userDetails')" aria-label="Cancel Editing">Cancel</button>
+                <button type="submit" class="btn btn-primary" aria-label="Save Profile Changes">
+                    <i class="fas fa-save" aria-hidden="true"></i> Save Changes
                 </button>
             </div>
         </form>
@@ -92,167 +92,137 @@
 
 <style>
     :root {
-        --primary: #2F855A;        /* Forest Green */
-        --secondary: #38B2AC;      /* Teal */
-        --accent: #E53E3E;         /* Red */
-        --bg-light: #F7FAF9;       /* Light background */
-        --text-primary: #1A4731;   /* Dark green */
-        --text-muted: #6B7280;     /* Gray */
-        --card-bg: #FFFFFF;        /* White cards */
-        --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        --border: #D1D5DB;         /* Neutral border */
-        --hover: #E6FFFA;          /* Light green hover */
+        --primary: #2C5282;
+        --secondary: #38B2AC;
+        --accent: #E53E3E;
+        --bg-light: #F7FAFC;
+        --text-primary: #2D3748;
+        --text-muted: #718096;
+        --card-bg: #FFFFFF;
+        --shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        --border: #E2E8F0;
+        --hover: #EDF2F7;
         --transition: all 0.3s ease;
-        --border-radius: 10px;
+        --border-radius: 12px;
+        --spacing-unit: 1rem;
     }
 
-    .dashboard-card {
-        padding: 1.5rem;
+    .user-details {
         background: var(--card-bg);
         border-radius: var(--border-radius);
         box-shadow: var(--shadow);
-        max-width: 600px;
-        margin: 0 auto;
-        animation: fadeIn 0.3s ease;
+        padding: calc(var(--spacing-unit) * 2);
+        transition: var(--transition);
     }
 
-    h2 {
-        font-size: 1.5rem;
+    .section-header {
+        margin-bottom: calc(var(--spacing-unit) * 1.5);
+        padding-bottom: var(--spacing-unit);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .section-header h2 {
+        font-size: 1.75rem;
         font-weight: 600;
-        color: var(--text-primary);
-        margin-bottom: 1.5rem;
+        color: var(--primary);
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    h2::before {
-        content: "\e0e1"; /* Remixicon user-line */
-        font-family: "remixicon";
-        color: var(--primary);
+    .details-container {
+        padding: var(--spacing-unit);
     }
 
-    /* Toast Notification */
-    .toast {
-        padding: 1rem 1.5rem;
-        border-radius: var(--border-radius);
-        margin-bottom: 1.5rem;
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        box-shadow: var(--shadow);
-        font-weight: 500;
-        animation: slideIn 0.3s ease;
+    .details-list {
+        display: grid;
+        gap: calc(var(--spacing-unit) * 0.75);
     }
 
-    .success {
-        background: #D1FAE5;
-        color: var(--primary);
-    }
-
-    .error {
-        background: #FEE2E2;
-        color: var(--accent);
-    }
-
-    @keyframes slideIn {
-        from { transform: translateY(-20px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    /* Details View */
-    .details-view {
-        padding: 1rem;
-    }
-
-    .detail-row {
-        display: flex;
-        justify-content: space-between;
+    .detail-item {
+        display: grid;
+        grid-template-columns: 140px 1fr;
         align-items: center;
         padding: 0.75rem 0;
         border-bottom: 1px solid var(--border);
         transition: var(--transition);
     }
 
-    .detail-row:hover {
+    .detail-item:hover {
         background: var(--hover);
     }
 
-    .label {
-        font-weight: 500;
+    .detail-label {
+        font-weight: 600;
         color: var(--text-primary);
         font-size: 1rem;
     }
 
-    .value {
+    .detail-value {
         color: var(--text-muted);
         font-size: 1rem;
+        word-break: break-word;
     }
 
-    /* Form Grid */
     .form-grid {
         display: grid;
-        gap: 1.25rem;
-        padding: 1.5rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: calc(var(--spacing-unit) * 1.5);
+        margin-bottom: calc(var(--spacing-unit) * 2);
     }
 
-    .form-group {
+    .form-field {
         display: flex;
         flex-direction: column;
         gap: 0.5rem;
     }
 
-    label {
+    .form-label {
         font-weight: 500;
         color: var(--text-primary);
         font-size: 0.95rem;
     }
 
-    input {
+    .form-input {
         padding: 0.75rem;
         border: 1px solid var(--border);
-        border-radius: var(--border-radius);
+        border-radius: 8px;
         font-size: 1rem;
-        color: var(--text-primary);
+        background: var(--card-bg);
         transition: var(--transition);
+        width: 100%;
     }
 
-    input:focus {
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(47, 133, 90, 0.2);
+    .form-input:focus {
+        border-color: var(--secondary);
+        box-shadow: 0 0 8px rgba(56, 178, 172, 0.2);
         outline: none;
     }
 
-    input:disabled {
-        background: #F3F4F6;
+    .form-input:disabled {
+        background: var(--bg-light);
         color: var(--text-muted);
         cursor: not-allowed;
     }
 
-    .form-hint {
-        font-size: 0.85rem;
-        color: var(--text-muted);
-    }
-
-    .error-message {
-        font-size: 0.85rem;
+    .error-text {
         color: var(--accent);
+        font-size: 0.85rem;
         min-height: 1rem;
     }
 
-    /* Form Actions */
-    .form-actions {
+    .action-buttons {
         display: flex;
-        gap: 1rem;
         justify-content: flex-end;
-        margin-top: 1.5rem;
+        gap: 1rem;
+        margin-top: calc(var(--spacing-unit) * 1.5);
     }
 
-    .btn-primary, .btn-secondary {
+    .btn {
         padding: 0.75rem 1.5rem;
-        border-radius: var(--border-radius);
         border: none;
-        font-weight: 500;
+        border-radius: 8px;
+        font-size: 1rem;
         cursor: pointer;
         transition: var(--transition);
         display: flex;
@@ -266,95 +236,50 @@
     }
 
     .btn-primary:hover {
-        background: #276749;
-        box-shadow: var(--shadow);
+        background: #1E3A8A;
+        box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
+        transform: translateY(-2px);
     }
 
     .btn-secondary {
-        background: var(--accent);
+        background: var(--text-muted);
         color: #FFFFFF;
     }
 
     .btn-secondary:hover {
-        background: #C53030;
-        box-shadow: var(--shadow);
+        background: #5A7184;
+        box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
+        transform: translateY(-2px);
     }
 
-    /* Animation */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Responsive Design */
     @media (max-width: 768px) {
-        .dashboard-card {
-            padding: 1rem;
-            max-width: 100%;
+        .detail-item {
+            grid-template-columns: 120px 1fr;
         }
+
         .form-grid {
-            padding: 1rem;
+            grid-template-columns: 1fr;
         }
-        .form-actions {
+    }
+
+    @media (max-width: 480px) {
+        .user-details {
+            padding: var(--spacing-unit);
+        }
+
+        .detail-item {
+            grid-template-columns: 1fr;
+            gap: 0.25rem;
+        }
+
+        .action-buttons {
             flex-direction: column;
             gap: 0.75rem;
         }
-        .btn-primary, .btn-secondary {
+
+        .btn {
             width: 100%;
             justify-content: center;
         }
     }
 </style>
-
-<script>
-    // Hide toast message after 3 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        const toast = document.getElementById('toastMessage');
-        if (toast && toast.classList.contains('success')) {
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                setTimeout(() => {
-                    toast.style.display = 'none';
-                    // Redirect to read-only view after fade-out
-                    loadSection('userDetails');
-                }, 300); // Match fade-out duration
-            }, 3000); // 3 seconds
-        }
-    });
-
-    // Basic client-side validation
-    document.getElementById('detailsForm')?.addEventListener('submit', function(e) {
-        let valid = true;
-        const fields = [
-            { id: 'password', error: 'Password is required' },
-            { id: 'fullName', error: 'Full Name is required' },
-            { id: 'email', error: 'Valid email is required', type: 'email' },
-            { id: 'phone', error: 'Phone must be in format 123-456-7890', pattern: /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/ },
-            { id: 'birthday', error: 'Birthday is required' }
-        ];
-
-        fields.forEach(field => {
-            const input = document.getElementById(field.id);
-            const errorSpan = document.getElementById(`${field.id}-error`);
-            errorSpan.textContent = '';
-
-            if (!input.value) {
-                errorSpan.textContent = field.error;
-                valid = false;
-            } else if (field.type === 'email' && !/^\S+@\S+\.\S+$/.test(input.value)) {
-                errorSpan.textContent = field.error;
-                valid = false;
-            } else if (field.pattern && !field.pattern.test(input.value)) {
-                errorSpan.textContent = field.error;
-                valid = false;
-            }
-        });
-
-        if (!valid) e.preventDefault();
-    });
-
-    // Placeholder loadSection function
-    function loadSection(section, params = '') {
-        window.location.href = `<%= request.getContextPath() %>/pages/userProfile.jsp?section=${section}.jsp${params ? '&' + params : ''}`;
-    }
-</script>
