@@ -85,6 +85,7 @@
                         <th>Date</th>
                         <th>Start Time</th>
                         <th>End Time</th>
+                        <th>Appointments Booked</th>
                         <th>Action</th>
                     </tr>
                     </thead>
@@ -96,11 +97,27 @@
     </div>
 </section>
 
+<!-- Existing Results Popup -->
 <div class="popup" id="resultsPopup">
     <div class="popup-content">
         <button class="close-btn" onclick="closePopup()">×</button>
         <h2>Available Time Slots</h2>
         <div class="results-grid" id="resultsContainer"></div>
+    </div>
+</div>
+
+<!-- New Login Prompt Popup -->
+<div class="login-popup" id="loginPopup">
+    <div class="login-popup-content">
+        <div class="popup-header">
+            <i class="fas fa-lock"></i>
+            <h2>Please Log In</h2>
+        </div>
+        <p>You need to log in as a patient to book an appointment.</p>
+        <div class="countdown" id="countdownMessage" style="display: none;">
+            Redirecting in <span id="countdownTimer">3</span> seconds...
+        </div>
+        <button class="login-btn" onclick="window.location.href='<%=request.getContextPath()%>/pages/login.jsp?role=patient'">Log In Now</button>
     </div>
 </div>
 

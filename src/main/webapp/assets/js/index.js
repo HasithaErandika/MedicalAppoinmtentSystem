@@ -22,8 +22,6 @@ window.onload = function () {
         })
         .then((data) => {
             console.log("Raw initial data:", JSON.stringify(data, null, 2));
-            // Remove or comment out this line
-            // document.getElementById("debugResponse").textContent = "Raw Server Response:\n" + JSON.stringify(data, null, 2);
             allSpecialties = data.specialties || [];
             if (allSpecialties.length === 0) {
                 console.warn("No specialties found in the response.");
@@ -87,23 +85,20 @@ function updateAvailabilityTable() {
 
             if (allAvailability.length === 0) {
                 console.warn("No availability found for specialty:", specialty);
-                tbody.innerHTML = '<tr><td colspan="5">No availability found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6">No availability found</td></tr>';
                 table.style.display = "table";
                 return;
             }
 
-            // Populate doctor filter
             allDoctors.forEach((doctor) => {
                 filterDoctor.innerHTML += `<option value="${doctor}">${doctor}</option>`;
             });
 
-            // Populate date filter
             const uniqueDates = [...new Set(allAvailability.map((avail) => avail.date))].sort();
             uniqueDates.forEach((date) => {
                 filterDate.innerHTML += `<option value="${date}">${date}</option>`;
             });
 
-            // Populate table
             allAvailability.forEach((avail) => {
                 const row = `
                     <tr data-doctor="${avail.name}" data-date="${avail.date}">
@@ -111,6 +106,7 @@ function updateAvailabilityTable() {
                         <td>${avail.date}</td>
                         <td>${avail.startTime}</td>
                         <td>${avail.endTime}</td>
+                        <td>${avail.appointmentCount}</td>
                         <td><button class="book-btn" onclick="bookAppointment('${avail.username}', '${avail.date}', '${avail.startTime}')">Book</button></td>
                     </tr>
                 `;
@@ -123,7 +119,7 @@ function updateAvailabilityTable() {
         })
         .catch((error) => {
             console.error("Error loading availability:", error);
-            tbody.innerHTML = `<tr><td colspan="5">Error loading availability: ${error.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6">Error loading availability: ${error.message}</td></tr>`;
             table.style.display = "table";
         });
 }
@@ -150,10 +146,29 @@ function closePopup() {
     document.getElementById("resultsPopup").style.display = "none";
 }
 
+function showLoginPopup() {
+    const popup = document.getElementById("loginPopup");
+    const countdownMessage = document.getElementById("countdownMessage");
+    popup.style.display = "flex"; // Show the popup
+    countdownMessage.style.display = "block"; // Show the countdown message
+
+    let countdown = 3;
+    const timerElement = document.getElementById("countdownTimer");
+    timerElement.textContent = countdown;
+
+    const interval = setInterval(() => {
+        countdown--;
+        timerElement.textContent = countdown;
+        if (countdown <= 0) {
+            clearInterval(interval);
+            window.location.href = `${contextPath}/pages/login.jsp?role=patient`;
+        }
+    }, 1000);
+}
+
 function bookAppointment(username, date, startTime) {
-    if (!document.body.dataset.loggedIn) {
-        alert("Please log in as a patient to book an appointment.");
-        window.location.href = `${contextPath}/pages/login.jsp?role=patient`;
+    if (document.body.dataset.loggedIn !== "true") {
+        showLoginPopup(); // Show custom popup with countdown
         return;
     }
 
@@ -178,7 +193,7 @@ function bookAppointment(username, date, startTime) {
             console.log("Booking response:", data);
             if (data.success) {
                 alert("Appointment booked successfully!");
-                updateAvailabilityTable(); // Refresh table after booking
+                updateAvailabilityTable();
             } else {
                 alert("Failed to book: " + data.message);
             }
