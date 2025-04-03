@@ -28,3 +28,4 @@ patient27,pass123,Nethmi Pathirana,patient27@hospital.net,0778449061,1981-09-16
 patient28,pass123,Supun Wijeratne,patient28@hospital.net,0778449062,1979-04-24
 patient29,pass123,Anjali de Silva,patient29@hospital.net,0778449063,1952-12-01
 patient30,pass123,Chamath Fonseka,patient30@hospital.net,0778449064,1993-06-10
+
