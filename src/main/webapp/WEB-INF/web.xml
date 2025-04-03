@@ -1,106 +1,123 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
-         version="5.0">
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
 
   <display-name>Medical Appointment System</display-name>
 
-
+  <!-- Welcome File List -->
   <welcome-file-list>
     <welcome-file>pages/index.jsp</welcome-file>
   </welcome-file-list>
 
+  <!-- Servlet Definitions -->
   <servlet>
     <servlet-name>SortServlet</servlet-name>
     <servlet-class>controller.SortServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>SortServlet</servlet-name>
-    <url-pattern>/SortServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>LoginServlet</servlet-name>
     <servlet-class>controller.LoginServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/login</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>LogoutServlet</servlet-name>
     <servlet-class>controller.LogoutServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>LogoutServlet</servlet-name>
-    <url-pattern>/LogoutServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>RegisterServlet</servlet-name>
     <servlet-class>controller.RegisterServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>RegisterServlet</servlet-name>
-    <url-pattern>/RegisterServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>AdminServlet</servlet-name>
     <servlet-class>controller.AdminServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>AdminServlet</servlet-name>
-    <url-pattern>/AdminServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>ManageDoctorsServlet</servlet-name>
     <servlet-class>controller.ManageDoctorsServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>ManageDoctorsServlet</servlet-name>
-    <url-pattern>/ManageDoctorsServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>ManagePatientsServlet</servlet-name>
     <servlet-class>controller.ManagePatientsServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>ManagePatientsServlet</servlet-name>
-    <url-pattern>/ManagePatientsServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>ManageAppointmentsServlet</servlet-name>
     <servlet-class>controller.ManageAppointmentsServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>ManageAppointmentsServlet</servlet-name>
-    <url-pattern>/ManageAppointmentsServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>DoctorScheduleServlet</servlet-name>
     <servlet-class>controller.DoctorScheduleServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>DoctorScheduleServlet</servlet-name>
-    <url-pattern>/DoctorScheduleServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>DataManagementServlet</servlet-name>
     <servlet-class>controller.DataManagementServlet</servlet-class>
   </servlet>
-  <servlet-mapping>
-    <servlet-name>DataManagementServlet</servlet-name>
-    <url-pattern>/DataManagementServlet</url-pattern>
-  </servlet-mapping>
   <servlet>
     <servlet-name>UserServlet</servlet-name>
     <servlet-class>controller.UserServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>DoctorServlet</servlet-name>
+    <servlet-class>controller.DoctorServlet</servlet-class>
+  </servlet>
+
+  <!-- Servlet Mappings -->
+  <servlet-mapping>
+    <servlet-name>SortServlet</servlet-name>
+    <url-pattern>/SortServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/LogoutServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>RegisterServlet</servlet-name>
+    <url-pattern>/RegisterServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>AdminServlet</servlet-name>
+    <url-pattern>/AdminServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ManageDoctorsServlet</servlet-name>
+    <url-pattern>/ManageDoctorsServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ManagePatientsServlet</servlet-name>
+    <url-pattern>/ManagePatientsServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>ManageAppointmentsServlet</servlet-name>
+    <url-pattern>/ManageAppointmentsServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DoctorScheduleServlet</servlet-name>
+    <url-pattern>/DoctorScheduleServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DataManagementServlet</servlet-name>
+    <url-pattern>/DataManagementServlet</url-pattern>
+  </servlet-mapping>
   <servlet-mapping>
     <servlet-name>UserServlet</servlet-name>
     <url-pattern>/UserServlet</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>DoctorServlet</servlet-name>
+    <url-pattern>/DoctorServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- Error Pages -->
   <error-page>
     <error-code>400</error-code>
+    <location>/pages/error.jsp</location>
+  </error-page>
+  <error-page>
+    <error-code>500</error-code>
     <location>/pages/error.jsp</location>
   </error-page>
 

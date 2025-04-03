@@ -1,4 +1,4 @@
-patient1,pass123,Hasitha Erandika,patient1@hospital.net,0778449035,2000-03-01
+patient1,pass123,Hasitha Erandika,pacdti@hospital.net,0778449035,2000-03-01
 patient2,pass234,Kasun Perera,patient2@hospital.net,0778449036,1995-07-15
 patient3,pass345,Nimal Fernando,patient3@hospital.net,0778449037,1988-12-20
 patient4,pass456,Sunil Jayasinghe,patient4@hospital.net,0778449038,1979-05-10
