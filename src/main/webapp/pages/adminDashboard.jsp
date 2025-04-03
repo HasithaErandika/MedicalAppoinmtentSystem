@@ -386,7 +386,7 @@
         <li><a href="<%=request.getContextPath()%>/ManageDoctorsServlet"><i class="fas fa-user-md"></i><span>Manage Doctors</span></a></li>
         <li><a href="<%=request.getContextPath()%>/ManagePatientsServlet"><i class="fas fa-users"></i><span>Manage Patients</span></a></li>
         <li><a href="<%=request.getContextPath()%>/DoctorScheduleServlet"><i class="fas fa-calendar-alt"></i><span>Doctor Schedule</span></a></li>
-        <li><a href="<%=request.getContextPath()%>/AppointmentServlet"><i class="fas fa-calendar-check"></i><span>Manage Appointments</span></a></li>
+        <li><a href="<%=request.getContextPath()%>/ManageAppointmentsServlet"><i class="fas fa-calendar-check"></i><span>Manage Appointments</span></a></li>
         <li><a href="<%=request.getContextPath()%>/DataManagementServlet"><i class="fas fa-database"></i><span>Data Management</span></a></li>
     </ul>
 </div>

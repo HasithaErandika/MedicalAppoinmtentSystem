@@ -53,6 +53,7 @@
                 <th>Date of Birth</th>
                 <th>Actions</th>
             </tr>
+            </thead>
             <tbody id="patientsBody">
             <c:forEach var="patient" items="${patients}">
                 <tr>
@@ -77,7 +78,6 @@
                                 <i class="ri-delete-bin-line"></i> Remove
                             </button>
                         </form>
-
                     </td>
                 </tr>
             </c:forEach>
@@ -96,41 +96,76 @@
         <form action="<%=request.getContextPath()%>/ManagePatientsServlet" method="post">
             <input type="hidden" name="action" value="add">
             <div class="form-grid">
-                <input type="hidden" name="action" value="edit">
-                <input type="hidden" name="originalUsername" id="editOriginalUsername">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="editUsername"><i class="ri-user-line"></i> Username</label>
-                        <input type="text" id="editUsername" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPassword"><i class="ri-lock-line"></i> Password</label>
-                        <input type="password" id="editPassword" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editName"><i class="ri-profile-line"></i> Full Name</label>
-                        <input type="text" id="editName" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmail"><i class="ri-mail-line"></i> Email</label>
-                        <input type="email" id="editEmail" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPhone"><i class="ri-phone-line"></i> Phone</label>
-                        <input type="tel" id="editPhone" name="phone" required pattern="[0-9]{10}">
-                    </div>
-                    <div class="form-group">
-                        <label for="editDob"><i class="ri-calendar-line"></i> Date of Birth</label>
-                        <input type="date" id="editDob" name="dob" required>
-                    </div>
+                <div class="form-group">
+                    <label for="addUsername"><i class="ri-user-line"></i> Username</label>
+                    <input type="text" id="addUsername" name="username" required>
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="ri-add-line"></i> Add Patient</button>
+                <div class="form-group">
+                    <label for="addPassword"><i class="ri-lock-line"></i> Password</label>
+                    <input type="password" id="addPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="addName"><i class="ri-profile-line"></i> Full Name</label>
+                    <input type="text" id="addName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="addEmail"><i class="ri-mail-line"></i> Email</label>
+                    <input type="email" id="addEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="addPhone"><i class="ri-phone-line"></i> Phone</label>
+                    <input type="tel" id="addPhone" name="phone" required pattern="[0-9]{10}">
+                </div>
+                <div class="form-group">
+                    <label for="addDob"><i class="ri-calendar-line"></i> Date of Birth</label>
+                    <input type="date" id="addDob" name="dob" required>
+                </div>
             </div>
+            <button type="submit" class="btn btn-primary"><i class="ri-add-line"></i> Add Patient</button>
         </form>
     </div>
 </div>
 
-
+<!-- Edit Patient Modal -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="ri-edit-line"></i> Edit Patient</h2>
+            <button class="modal-close" onclick="closeEditModal()">×</button>
+        </div>
+        <form action="<%=request.getContextPath()%>/ManagePatientsServlet" method="post">
+            <input type="hidden" name="action" value="edit">
+            <input type="hidden" name="originalUsername" id="editOriginalUsername">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="editUsername"><i class="ri-user-line"></i> Username</label>
+                    <input type="text" id="editUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPassword"><i class="ri-lock-line"></i> Password</label>
+                    <input type="password" id="editPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="editName"><i class="ri-profile-line"></i> Full Name</label>
+                    <input type="text" id="editName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="editEmail"><i class="ri-mail-line"></i> Email</label>
+                    <input type="email" id="editEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPhone"><i class="ri-phone-line"></i> Phone</label>
+                    <input type="tel" id="editPhone" name="phone" required pattern="[0-9]{10}">
+                </div>
+                <div class="form-group">
+                    <label for="editDob"><i class="ri-calendar-line"></i> Date of Birth</label>
+                    <input type="date" id="editDob" name="dob" required>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Save Changes</button>
+        </form>
+    </div>
+</div>
 
 <script>
     // Add Modal functions
@@ -140,6 +175,22 @@
 
     function closeAddModal() {
         document.getElementById('addModal').style.display = 'none';
+    }
+
+    // Edit Modal functions
+    function openEditModal(username, password, name, email, phone, dob) {
+        document.getElementById('editModal').style.display = 'flex';
+        document.getElementById('editOriginalUsername').value = username;
+        document.getElementById('editUsername').value = username;
+        document.getElementById('editPassword').value = password;
+        document.getElementById('editName').value = name;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editDob').value = dob;
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
     }
 
     // Search function
@@ -178,14 +229,11 @@
             return dateB - dateA; // Newest first
         });
 
-        // Clear and re-append sorted rows
         while (tbody.firstChild) {
             tbody.removeChild(tbody.firstChild);
         }
         rows.forEach(row => tbody.appendChild(row));
     }
-
-    // [Previous modal and chart scripts remain unchanged]
 
     window.onclick = function(event) {
         const addModal = document.getElementById('addModal');
@@ -196,6 +244,7 @@
             closeEditModal();
         }
     }
+
     // Age Distribution Chart
     const patientsData = [
         <c:forEach var="patient" items="${patients}">

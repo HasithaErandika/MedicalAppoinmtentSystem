@@ -9,7 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/manageOperations.css">
-
 </head>
 <body>
 <div class="container">
@@ -85,8 +84,6 @@
                 </table>
             </div>
         </div>
-
-
     </div>
 </div>
 
@@ -119,6 +116,7 @@
                     <i class="ri-heart-pulse-line"></i>
                     <label>Specialization</label>
                     <input type="text" name="specialization" required>
+                    </select>
                 </div>
                 <div class="form-group">
                     <i class="ri-mail-line"></i>
@@ -167,7 +165,16 @@
                 <div class="form-group">
                     <i class="ri-heart-pulse-line"></i>
                     <label>Specialization</label>
-                    <input type="text" id="editSpecialization" name="specialization" required>
+                    <select id="editSpecialization" name="specialization" required>
+                        <option value="">Select Specialization</option>
+                        <option value="Cardiology">Cardiology</option>
+                        <option value="Neurology">Neurology</option>
+                        <option value="Orthopedics">Orthopedics</option>
+                        <option value="Pediatrics">Pediatrics</option>
+                        <option value="Pulmonology">Pulmonology</option>
+                        <option value="Dermatology">Dermatology</option>
+                        <option value="Oncology">Oncology</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <i class="ri-mail-line"></i>
