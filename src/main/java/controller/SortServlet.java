@@ -18,6 +18,7 @@ public class SortServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(SortServlet.class.getName());
     private static final String DOCTORS_FILE = "/data/doctors.txt";
     private static final String AVAILABILITY_FILE = "/data/doctors_availability.txt";
+    private static final String APPOINTMENTS_FILE = "/data/appointments.txt"; // New constant
     private static final String NAME = "name";
     private static final String SPECIALTY = "specialty";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -29,6 +30,7 @@ public class SortServlet extends HttpServlet {
         String date;
         String startTime;
         String endTime;
+        int appointmentCount; // New field to store appointment count
 
         Doctor(String username, String name, String specialty, String date, String startTime, String endTime) {
             this.username = username;
@@ -37,6 +39,7 @@ public class SortServlet extends HttpServlet {
             this.date = date;
             this.startTime = startTime;
             this.endTime = endTime;
+            this.appointmentCount = 0; // Default to 0
         }
 
         public LocalTime getStartTimeAsLocalTime() {
@@ -81,6 +84,9 @@ public class SortServlet extends HttpServlet {
         Map<String, Map<String, String>> doctorDetails = loadDoctorDetails(request);
         Map<String, List<String>> specialtyDoctors = loadSpecialtiesAndDoctors(doctorDetails);
         List<Doctor> allDoctors = loadDoctors(request, doctorDetails);
+
+        // Calculate appointment counts for each doctor's availability
+        calculateAppointmentCounts(request, allDoctors);
 
         Map<String, Object> responseData = new HashMap<>();
         List<String> specialties = new ArrayList<>(specialtyDoctors.keySet());
@@ -233,5 +239,42 @@ public class SortServlet extends HttpServlet {
         }
         LOGGER.info("Filtered doctors for specialty '" + specialty + "' and doctor '" + doctorName + "': " + filtered.size() + " entries");
         return filtered;
+    }
+
+    // New method to calculate appointment counts
+    private void calculateAppointmentCounts(HttpServletRequest request, List<Doctor> doctors) throws ServletException {
+        String appointmentsPath = request.getServletContext().getRealPath(APPOINTMENTS_FILE);
+        File file = new File(appointmentsPath);
+
+        if (!file.exists()) {
+            LOGGER.severe("Appointments file not found at: " + appointmentsPath);
+            throw new ServletException("Appointments file not found");
+        }
+
+        try (BufferedReader br = new BufferedReader(new FileReader(appointmentsPath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] parts = line.split(",");
+                if (parts.length >= 4) {
+                    String appointmentDateTime = parts[3].trim(); // e.g., "2025-03-11 09:00"
+                    String[] dateTimeParts = appointmentDateTime.split(" ");
+                    if (dateTimeParts.length == 2) {
+                        String appointmentDate = dateTimeParts[0]; // "2025-03-11"
+                        String appointmentTime = dateTimeParts[1]; // "09:00"
+
+                        for (Doctor doc : doctors) {
+                            if (doc.date.equals(appointmentDate) &&
+                                    doc.startTime.equals(appointmentTime)) {
+                                doc.appointmentCount++; // Increment count if date and start time match
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error loading appointments", e);
+            throw new ServletException("Error loading appointments", e);
+        }
+        LOGGER.info("Calculated appointment counts for doctors: " + doctors.size() + " entries updated");
     }
 }
