@@ -27,6 +27,7 @@ public class UserServlet extends HttpServlet {
     private DoctorAvailabilityService availabilityService;
     private FileHandler doctorFileHandler;
     private FileHandler userFileHandler;
+    private static final Gson GSON = new Gson();
 
     @Override
     public void init() throws ServletException {
@@ -36,7 +37,7 @@ public class UserServlet extends HttpServlet {
             appointmentService = new AppointmentService(basePath + "appointments.txt");
             availabilityService = new DoctorAvailabilityService(basePath + "doctors_availability.txt", appointmentService);
             doctorFileHandler = new FileHandler(basePath + "doctors.txt");
-            userFileHandler = new FileHandler(basePath + "patients.txt"); // Updated to patients.txt
+            userFileHandler = new FileHandler(basePath + "patients.txt");
             LOGGER.info("Successfully initialized file handlers. Patients file: " + (basePath + "patients.txt"));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize services", e);
@@ -60,9 +61,28 @@ public class UserServlet extends HttpServlet {
         String action = request.getParameter("action");
         LOGGER.info("User " + username + " requested action: " + action);
 
-        // Handle AJAX requests (getAppointments, getTimeSlots) omitted for brevity...
+        if ("getAppointments".equals(action)) {
+            // Handle AJAX request to fetch user appointments
+            try {
+                List<Appointment> allAppointments = appointmentService.getAllAppointments();
+                List<Appointment> userAppointments = allAppointments.stream()
+                        .filter(appt -> appt.getPatientId().equals(username))
+                        .collect(Collectors.toList());
 
-        // Fetch user details and set session attributes
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                String json = GSON.toJson(userAppointments);
+                response.getWriter().write(json);
+                LOGGER.info("Sent appointments for user " + username + ": " + json);
+                return; // Exit after sending JSON
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error fetching appointments for " + username, e);
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching appointments: " + e.getMessage());
+                return;
+            }
+        }
+
+        // Existing logic for page rendering
         try {
             List<String> userLines = userFileHandler.readLines();
             LOGGER.info("Read " + userLines.size() + " lines from patients.txt: " + userLines);
@@ -90,7 +110,6 @@ public class UserServlet extends HttpServlet {
             request.setAttribute("messageType", "error");
         }
 
-        // Fetch appointments and doctors (omitted for brevity)...
         request.getRequestDispatcher("/pages/userProfile/userProfile.jsp").forward(request, response);
     }
 
@@ -137,8 +156,8 @@ public class UserServlet extends HttpServlet {
                 String fullName = request.getParameter("fullName");
                 String email = request.getParameter("email");
                 String phone = request.getParameter("phone");
-                String password = request.getParameter("password"); // Add password
-                String birthday = request.getParameter("birthday"); // Add birthday
+                String password = request.getParameter("password");
+                String birthday = request.getParameter("birthday");
 
                 if (fullName == null || email == null || phone == null || password == null || birthday == null ||
                         fullName.trim().isEmpty() || email.trim().isEmpty() || phone.trim().isEmpty() ||
@@ -162,11 +181,11 @@ public class UserServlet extends HttpServlet {
                 }
                 userFileHandler.writeLines(updatedLines);
 
-                request.getSession().setAttribute("password", password); // Add password
+                request.getSession().setAttribute("password", password);
                 request.getSession().setAttribute("fullname", fullName);
                 request.getSession().setAttribute("email", email);
                 request.getSession().setAttribute("phone", phone);
-                request.getSession().setAttribute("birthday", birthday); // Add birthday
+                request.getSession().setAttribute("birthday", birthday);
                 request.setAttribute("message", "Details updated successfully!");
                 request.setAttribute("messageType", "success");
             } catch (Exception e) {

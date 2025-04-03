@@ -27,26 +27,13 @@
             </tr>
             </thead>
             <tbody>
-            <c:forEach var="appt" items="${appointments}">
-                <c:if test="${appt.patientId == sessionScope.username}">
-                    <tr>
-                        <td>${appt.id}</td>
-                        <td>${appt.doctorId}</td>
-                        <td>${appt.dateTime}</td>
-                        <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">
-                                ${appt.priority == 1 ? 'Emergency' : 'Normal'}
-                        </td>
-                    </tr>
-                </c:if>
-            </c:forEach>
+            <!-- Table body will be populated dynamically by JavaScript -->
             </tbody>
         </table>
-        <c:if test="${empty appointments || appointments.stream().noneMatch(appt -> appt.patientId == sessionScope.username)}">
-            <div class="no-appointments">
-                <i class="fas fa-calendar-times" aria-hidden="true"></i>
-                <p>No upcoming appointments found.</p>
-            </div>
-        </c:if>
+        <div class="no-appointments" id="noAppointmentsMessage" style="display: none;">
+            <i class="fas fa-calendar-times" aria-hidden="true"></i>
+            <p>No upcoming appointments found.</p>
+        </div>
     </div>
 </section>
 
@@ -250,48 +237,94 @@
 </style>
 
 <script>
-    let sortDirection = [0, 0, 0, 0]; // 0: unsorted, 1: ascending, -1: descending
+    // Sorting function
+    function sortTable(col) {
+        const table = document.querySelector('#appointmentsSection table tbody');
+        const rows = Array.from(table.rows);
+        const th = document.querySelector(`th[data-sort="${col}"]`);
+        const isAsc = !th.classList.contains('asc');
 
-    function sortTable(columnIndex) {
-        const table = document.querySelector('.appointments-table');
-        const tbody = table.querySelector('tbody');
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        const th = table.querySelectorAll('th')[columnIndex];
-        const isAscending = sortDirection[columnIndex] === 1 ? -1 : 1;
-
-        // Reset all directions except the current column
-        sortDirection = sortDirection.map((dir, idx) => idx === columnIndex ? isAscending : 0);
-
-        // Update sort icons
-        table.querySelectorAll('.sortable').forEach((header, idx) => {
-            header.classList.remove('asc', 'desc');
-            if (idx === columnIndex) {
-                header.classList.add(isAscending === 1 ? 'asc' : 'desc');
+        // Remove sort classes from all headers except the current one
+        document.querySelectorAll('.sortable').forEach(header => {
+            if (header !== th) {
+                header.classList.remove('asc', 'desc');
             }
         });
 
-        // Sort rows
+        // Toggle sort direction
+        th.classList.remove('asc', 'desc');
+        th.classList.add(isAsc ? 'asc' : 'desc');
+
         rows.sort((a, b) => {
-            const aValue = a.cells[columnIndex].textContent.trim();
-            const bValue = b.cells[columnIndex].textContent.trim();
+            const x = a.cells[col].textContent.trim();
+            const y = b.cells[col].textContent.trim();
 
-            if (columnIndex === 0) { // ID (numeric)
-                return isAscending * (parseInt(aValue) - parseInt(bValue));
-            }
-            if (columnIndex === 1) { // Doctor (string)
-                return isAscending * aValue.localeCompare(bValue);
-            }
-            if (columnIndex === 2) { // Date & Time (date)
-                return isAscending * (new Date(aValue) - new Date(bValue));
-            }
-            if (columnIndex === 3) { // Priority (Emergency > Normal)
+            if (col === 0) { // ID (numeric)
+                return isAsc ? parseInt(x) - parseInt(y) : parseInt(y) - parseInt(x);
+            } else if (col === 2) { // Date & Time (date)
+                return isAsc ? new Date(x) - new Date(y) : new Date(y) - new Date(x);
+            } else if (col === 3) { // Priority (Emergency > Normal)
                 const priorityOrder = { 'Emergency': 1, 'Normal': 0 };
-                return isAscending * (priorityOrder[aValue] - priorityOrder[bValue]);
+                return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x];
+            } else { // Doctor (string)
+                return isAsc ? x.localeCompare(y) : y.localeCompare(x);
             }
-            return 0;
         });
 
-        // Re-append sorted rows
-        rows.forEach(row => tbody.appendChild(row));
+        rows.forEach(row => table.appendChild(row));
     }
+
+    // Fetch user appointments
+    async function fetchUserAppointments() {
+        console.log("Fetching user appointments...");
+        const table = document.querySelector('#appointmentsSection table tbody');
+        const noAppointmentsMessage = document.getElementById('noAppointmentsMessage');
+        const url = `${window.contextPath}/user?action=getAppointments`;
+
+        try {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: { Accept: 'application/json' },
+                cache: 'no-store',
+                credentials: 'same-origin' // Include cookies for session
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new Error(`Failed to fetch appointments: ${response.status} - ${response.statusText} - ${errorText}`);
+            }
+
+            const appointments = await response.json();
+            console.log("User appointments:", appointments);
+
+            table.innerHTML = '';
+            noAppointmentsMessage.style.display = 'none';
+
+            if (appointments.length === 0) {
+                noAppointmentsMessage.style.display = 'flex';
+                return;
+            }
+
+            appointments.forEach(appt => {
+                const row = `
+                    <tr>
+                        <td>${appt.id}</td>
+                        <td>${appt.doctorId}</td>
+                        <td>${appt.dateTime}</td>
+                        <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">
+                            ${appt.priority == 1 ? 'Emergency' : 'Normal'}
+                        </td>
+                    </tr>
+                `;
+                table.insertAdjacentHTML('beforeend', row);
+            });
+        } catch (error) {
+            console.error("Error fetching appointments:", error);
+            table.innerHTML = `<tr><td colspan="4">Error: ${error.message}</td></tr>`;
+            noAppointmentsMessage.style.display = 'none';
+        }
+    }
+
+    // Fetch appointments when the page loads
+    document.addEventListener('DOMContentLoaded', fetchUserAppointments);
 </script>
