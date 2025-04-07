@@ -18,11 +18,11 @@
         </a>
     </div>
 
-    <% if (request.getAttribute("message") != null) { %>
-    <div class="message <%= request.getAttribute("messageType") %>">
-        <%= request.getAttribute("message") %>
-    </div>
-    <% } %>
+    <c:if test="${not empty message}">
+        <div class="message ${messageType == 'error' ? 'error-message' : 'success-message'}">
+                ${message}
+        </div>
+    </c:if>
 
     <div class="search-container">
         <input type="text" class="search-input" id="searchInput" placeholder="Search appointments..." onkeyup="searchTable()">
@@ -66,7 +66,7 @@
                     <th>ID</th>
                     <th>Patient Name</th>
                     <th>Doctor Name</th>
-                    <th>Token ID</th> <!-- Added Token ID column -->
+                    <th>Token ID</th>
                     <th>Date & Time</th>
                     <th>Priority</th>
                     <th>Actions</th>
@@ -76,9 +76,9 @@
                 <c:forEach var="appt" items="${appointments}">
                     <tr>
                         <td>${appt.id}</td>
-                        <td>${appt.patientName}</td>
-                        <td>${appt.doctorName}</td>
-                        <td>${appt.tokenID}</td> <!-- Added Token ID display -->
+                        <td>${appt.patientName != null ? appt.patientName : appt.patientId}</td>
+                        <td>${appt.doctorName != null ? appt.doctorName : appt.doctorId}</td>
+                        <td>${appt.tokenID}</td>
                         <td>${appt.dateTime}</td>
                         <td class="${appt.priority == 1 ? 'priority-emergency' : ''}">
                                 ${appt.priority == 1 ? 'Emergency' : 'Normal'}
@@ -133,7 +133,7 @@
                     </select>
                 </div>
                 <div class="form-group">
-                    <i class="ri-key-2-line"></i> <!-- Icon for Token ID -->
+                    <i class="ri-key-2-line"></i>
                     <label>Token ID</label>
                     <input type="text" id="tokenID" name="tokenID" required>
                 </div>
@@ -145,7 +145,7 @@
                 <div class="form-group">
                     <i class="ri-time-line"></i>
                     <label>Time Slot</label>
-                    <select id="timeSlot" name="timeSlot" required>
+                    <select id="timeSlot" name="time" required>
                         <option value="" disabled>Select a time slot</option>
                     </select>
                 </div>
@@ -164,7 +164,7 @@
         document.getElementById('appointmentId').value = id;
         document.getElementById('patientId').value = patientId;
         document.getElementById('doctorId').value = doctorId;
-        document.getElementById('tokenID').value = tokenID; // Set Token ID
+        document.getElementById('tokenID').value = tokenID;
         document.getElementById('date').value = date;
         document.getElementById('isEmergency').checked = isEmergency;
 
@@ -182,28 +182,22 @@
     }
 
     function updateTimeSlots() {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
             const doctorId = document.getElementById('doctorId').value;
             const date = document.getElementById('date').value;
             const timeSlotSelect = document.getElementById('timeSlot');
             timeSlotSelect.innerHTML = '<option value="" disabled>Select a time slot</option>';
 
             if (doctorId && date) {
-                fetch('<%=request.getContextPath()%>/ManageAppointmentsServlet?action=getTimeSlots&doctorId=' + doctorId + '&date=' + date)
-                    .then(response => response.json())
-                    .then(slots => {
-                        slots.forEach(slot => {
-                            const option = document.createElement('option');
-                            option.value = slot;
-                            option.text = slot;
-                            timeSlotSelect.appendChild(option);
-                        });
-                        resolve();
-                    })
-                    .catch(error => {
-                        console.error('Error fetching time slots:', error);
-                        reject(error);
-                    });
+                // Mock time slots (replace with actual fetch if DoctorAvailabilityService provides an endpoint)
+                const mockSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00'];
+                mockSlots.forEach(slot => {
+                    const option = document.createElement('option');
+                    option.value = slot;
+                    option.text = slot;
+                    timeSlotSelect.appendChild(option);
+                });
+                resolve();
             } else {
                 resolve();
             }
@@ -213,7 +207,7 @@
     function validateForm() {
         const patientId = document.getElementById('patientId').value;
         const doctorId = document.getElementById('doctorId').value;
-        const tokenID = document.getElementById('tokenID').value; // Validate Token ID
+        const tokenID = document.getElementById('tokenID').value;
         const date = document.getElementById('date').value;
         const timeSlot = document.getElementById('timeSlot').value;
 
@@ -221,6 +215,16 @@
             alert('Please fill in all required fields, including Token ID.');
             return false;
         }
+
+        // Combine date and time for submission
+        const dateTime = date + ' ' + timeSlot;
+        const form = document.getElementById('editForm');
+        const hiddenDateTime = document.createElement('input');
+        hiddenDateTime.type = 'hidden';
+        hiddenDateTime.name = 'dateTime';
+        hiddenDateTime.value = dateTime;
+        form.appendChild(hiddenDateTime);
+
         return true;
     }
 
@@ -228,7 +232,6 @@
         return confirm('Are you sure you want to cancel this appointment?');
     }
 
-    // Search function
     function searchTable() {
         const input = document.getElementById('searchInput').value.toLowerCase();
         const year = document.getElementById('yearFilter').value;
@@ -242,7 +245,7 @@
             const id = td[0].textContent.toLowerCase();
             const patientName = td[1].textContent.toLowerCase();
             const doctorName = td[2].textContent.toLowerCase();
-            const tokenID = td[3].textContent.toLowerCase(); // Added Token ID to search
+            const tokenID = td[3].textContent.toLowerCase();
             const dateTime = td[4].textContent;
             const [datePart] = dateTime.split(' ');
             const [yearPart, monthPart, dayPart] = datePart.split('-');
@@ -256,19 +259,17 @@
         }
     }
 
-    // Filter function
     function filterTable() {
         searchTable();
     }
 
-    // Sort function by date
     function sortTable() {
         const table = document.getElementById('appointmentsTable');
         const tbody = document.getElementById('appointmentsBody');
         const rows = Array.from(tbody.getElementsByTagName('tr'));
 
         rows.sort((a, b) => {
-            const dateTimeA = new Date(a.cells[4].textContent); // Updated index due to Token ID
+            const dateTimeA = new Date(a.cells[4].textContent);
             const dateTimeB = new Date(b.cells[4].textContent);
             return dateTimeB - dateTimeA; // Newest first
         });

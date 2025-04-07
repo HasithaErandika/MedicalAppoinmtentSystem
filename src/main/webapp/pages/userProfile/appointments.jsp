@@ -4,12 +4,12 @@
 <section class="dashboard-card appointments-section" id="appointmentsSection" aria-labelledby="appointments-title">
     <header class="section-header">
         <h2 id="appointments-title">
-            <i class="fas fa-calendar-alt" aria-hidden="true"></i> Your Upcoming Appointments
+            <i class="fas fa-calendar-alt" aria-hidden="true"></i> Your Appointments
         </h2>
     </header>
 
     <div class="table-container">
-        <table role="grid" class="appointments-table" aria-label="Upcoming Appointments">
+        <table role="grid" class="appointments-table" aria-label="Your Appointments">
             <thead>
             <tr>
                 <th scope="col" data-sort="0" class="sortable" onclick="sortTable(0)">
@@ -19,7 +19,7 @@
                     Doctor <i class="fas fa-sort" aria-hidden="true"></i>
                 </th>
                 <th scope="col" data-sort="2" class="sortable" onclick="sortTable(2)">
-                    Token ID <i class="fas fa-sort" aria-hidden="true"></i> <!-- Added Token ID column -->
+                    Token <i class="fas fa-sort" aria-hidden="true"></i>
                 </th>
                 <th scope="col" data-sort="3" class="sortable" onclick="sortTable(3)">
                     Date & Time <i class="fas fa-sort" aria-hidden="true"></i>
@@ -30,12 +30,12 @@
             </tr>
             </thead>
             <tbody>
-            <!-- Table body will be populated dynamically by JavaScript -->
+            <!-- Table body will be populated dynamically by UserProfile.js -->
             </tbody>
         </table>
         <div class="no-appointments" id="noAppointmentsMessage" style="display: none;">
             <i class="fas fa-calendar-times" aria-hidden="true"></i>
-            <p>No upcoming appointments found.</p>
+            <p>No appointments found.</p>
         </div>
     </div>
 </section>
@@ -198,6 +198,16 @@
         color: var(--text-muted);
     }
 
+    /* New styles for past vs upcoming */
+    .past-appointment {
+        background: rgba(113, 128, 150, 0.1); /* Light gray for past */
+        color: var(--text-muted);
+    }
+
+    .upcoming-appointment {
+        background: rgba(56, 178, 172, 0.1); /* Light teal for upcoming */
+    }
+
     @keyframes fadeIn {
         from { opacity: 0; transform: translateY(15px); }
         to { opacity: 1; transform: translateY(0); }
@@ -238,99 +248,3 @@
         }
     }
 </style>
-
-<script>
-    // Sorting function
-    function sortTable(col) {
-        const table = document.querySelector('#appointmentsSection table tbody');
-        const rows = Array.from(table.rows);
-        const th = document.querySelector(`th[data-sort="${col}"]`);
-        const isAsc = !th.classList.contains('asc');
-
-        // Remove sort classes from all headers except the current one
-        document.querySelectorAll('.sortable').forEach(header => {
-            if (header !== th) {
-                header.classList.remove('asc', 'desc');
-            }
-        });
-
-        // Toggle sort direction
-        th.classList.remove('asc', 'desc');
-        th.classList.add(isAsc ? 'asc' : 'desc');
-
-        rows.sort((a, b) => {
-            const x = a.cells[col].textContent.trim();
-            const y = b.cells[col].textContent.trim();
-
-            if (col === 0) { // ID (numeric)
-                return isAsc ? parseInt(x) - parseInt(y) : parseInt(y) - parseInt(x);
-            } else if (col === 2) { // Token ID (string)
-                return isAsc ? x.localeCompare(y) : y.localeCompare(x);
-            } else if (col === 3) { // Date & Time (date)
-                return isAsc ? new Date(x) - new Date(y) : new Date(y) - new Date(x);
-            } else if (col === 4) { // Priority (Emergency > Normal)
-                const priorityOrder = { 'Emergency': 1, 'Normal': 0 };
-                return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x];
-            } else { // Doctor (string)
-                return isAsc ? x.localeCompare(y) : y.localeCompare(x);
-            }
-        });
-
-        rows.forEach(row => table.appendChild(row));
-    }
-
-    // Fetch user appointments
-    async function fetchUserAppointments() {
-        console.log("Fetching user appointments...");
-        const table = document.querySelector('#appointmentsSection table tbody');
-        const noAppointmentsMessage = document.getElementById('noAppointmentsMessage');
-        const url = `${window.contextPath}/user?action=getAppointments`;
-
-        try {
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: { Accept: 'application/json' },
-                cache: 'no-store',
-                credentials: 'same-origin' // Include cookies for session
-            });
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Failed to fetch appointments: ${response.status} - ${response.statusText} - ${errorText}`);
-            }
-
-            const appointments = await response.json();
-            console.log("User appointments:", appointments);
-
-            table.innerHTML = '';
-            noAppointmentsMessage.style.display = 'none';
-
-            if (appointments.length === 0) {
-                noAppointmentsMessage.style.display = 'flex';
-                return;
-            }
-
-            appointments.forEach(appt => {
-                const row = `
-                    <tr>
-                        <td>${appt.id}</td>
-                        <td>${appt.doctorId}</td>
-                        <td>${appt.tokenID}</td> <!-- Added Token ID -->
-                        <td>${appt.dateTime}</td>
-                        <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">
-                            ${appt.priority == 1 ? 'Emergency' : 'Normal'}
-                        </td>
-                    </tr>
-                `;
-                table.insertAdjacentHTML('beforeend', row);
-            });
-        } catch (error) {
-            console.error("Error fetching appointments:", error);
-            table.innerHTML = `<tr><td colspan="5">Error: ${error.message}</td></tr>`; // Updated colspan to 5
-            noAppointmentsMessage.style.display = 'none';
-        }
-    }
-
-    // Fetch appointments when the page loads
-    document.addEventListener('DOMContentLoaded', fetchUserAppointments);
-</script>
