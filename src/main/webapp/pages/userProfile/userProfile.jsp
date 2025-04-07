@@ -117,14 +117,14 @@
 </main>
 
 <!-- Confirmation Modal -->
-<dialog class="modal" id="confirmModal" aria-labelledby="modal-title">
+<dialog id="confirmModal" class="modal" aria-labelledby="modal-title">
     <div class="modal-content">
-        <button class="close-modal" aria-label="Close modal" onclick="closeModal()" type="button">×</button>
-        <h2 id="modal-title">Confirm Booking</h2>
-        <p id="confirmMessage"></p>
+        <h3 id="modal-title">Confirm Booking</h3>
+        <p id="confirmMessage">Are you sure you want to book this appointment?</p>
+        <div id="appointmentDetails" class="appointment-details"></div>
         <div class="modal-actions">
-            <button class="btn-secondary" onclick="closeModal()" type="button">Cancel</button>
-            <button class="btn-primary" onclick="submitBooking()" type="button">Confirm</button>
+            <button id="cancelBtn" class="cancel-btn" type="button" onclick="closeModal()">Cancel</button>
+            <button id="confirmBtn" class="confirm-btn" type="button">Confirm</button>
         </div>
     </div>
 </dialog>
@@ -135,5 +135,76 @@
 <script>
     window.contextPath = '<%= request.getContextPath() %>';
 </script>
+
+<style>
+    /* Modal Styles (inline for simplicity, can move to userProfile.css) */
+    .modal {
+        border: none;
+        border-radius: 12px;
+        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+        padding: 1.5rem;
+        max-width: 500px;
+        width: 90%;
+        background: #FFFFFF;
+    }
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .modal-content h3 {
+        margin: 0;
+        color: #2C5282;
+        font-size: 1.5rem;
+    }
+
+    .modal-content p {
+        margin: 0;
+        color: #2D3748;
+    }
+
+    .appointment-details {
+        padding: 1rem;
+        background: #F7FAFC;
+        border-radius: 8px;
+        color: #2D3748;
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-end;
+    }
+
+    .confirm-btn, .cancel-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .confirm-btn {
+        background: #38B2AC;
+        color: #FFFFFF;
+    }
+
+    .confirm-btn:hover {
+        background: #2B928C;
+        box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3);
+    }
+
+    .cancel-btn {
+        background: #E53E3E;
+        color: #FFFFFF;
+    }
+
+    .cancel-btn:hover {
+        background: #C53030;
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+    }
+</style>
 </body>
 </html>

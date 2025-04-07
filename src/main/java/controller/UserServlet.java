@@ -41,7 +41,7 @@ public class UserServlet extends HttpServlet {
             LOGGER.info("Successfully initialized file handlers. Patients file: " + (basePath + "patients.txt"));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize services", e);
-            throw new ServletException("Failed to initialize UserServlet diensten", e);
+            throw new ServletException("Failed to initialize UserServlet services", e);
         }
     }
 
@@ -62,7 +62,6 @@ public class UserServlet extends HttpServlet {
         LOGGER.info("User " + username + " requested action: " + action);
 
         if ("getAppointments".equals(action)) {
-            // Handle AJAX request to fetch user appointments
             try {
                 List<Appointment> allAppointments = appointmentService.getAllAppointments();
                 List<Appointment> userAppointments = allAppointments.stream()
@@ -77,12 +76,14 @@ public class UserServlet extends HttpServlet {
                 return; // Exit after sending JSON
             } catch (Exception e) {
                 LOGGER.log(Level.SEVERE, "Error fetching appointments for " + username, e);
-                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error fetching appointments: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentType("application/json");
+                response.getWriter().write(GSON.toJson(new ErrorResponse("Error fetching appointments: " + e.getMessage())));
                 return;
             }
         }
 
-        // Existing logic for page rendering
+        // Load user details for page rendering
         try {
             List<String> userLines = userFileHandler.readLines();
             LOGGER.info("Read " + userLines.size() + " lines from patients.txt: " + userLines);
@@ -131,16 +132,12 @@ public class UserServlet extends HttpServlet {
                 String doctorId = request.getParameter("doctorId");
                 String date = request.getParameter("date");
                 String timeSlot = request.getParameter("timeSlot");
-                String tokenID = request.getParameter("tokenID"); // Added tokenID parameter
+                String token = request.getParameter("token"); // Changed from tokenID to token
                 boolean isEmergency = "on".equals(request.getParameter("isEmergency"));
 
-                if (doctorId == null || date == null || timeSlot == null ||
-                        doctorId.trim().isEmpty() || date.trim().isEmpty() || timeSlot.trim().isEmpty()) {
+                if (doctorId == null || date == null || timeSlot == null || token == null ||
+                        doctorId.trim().isEmpty() || date.trim().isEmpty() || timeSlot.trim().isEmpty() || token.trim().isEmpty()) {
                     throw new IllegalArgumentException("Missing booking parameters");
-                }
-
-                if (tokenID == null || tokenID.trim().isEmpty()) {
-                    tokenID = generateTokenID(); // Generate a token if not provided
                 }
 
                 String dateTime = date + " " + timeSlot;
@@ -148,13 +145,19 @@ public class UserServlet extends HttpServlet {
                     throw new IllegalStateException("Time slot unavailable");
                 }
 
-                appointmentService.bookAppointment(username, doctorId, tokenID, dateTime, isEmergency); // Added tokenID
-                request.setAttribute("message", "Appointment booked successfully! Token: " + tokenID);
-                request.setAttribute("messageType", "success");
+                appointmentService.bookAppointment(username, doctorId, token, dateTime, isEmergency);
+
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(GSON.toJson(new SuccessResponse(true, "Appointment booked successfully! Token: " + token)));
+                LOGGER.info("Booked appointment for " + username + " with token: " + token);
+                return; // Exit after sending JSON
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Booking error: " + e.getMessage());
-                request.setAttribute("message", "Error booking appointment: " + e.getMessage());
-                request.setAttribute("messageType", "error");
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.setContentType("application/json");
+                response.getWriter().write(GSON.toJson(new ErrorResponse("Error booking appointment: " + e.getMessage())));
+                return;
             }
         } else if ("updateDetails".equals(action)) {
             try {
@@ -198,13 +201,26 @@ public class UserServlet extends HttpServlet {
                 request.setAttribute("message", "Error updating details: " + e.getMessage());
                 request.setAttribute("messageType", "error");
             }
+            doGet(request, response); // Refresh page for UI updates
         }
-
-        doGet(request, response); // Refresh page
     }
 
-    // Simple method to generate a unique tokenID
-    private String generateTokenID() {
-        return "TOK" + System.currentTimeMillis(); // Basic implementation, could be improved
+    // Helper classes for JSON responses
+    private static class SuccessResponse {
+        boolean success;
+        String message;
+
+        SuccessResponse(boolean success, String message) {
+            this.success = success;
+            this.message = message;
+        }
+    }
+
+    private static class ErrorResponse {
+        String error;
+
+        ErrorResponse(String error) {
+            this.error = error;
+        }
     }
 }

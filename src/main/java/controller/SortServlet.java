@@ -31,6 +31,7 @@ public class SortServlet extends HttpServlet {
         String startTime;
         String endTime;
         int appointmentCount;
+        String nextToken; // Added to store the next available token
 
         Doctor(String username, String name, String specialty, String date, String startTime, String endTime) {
             this.username = username;
@@ -40,6 +41,7 @@ public class SortServlet extends HttpServlet {
             this.startTime = startTime;
             this.endTime = endTime;
             this.appointmentCount = 0;
+            this.nextToken = "TOK001"; // Default, updated later
         }
 
         public LocalTime getStartTimeAsLocalTime() {
@@ -89,7 +91,7 @@ public class SortServlet extends HttpServlet {
 
         Map<String, Object> responseData = new HashMap<>();
         List<String> specialties = new ArrayList<>(specialtyDoctors.keySet());
-        bubbleSortStrings(specialties, true);  // Sort specialties case-insensitively
+        bubbleSortStrings(specialties, true);
         responseData.put("specialties", specialties);
 
         if (specialty == null || specialty.trim().isEmpty()) {
@@ -108,11 +110,11 @@ public class SortServlet extends HttpServlet {
                 doctorsForSpecialty = new ArrayList<>();
             }
             LOGGER.info("Doctors for specialty '" + specialtyLower + "': " + doctorsForSpecialty);
-            bubbleSortStrings(doctorsForSpecialty, true);  // Sort doctors case-insensitively
+            bubbleSortStrings(doctorsForSpecialty, true);
             responseData.put("doctors", doctorsForSpecialty);
 
             List<Doctor> filteredDoctors = filterDoctors(allDoctors, specialtyLower, doctorName, date, time);
-            bubbleSortDoctors(filteredDoctors);  // Sort availability by date and time
+            bubbleSortDoctors(filteredDoctors);
             responseData.put("availability", filteredDoctors);
         }
 
@@ -125,7 +127,6 @@ public class SortServlet extends HttpServlet {
         }
     }
 
-    // Bubble Sort for Strings (used for specialties and doctor names)
     private void bubbleSortStrings(List<String> list, boolean caseInsensitive) {
         int n = list.size();
         for (int i = 0; i < n - 1; i++) {
@@ -136,7 +137,6 @@ public class SortServlet extends HttpServlet {
                         a.compareToIgnoreCase(b) :
                         a.compareTo(b);
                 if (comparison > 0) {
-                    // Swap
                     list.set(j, b);
                     list.set(j + 1, a);
                 }
@@ -144,15 +144,13 @@ public class SortServlet extends HttpServlet {
         }
     }
 
-    // Bubble Sort for Doctor objects (used for availability)
     private void bubbleSortDoctors(List<Doctor> doctors) {
         int n = doctors.size();
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
                 Doctor a = doctors.get(j);
                 Doctor b = doctors.get(j + 1);
-                if (a.compareTo(b) > 0) {  // Using existing compareTo method
-                    // Swap
+                if (a.compareTo(b) > 0) {
                     doctors.set(j, b);
                     doctors.set(j + 1, a);
                 }
@@ -288,26 +286,32 @@ public class SortServlet extends HttpServlet {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 4) {
-                    String appointmentDateTime = parts[3].trim();
-                    String[] dateTimeParts = appointmentDateTime.split(" ");
-                    if (dateTimeParts.length == 2) {
-                        String appointmentDate = dateTimeParts[0];
-                        String appointmentTime = dateTimeParts[1];
+                if (parts.length >= 7) { // Ensure enough fields (appointmentID, patient, doctor, token, date, time, priority)
+                    String doctorUsername = parts[2].trim(); // Doctor ID (e.g., doctor5)
+                    String appointmentDate = parts[4].trim(); // Date (e.g., 2025-03-09)
+                    String appointmentTime = parts[5].trim(); // Time (e.g., 09:30)
 
-                        for (Doctor doc : doctors) {
-                            if (doc.date.equals(appointmentDate) &&
-                                    doc.startTime.equals(appointmentTime)) {
-                                doc.appointmentCount++;
-                            }
+                    for (Doctor doc : doctors) {
+                        if (doc.username.equals(doctorUsername) &&
+                                doc.date.equals(appointmentDate) &&
+                                doc.startTime.equals(appointmentTime)) {
+                            doc.appointmentCount++;
                         }
                     }
+                } else {
+                    LOGGER.warning("Invalid appointment entry: " + line);
                 }
+            }
+
+            // After counting appointments, generate next available token for each slot
+            for (Doctor doc : doctors) {
+                int nextTokenNumber = doc.appointmentCount + 1;
+                doc.nextToken = String.format("TOK%03d", nextTokenNumber); // e.g., TOK001, TOK002
             }
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Error loading appointments", e);
             throw new ServletException("Error loading appointments", e);
         }
-        LOGGER.info("Calculated appointment counts for doctors: " + doctors.size() + " entries updated");
+        LOGGER.info("Calculated appointment counts and tokens for doctors: " + doctors.size() + " entries updated");
     }
 }
