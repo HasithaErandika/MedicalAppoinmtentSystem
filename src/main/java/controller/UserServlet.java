@@ -8,9 +8,9 @@ import model.Appointment;
 import service.AppointmentService;
 import service.DoctorAvailabilityService;
 import service.FileHandler;
-import java.util.ArrayList; // Added import
-import java.util.List;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import com.google.gson.Gson;
@@ -131,7 +131,7 @@ public class UserServlet extends HttpServlet {
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Booking error: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.getWriter().write(GSON.toJson(new ErrorResponse("Error booking appointment")));
+                response.getWriter().write(GSON.toJson(new ErrorResponse("Error booking appointment: " + e.getMessage())));
             }
             return;
         } else if ("updateDetails".equals(action)) {

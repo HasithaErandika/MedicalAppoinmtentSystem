@@ -6,15 +6,18 @@ import java.util.logging.Logger;
 
 public class Availability implements Comparable<Availability> {
     private static final Logger LOGGER = Logger.getLogger(Availability.class.getName());
+
     private String doctorId;
+    private String doctorName;
     private String date;
     private String startTime;
     private String endTime;
     private int appointmentCount;
     private String nextToken;
 
-    public Availability(String doctorId, String date, String startTime, String endTime) {
+    public Availability(String doctorId, String doctorName, String date, String startTime, String endTime) {
         this.doctorId = doctorId;
+        this.doctorName = doctorName;
         this.date = date;
         this.startTime = startTime;
         this.endTime = endTime;
@@ -22,54 +25,18 @@ public class Availability implements Comparable<Availability> {
         this.nextToken = "TOK001";
     }
 
-    // Getters and Setters
-    public String getDoctorId() {
-        return doctorId;
-    }
+    // Getters
+    public String getDoctorId() { return doctorId; }
+    public String getDoctorName() { return doctorName; }
+    public String getDate() { return date; }
+    public String getStartTime() { return startTime; }
+    public String getEndTime() { return endTime; }
+    public int getAppointmentCount() { return appointmentCount; }
+    public String getNextToken() { return nextToken; }
 
-    public void setDoctorId(String doctorId) {
-        this.doctorId = doctorId;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public int getAppointmentCount() {
-        return appointmentCount;
-    }
-
-    public void setAppointmentCount(int appointmentCount) {
-        this.appointmentCount = appointmentCount;
-    }
-
-    public String getNextToken() {
-        return nextToken;
-    }
-
-    public void setNextToken(String nextToken) {
-        this.nextToken = nextToken;
-    }
+    // Setters (for fields that might change)
+    public void setAppointmentCount(int appointmentCount) { this.appointmentCount = appointmentCount; }
+    public void setNextToken(String nextToken) { this.nextToken = nextToken; }
 
     public LocalTime getStartTimeAsLocalTime() {
         try {
@@ -89,6 +56,14 @@ public class Availability implements Comparable<Availability> {
 
     @Override
     public String toString() {
-        return doctorId + "," + date + "," + startTime + "," + endTime + "," + appointmentCount + "," + nextToken;
+        return "Availability{" +
+                "doctorId='" + doctorId + '\'' +
+                ", doctorName='" + doctorName + '\'' +
+                ", date='" + date + '\'' +
+                ", startTime='" + startTime + '\'' +
+                ", endTime='" + endTime + '\'' +
+                ", appointmentCount=" + appointmentCount +
+                ", nextToken='" + nextToken + '\'' +
+                '}';
     }
 }

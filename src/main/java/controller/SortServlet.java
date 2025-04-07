@@ -24,15 +24,17 @@ public class SortServlet extends HttpServlet {
     private AppointmentService appointmentService;
 
     static class Availability implements Comparable<Availability> {
-        String doctorId;
+        String doctorId;    // Keep for internal logic
+        String doctorName;  // Add for frontend display
         String date;
         String startTime;
         String endTime;
         int appointmentCount;
         String nextToken;
 
-        Availability(String doctorId, String date, String startTime, String endTime) {
+        Availability(String doctorId, String doctorName, String date, String startTime, String endTime) {
             this.doctorId = doctorId;
+            this.doctorName = doctorName;
             this.date = date;
             this.startTime = startTime;
             this.endTime = endTime;
@@ -129,12 +131,13 @@ public class SortServlet extends HttpServlet {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 6) { // username,password,name,specialty,email,phone
-                    String username = parts[0].trim();
-                    String name = parts[2].trim();      // e.g., "Dr. Gamini Goonetilleke"
-                    String specialty = parts[3].trim(); // e.g., "General Surgery"
-                    String contact = parts[5].trim();   // e.g., "0778896501" (using phone as contact)
-                    doctorDetails.put(username, new Doctor(username, name, specialty, contact));
+                if (parts.length >= 4) { // Adjusted to match minimum required fields
+                    doctorDetails.put(parts[0].trim(), new Doctor(
+                            parts[0].trim(), // id
+                            parts[2].trim(), // name (adjusted index based on your comment)
+                            parts[3].trim(), // specialization
+                            parts[5].trim()  // contact (phone)
+                    ));
                 }
             }
         } catch (IOException e) {
@@ -146,11 +149,14 @@ public class SortServlet extends HttpServlet {
     }
 
     private Map<String, List<String>> loadSpecialtiesAndDoctors(Map<String, Doctor> doctorDetails) {
-        Map<String, List<String>> specialtyDoctors = new HashMap<>();
+        Map<String, Set<String>> specialtyDoctorsSet = new HashMap<>(); // Use Set to avoid duplicates
         for (Doctor doctor : doctorDetails.values()) {
             String specialty = doctor.getSpecialization().toLowerCase();
-            specialtyDoctors.computeIfAbsent(specialty, k -> new ArrayList<>()).add(doctor.getName());
+            specialtyDoctorsSet.computeIfAbsent(specialty, k -> new HashSet<>()).add(doctor.getName());
         }
+        // Convert Set to List for response
+        Map<String, List<String>> specialtyDoctors = new HashMap<>();
+        specialtyDoctorsSet.forEach((specialty, names) -> specialtyDoctors.put(specialty, new ArrayList<>(names)));
         LOGGER.info("Specialty to doctors mapping: " + specialtyDoctors);
         return specialtyDoctors;
     }
@@ -170,8 +176,11 @@ public class SortServlet extends HttpServlet {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length >= 4 && doctorDetails.containsKey(parts[0].trim())) {
+                    String doctorId = parts[0].trim();
+                    String doctorName = doctorDetails.get(doctorId).getName();
                     availabilities.add(new Availability(
-                            parts[0].trim(), // doctorId (username)
+                            doctorId,        // doctorId
+                            doctorName,      // doctorName
                             parts[1].trim(), // date
                             parts[2].trim(), // startTime
                             parts[3].trim()  // endTime

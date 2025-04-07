@@ -2,7 +2,6 @@ package service;
 
 import model.Appointment;
 import java.io.IOException;
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -36,12 +35,9 @@ public class DoctorAvailabilityService {
             throw new IllegalArgumentException("doctorId and date must not be null or empty");
         }
         List<String> availability = readAvailability();
-        LocalDate localDate = LocalDate.parse(date, DATE_FORMATTER);
-        String dayOfWeek = localDate.getDayOfWeek().toString();
-
         for (String line : availability) {
             String[] parts = line.split(",");
-            if (parts.length >= 4 && parts[0].equals(doctorId) && parts[1].equalsIgnoreCase(dayOfWeek)) {
+            if (parts.length >= 4 && parts[0].equals(doctorId) && parts[1].equals(date)) {
                 return true;
             }
         }
@@ -55,14 +51,12 @@ public class DoctorAvailabilityService {
         List<String> slots = new ArrayList<>();
         List<String> availability = readAvailability();
         List<Appointment> appointments = appointmentService.getAllAppointments();
-        LocalDate localDate = LocalDate.parse(date, DATE_FORMATTER);
-        String dayOfWeek = localDate.getDayOfWeek().toString();
 
         for (String line : availability) {
             String[] parts = line.split(",");
-            if (parts.length >= 4 && parts[0].equals(doctorId) && parts[1].equalsIgnoreCase(dayOfWeek)) {
-                LocalTime start = LocalTime.parse(parts[2]);
-                LocalTime end = LocalTime.parse(parts[3]);
+            if (parts.length >= 4 && parts[0].equals(doctorId) && parts[1].equals(date)) {
+                LocalTime start = LocalTime.parse(parts[2], TIME_FORMATTER);
+                LocalTime end = LocalTime.parse(parts[3], TIME_FORMATTER);
                 LocalTime current = start;
 
                 while (current.isBefore(end)) {
