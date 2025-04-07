@@ -6,7 +6,6 @@ let contextPath = window.contextPath || "";
 
 window.onload = function () {
     console.log("Loading specialties...");
-    document.getElementById("resultsContainer").innerHTML = "<p>Loading specialties...</p>";
     fetch(`${contextPath}/SortServlet`, {
         method: "GET",
         headers: { Accept: "application/json" },
@@ -27,12 +26,17 @@ window.onload = function () {
                 console.warn("No specialties found in the response.");
             }
             populateSpecialties();
-            document.getElementById("resultsContainer").innerHTML = "";
         })
         .catch((error) => {
             console.error("Error loading specialties:", error);
-            document.getElementById("resultsContainer").innerHTML = "<p>Error loading specialties: " + error.message + "</p>";
+            document.getElementById("debugResponse").innerHTML = "<p>Error loading specialties: " + error.message + "</p>";
         });
+
+    // Attach event listener to the login button
+    document.getElementById("loginNowBtn").addEventListener("click", function() {
+        clearInterval(window.loginCountdownInterval); // Clear any existing countdown
+        window.location.href = `${contextPath}/pages/login.jsp?role=patient`;
+    });
 };
 
 function populateSpecialties() {
@@ -94,7 +98,7 @@ function updateAvailabilityTable() {
                 filterDoctor.innerHTML += `<option value="${doctor}">${doctor}</option>`;
             });
 
-            const uniqueDates = [...new Set(allAvailability.map((avail) => avail.date))].sort();
+            const uniqueDates = [...new Set(allAvailability.map((avail) => avail.date))];
             uniqueDates.forEach((date) => {
                 filterDate.innerHTML += `<option value="${date}">${date}</option>`;
             });
@@ -142,25 +146,29 @@ function filterTable() {
     console.log("Table filtered with doctor:", filterDoctor, "and date:", filterDate);
 }
 
-function closePopup() {
-    document.getElementById("resultsPopup").style.display = "none";
-}
-
 function showLoginPopup() {
     const popup = document.getElementById("loginPopup");
     const countdownMessage = document.getElementById("countdownMessage");
-    popup.style.display = "flex"; // Show the popup
-    countdownMessage.style.display = "block"; // Show the countdown message
+    const timerElement = document.getElementById("countdownTimer");
+
+    // Reset and show popup
+    popup.style.display = "flex";
+    countdownMessage.style.display = "block";
 
     let countdown = 3;
-    const timerElement = document.getElementById("countdownTimer");
     timerElement.textContent = countdown;
 
-    const interval = setInterval(() => {
+    // Clear any existing interval
+    if (window.loginCountdownInterval) {
+        clearInterval(window.loginCountdownInterval);
+    }
+
+    // Start new countdown
+    window.loginCountdownInterval = setInterval(() => {
         countdown--;
         timerElement.textContent = countdown;
         if (countdown <= 0) {
-            clearInterval(interval);
+            clearInterval(window.loginCountdownInterval);
             window.location.href = `${contextPath}/pages/login.jsp?role=patient`;
         }
     }, 1000);
@@ -168,7 +176,7 @@ function showLoginPopup() {
 
 function bookAppointment(username, date, startTime) {
     if (document.body.dataset.loggedIn !== "true") {
-        showLoginPopup(); // Show custom popup with countdown
+        showLoginPopup();
         return;
     }
 

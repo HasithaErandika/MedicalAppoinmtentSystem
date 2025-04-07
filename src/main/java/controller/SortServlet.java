@@ -18,7 +18,7 @@ public class SortServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(SortServlet.class.getName());
     private static final String DOCTORS_FILE = "/data/doctors.txt";
     private static final String AVAILABILITY_FILE = "/data/doctors_availability.txt";
-    private static final String APPOINTMENTS_FILE = "/data/appointments.txt"; // New constant
+    private static final String APPOINTMENTS_FILE = "/data/appointments.txt";
     private static final String NAME = "name";
     private static final String SPECIALTY = "specialty";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
@@ -30,7 +30,7 @@ public class SortServlet extends HttpServlet {
         String date;
         String startTime;
         String endTime;
-        int appointmentCount; // New field to store appointment count
+        int appointmentCount;
 
         Doctor(String username, String name, String specialty, String date, String startTime, String endTime) {
             this.username = username;
@@ -39,7 +39,7 @@ public class SortServlet extends HttpServlet {
             this.date = date;
             this.startTime = startTime;
             this.endTime = endTime;
-            this.appointmentCount = 0; // Default to 0
+            this.appointmentCount = 0;
         }
 
         public LocalTime getStartTimeAsLocalTime() {
@@ -85,12 +85,11 @@ public class SortServlet extends HttpServlet {
         Map<String, List<String>> specialtyDoctors = loadSpecialtiesAndDoctors(doctorDetails);
         List<Doctor> allDoctors = loadDoctors(request, doctorDetails);
 
-        // Calculate appointment counts for each doctor's availability
         calculateAppointmentCounts(request, allDoctors);
 
         Map<String, Object> responseData = new HashMap<>();
         List<String> specialties = new ArrayList<>(specialtyDoctors.keySet());
-        Collections.sort(specialties, String.CASE_INSENSITIVE_ORDER);
+        bubbleSortStrings(specialties, true);  // Sort specialties case-insensitively
         responseData.put("specialties", specialties);
 
         if (specialty == null || specialty.trim().isEmpty()) {
@@ -109,11 +108,11 @@ public class SortServlet extends HttpServlet {
                 doctorsForSpecialty = new ArrayList<>();
             }
             LOGGER.info("Doctors for specialty '" + specialtyLower + "': " + doctorsForSpecialty);
-            Collections.sort(doctorsForSpecialty, String.CASE_INSENSITIVE_ORDER);
+            bubbleSortStrings(doctorsForSpecialty, true);  // Sort doctors case-insensitively
             responseData.put("doctors", doctorsForSpecialty);
 
             List<Doctor> filteredDoctors = filterDoctors(allDoctors, specialtyLower, doctorName, date, time);
-            Collections.sort(filteredDoctors);
+            bubbleSortDoctors(filteredDoctors);  // Sort availability by date and time
             responseData.put("availability", filteredDoctors);
         }
 
@@ -123,6 +122,41 @@ public class SortServlet extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             out.print(jsonResponse);
             out.flush();
+        }
+    }
+
+    // Bubble Sort for Strings (used for specialties and doctor names)
+    private void bubbleSortStrings(List<String> list, boolean caseInsensitive) {
+        int n = list.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                String a = list.get(j);
+                String b = list.get(j + 1);
+                int comparison = caseInsensitive ?
+                        a.compareToIgnoreCase(b) :
+                        a.compareTo(b);
+                if (comparison > 0) {
+                    // Swap
+                    list.set(j, b);
+                    list.set(j + 1, a);
+                }
+            }
+        }
+    }
+
+    // Bubble Sort for Doctor objects (used for availability)
+    private void bubbleSortDoctors(List<Doctor> doctors) {
+        int n = doctors.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                Doctor a = doctors.get(j);
+                Doctor b = doctors.get(j + 1);
+                if (a.compareTo(b) > 0) {  // Using existing compareTo method
+                    // Swap
+                    doctors.set(j, b);
+                    doctors.set(j + 1, a);
+                }
+            }
         }
     }
 
@@ -241,7 +275,6 @@ public class SortServlet extends HttpServlet {
         return filtered;
     }
 
-    // New method to calculate appointment counts
     private void calculateAppointmentCounts(HttpServletRequest request, List<Doctor> doctors) throws ServletException {
         String appointmentsPath = request.getServletContext().getRealPath(APPOINTMENTS_FILE);
         File file = new File(appointmentsPath);
@@ -256,16 +289,16 @@ public class SortServlet extends HttpServlet {
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
                 if (parts.length >= 4) {
-                    String appointmentDateTime = parts[3].trim(); // e.g., "2025-03-11 09:00"
+                    String appointmentDateTime = parts[3].trim();
                     String[] dateTimeParts = appointmentDateTime.split(" ");
                     if (dateTimeParts.length == 2) {
-                        String appointmentDate = dateTimeParts[0]; // "2025-03-11"
-                        String appointmentTime = dateTimeParts[1]; // "09:00"
+                        String appointmentDate = dateTimeParts[0];
+                        String appointmentTime = dateTimeParts[1];
 
                         for (Doctor doc : doctors) {
                             if (doc.date.equals(appointmentDate) &&
                                     doc.startTime.equals(appointmentTime)) {
-                                doc.appointmentCount++; // Increment count if date and start time match
+                                doc.appointmentCount++;
                             }
                         }
                     }
