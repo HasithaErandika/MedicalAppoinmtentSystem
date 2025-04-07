@@ -2,26 +2,20 @@
 let allSpecialties = [];
 let allDoctors = [];
 let allAvailability = [];
-let userAppointments = []; // To store user's booked appointments with tokens
-let pendingBooking = null; // To store booking details temporarily
+let userAppointments = []; // User's booked appointments with tokens
+let pendingBooking = null; // Temporary storage for booking details
 
 // Global functions
 async function loadSection(section) {
     const contentArea = document.getElementById('content-area');
     contentArea.innerHTML = '<div class="loading">Loading...</div>';
-    const baseSection = section.includes('?') ? section.split('?')[0] : section;
-    const query = section.includes('?') ? '?' + section.split('?')[1] : '';
-    const url = encodeURI(`${window.contextPath}/pages/userProfile/${baseSection}.jsp${query}`);
-    console.log("Attempting to fetch section from URL:", url);
+    const [baseSection, query] = section.split('?');
+    const url = encodeURI(`${window.contextPath}/pages/userProfile/${baseSection}.jsp${query ? '?' + query : ''}`);
+    console.log("Fetching section from:", url);
     try {
         const response = await fetch(url);
-        console.log("Response status for", section, ":", response.status, "Status text:", response.statusText);
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to load section ${section}: ${response.status} - ${response.statusText} - ${errorText}`);
-        }
+        if (!response.ok) throw new Error(`Failed to load ${section}: ${response.status} - ${response.statusText}`);
         const text = await response.text();
-        console.log("Successfully loaded section", section);
         contentArea.innerHTML = text;
         initializeSection(baseSection);
     } catch (error) {
@@ -39,13 +33,24 @@ function initializeSection(section) {
 function initBookAppointment() {
     console.log("Initializing Book Appointment...");
     fetchSpecialties();
-    fetchUserAppointmentsForTokens(); // Fetch user's existing appointments
-    setupConfirmButton(); // Set up confirm button listener
+    fetchUserAppointmentsForTokens();
+    setupConfirmButton();
+    const specialtySelect = document.getElementById('specialty');
+    if (specialtySelect) {
+        specialtySelect.addEventListener('change', updateAvailabilityTable);
+    }
+    const filterDoctor = document.getElementById('filterDoctor');
+    const filterDate = document.getElementById('filterDate');
+    if (filterDoctor) filterDoctor.addEventListener('change', filterTable);
+    if (filterDate) filterDate.addEventListener('change', filterTable);
 }
 
 function initAppointments() {
     console.log("Initializing Appointments...");
     fetchUserAppointments();
+    document.querySelectorAll('#appointmentsSection .sortable').forEach(th => {
+        th.addEventListener('click', () => sortTable(parseInt(th.dataset.sort)));
+    });
 }
 
 function initUserDetails() {
@@ -60,23 +65,11 @@ function initUserDetails() {
             if (validateForm(form)) form.submit();
         });
     }
-    if (editBtn) {
-        editBtn.addEventListener('click', () => {
-            loadSection('userDetails?edit=true');
-        });
-    }
-    if (cancelBtn) {
-        cancelBtn.addEventListener('click', () => {
-            loadSection('userDetails');
-        });
-    }
-    if (!form && !editBtn && !cancelBtn) {
-        console.log("No interactive elements found; section may not have loaded correctly.");
-    }
+    if (editBtn) editBtn.addEventListener('click', () => loadSection('userDetails?edit=true'));
+    if (cancelBtn) cancelBtn.addEventListener('click', () => loadSection('userDetails'));
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const contextPath = window.contextPath;
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('main-content');
 
@@ -95,32 +88,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    initializeSection('bookAppointment');
+    loadSection('bookAppointment');
 });
 
+// Fetch specialties from SortServlet
 async function fetchSpecialties() {
     const specialtySelect = document.getElementById('specialty');
+    if (!specialtySelect) return;
     const url = `${window.contextPath}/SortServlet`;
-    console.log("Attempting to fetch specialties from:", url);
     try {
         const response = await fetch(url, {
             method: 'GET',
             headers: { Accept: 'application/json' },
             cache: 'no-store'
         });
-        console.log("Response status:", response.status, "Status text:", response.statusText);
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to fetch specialties: ${response.status} - ${response.statusText} - ${errorText}`);
-        }
+        if (!response.ok) throw new Error(`Failed to fetch specialties: ${response.statusText}`);
         const data = await response.json();
-        console.log("Received specialties data:", data);
         allSpecialties = data.specialties || [];
-        if (allSpecialties.length === 0) console.warn("No specialties found.");
         populateSpecialties();
     } catch (error) {
         console.error("Error fetching specialties:", error);
-        specialtySelect.insertAdjacentHTML('afterend', `<p>Error: ${error.message}</p>`);
+        specialtySelect.insertAdjacentHTML('afterend', `<p class="error">Error: ${error.message}</p>`);
     }
 }
 
@@ -130,11 +118,10 @@ function populateSpecialties() {
     allSpecialties.forEach(specialty => {
         specialtySelect.insertAdjacentHTML('beforeend', `<option value="${specialty}">${specialty}</option>`);
     });
-    console.log("Specialties populated:", allSpecialties);
 }
 
+// Fetch and update availability table
 async function updateAvailabilityTable() {
-    console.log("Updating availability table...");
     const specialty = document.getElementById('specialty')?.value;
     const table = document.getElementById('availabilityTable');
     const tbody = table?.querySelector('tbody');
@@ -143,10 +130,7 @@ async function updateAvailabilityTable() {
     const filterDate = document.getElementById('filterDate');
     const noResults = document.getElementById('noResults');
 
-    if (!specialty || !table || !tbody) {
-        console.log("Required elements not found for updating table.");
-        return;
-    }
+    if (!specialty || !tbody) return;
 
     tbody.innerHTML = '';
     table.style.display = 'none';
@@ -155,27 +139,18 @@ async function updateAvailabilityTable() {
     filterDate.innerHTML = '<option value="">All Dates</option>';
     noResults.style.display = 'none';
 
-    if (!specialty) {
-        document.getElementById('specialty-error').textContent = 'Please select a specialty';
-        console.log("No specialty selected.");
-        return;
-    }
-    document.getElementById('specialty-error').textContent = '';
+    document.getElementById('specialty-error').textContent = specialty ? '' : 'Please select a specialty';
+    if (!specialty) return;
 
     try {
         const url = `${window.contextPath}/SortServlet?specialty=${encodeURIComponent(specialty)}`;
-        console.log("Fetching availability from:", url);
         const response = await fetch(url, {
             method: 'GET',
             headers: { Accept: 'application/json' },
             cache: 'no-store'
         });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to fetch availability: ${response.status} - ${response.statusText} - ${errorText}`);
-        }
+        if (!response.ok) throw new Error(`Failed to fetch availability: ${response.statusText}`);
         const data = await response.json();
-        console.log("Availability data:", data);
         allAvailability = data.availability || [];
         allDoctors = data.doctors || [];
 
@@ -183,7 +158,6 @@ async function updateAvailabilityTable() {
             tbody.innerHTML = '<tr><td colspan="7">No availability found</td></tr>';
             table.style.display = 'table';
             noResults.style.display = 'block';
-            console.warn("No availability for specialty:", specialty);
             return;
         }
 
@@ -197,23 +171,25 @@ async function updateAvailabilityTable() {
 
         allAvailability.forEach(avail => {
             const bookedAppt = userAppointments.find(appt =>
-                appt.doctorId === avail.username &&
+                appt.doctorId === avail.doctorId &&
                 appt.date === avail.date &&
                 appt.timeSlot === avail.startTime
             );
-            const token = bookedAppt ? bookedAppt.token : '-';
-
+            const token = bookedAppt ? bookedAppt.token : avail.nextToken;
+            const isBooked = !!bookedAppt;
             const row = `
-                <tr data-doctor="${avail.name}" data-date="${avail.date}">
-                    <td>${avail.name}</td>
+                <tr data-doctor="${avail.doctorId}" data-date="${avail.date}">
+                    <td>${avail.doctorId}</td> <!-- Using doctorId instead of name -->
                     <td>${avail.date}</td>
                     <td>${avail.startTime}</td>
                     <td>${avail.endTime}</td>
                     <td>${avail.appointmentCount}</td>
                     <td>${token}</td>
-                    <td><button class="book-btn" onclick="showBookingConfirmation('${avail.username}', '${avail.name}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}')">
-                        <i class="fas fa-calendar-check" aria-hidden="true"></i> Book
-                    </button></td>
+                    <td>
+                        ${!isBooked ? `<button class="book-btn" onclick="showBookingConfirmation('${avail.doctorId}', '${avail.doctorId}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}')">
+                            <i class="fas fa-calendar-check"></i> Book
+                        </button>` : 'Booked'}
+                    </td>
                 </tr>
             `;
             tbody.insertAdjacentHTML('beforeend', row);
@@ -221,7 +197,6 @@ async function updateAvailabilityTable() {
 
         table.style.display = 'table';
         filterContainer.style.display = 'block';
-        console.log("Table populated with:", allAvailability);
     } catch (error) {
         console.error("Error fetching availability:", error);
         tbody.innerHTML = `<tr><td colspan="7">Error: ${error.message}</td></tr>`;
@@ -231,7 +206,6 @@ async function updateAvailabilityTable() {
 }
 
 function filterTable() {
-    console.log("Filtering table...");
     const filterDoctor = document.getElementById('filterDoctor')?.value;
     const filterDate = document.getElementById('filterDate')?.value;
     const rows = document.querySelectorAll('#availabilityTable tbody tr');
@@ -243,32 +217,23 @@ function filterTable() {
         const date = row.getAttribute('data-date');
         const doctorMatch = !filterDoctor || doctor === filterDoctor;
         const dateMatch = !filterDate || date === filterDate;
-        if (doctorMatch && dateMatch) {
-            row.style.display = '';
-            visibleRows++;
-        } else {
-            row.style.display = 'none';
-        }
+        row.style.display = (doctorMatch && dateMatch) ? '' : 'none';
+        if (doctorMatch && dateMatch) visibleRows++;
     });
     noResults.style.display = visibleRows === 0 ? 'block' : 'none';
     document.getElementById('availabilityTable').style.display = visibleRows === 0 ? 'none' : 'table';
-    console.log("Filtered with doctor:", filterDoctor, "date:", filterDate);
 }
 
 function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken) {
-    console.log("Showing booking confirmation for:", { doctorId, doctorName, date, startTime, nextToken });
     const modal = document.getElementById('confirmModal');
     const message = document.getElementById('confirmMessage');
     const details = document.getElementById('appointmentDetails');
 
-    if (!modal || !message || !details) {
-        console.error("Modal elements not found.");
-        return;
-    }
+    if (!modal || !message || !details) return;
 
     message.textContent = "Are you sure you want to book this appointment?";
     details.innerHTML = `
-        <p><strong>Doctor:</strong> ${doctorName}</p>
+        <p><strong>Doctor ID:</strong> ${doctorId}</p>
         <p><strong>Date:</strong> ${date}</p>
         <p><strong>Start Time:</strong> ${startTime}</p>
         <p><strong>Your Token:</strong> ${nextToken}</p>
@@ -281,21 +246,17 @@ function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToke
 function setupConfirmButton() {
     const confirmBtn = document.getElementById('confirmBtn');
     if (confirmBtn) {
-        confirmBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent any default behavior
+        confirmBtn.addEventListener('click', () => {
             if (pendingBooking) {
                 confirmBooking(pendingBooking.doctorId, pendingBooking.date, pendingBooking.startTime, pendingBooking.nextToken);
                 pendingBooking = null;
             }
             closeModal();
         });
-    } else {
-        console.error("Confirm button not found.");
     }
 }
 
 function confirmBooking(doctorId, date, startTime, nextToken) {
-    console.log("Confirming booking:", { doctorId, date, startTime, nextToken });
     fetch(`${window.contextPath}/user`, {
         method: 'POST',
         headers: {
@@ -304,24 +265,22 @@ function confirmBooking(doctorId, date, startTime, nextToken) {
         },
         body: new URLSearchParams({
             action: 'book',
-            doctorId: doctorId,
-            date: date,
+            doctorId,
+            date,
             timeSlot: startTime,
-            isEmergency: 'off',
-            token: nextToken
+            token: nextToken,
+            isEmergency: 'off'
         })
     })
         .then(response => {
-            console.log("Fetch response status:", response.status);
             if (!response.ok) throw new Error(`Booking failed: ${response.statusText}`);
             return response.json();
         })
         .then(data => {
-            console.log("Booking response:", data);
             if (data.success) {
-                alert(`Appointment booked successfully! Your token: ${nextToken}`);
+                alert(`Appointment booked successfully! Token: ${nextToken}`);
                 userAppointments.push({ doctorId, date, timeSlot: startTime, token: nextToken });
-                updateAvailabilityTable(); // Update table in place
+                updateAvailabilityTable();
             } else {
                 alert("Booking failed: " + (data.message || "Unknown error"));
             }
@@ -333,7 +292,6 @@ function confirmBooking(doctorId, date, startTime, nextToken) {
 }
 
 async function fetchUserAppointmentsForTokens() {
-    console.log("Fetching user appointments for tokens...");
     const url = `${window.contextPath}/user?action=getAppointments`;
     try {
         const response = await fetch(url, {
@@ -341,44 +299,28 @@ async function fetchUserAppointmentsForTokens() {
             headers: { Accept: 'application/json' },
             cache: 'no-store'
         });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to fetch appointments: ${response.status} - ${response.statusText} - ${errorText}`);
-        }
+        if (!response.ok) throw new Error(`Failed to fetch appointments: ${response.statusText}`);
         const appointments = await response.json();
-        console.log("User appointments for tokens:", appointments);
         userAppointments = appointments.map(appt => ({
             doctorId: appt.doctorId,
-            date: appt.date,
-            timeSlot: appt.timeSlot || appt.dateTime?.split(' ')[1],
-            token: appt.token
+            date: appt.dateTime.split(' ')[0],
+            timeSlot: appt.dateTime.split(' ')[1],
+            token: appt.tokenID
         }));
         updateAvailabilityTable();
     } catch (error) {
-        console.error("Error fetching appointments for tokens:", error);
+        console.error("Error fetching appointments:", error);
         userAppointments = [];
     }
 }
 
-// ... (Previous unchanged code) ...
-
-function initAppointments() {
-    console.log("Initializing Appointments...");
-    fetchUserAppointments();
-}
-
 async function fetchUserAppointments() {
-    console.log("Fetching user appointments...");
     const table = document.querySelector('#appointmentsSection table tbody');
     const noAppointmentsMessage = document.getElementById('noAppointmentsMessage');
-
-    if (!table || !noAppointmentsMessage) {
-        console.error("Appointments table or noAppointmentsMessage element not found.");
-        return;
-    }
+    if (!table || !noAppointmentsMessage) return;
 
     const url = `${window.contextPath}/user?action=getAppointments`;
-    const currentDate = new Date('2025-04-07'); // Fixed date as per context
+    const currentDate = new Date('2025-04-07'); // Matches your context date
 
     try {
         const response = await fetch(url, {
@@ -387,34 +329,23 @@ async function fetchUserAppointments() {
             cache: 'no-store',
             credentials: 'same-origin'
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Failed to fetch appointments: ${response.status} - ${response.statusText} - ${errorText}`);
-        }
-
+        if (!response.ok) throw new Error(`Failed to fetch appointments: ${response.statusText}`);
         const appointments = await response.json();
-        console.log("User appointments:", appointments);
 
         table.innerHTML = '';
-        noAppointmentsMessage.style.display = 'none';
-
-        if (appointments.length === 0) {
-            noAppointmentsMessage.style.display = 'flex';
-            return;
-        }
+        noAppointmentsMessage.style.display = appointments.length === 0 ? 'flex' : 'none';
 
         appointments.forEach(appt => {
-            const apptDateTime = new Date(appt.dateTime || `${appt.date} ${appt.timeSlot}`);
+            const dateTime = appt.dateTime;
+            const apptDateTime = new Date(dateTime);
             const isUpcoming = apptDateTime >= currentDate;
             const rowClass = isUpcoming ? 'upcoming-appointment' : 'past-appointment';
-
             const row = `
                 <tr class="${rowClass}">
                     <td>${appt.id}</td>
                     <td>${appt.doctorId}</td>
-                    <td>${appt.token}</td>
-                    <td>${appt.dateTime || `${appt.date} ${appt.timeSlot}`}</td>
+                    <td>${appt.tokenID}</td>
+                    <td>${dateTime}</td>
                     <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">
                         ${appt.priority == 1 ? 'Emergency' : 'Normal'}
                     </td>
@@ -430,37 +361,27 @@ async function fetchUserAppointments() {
 }
 
 function sortTable(col) {
-    console.log("Sorting table by column:", col);
     const table = document.querySelector('#appointmentsSection table tbody');
     const rows = Array.from(table.rows);
     const th = document.querySelector(`#appointmentsSection th[data-sort="${col}"]`);
     const isAsc = !th.classList.contains('asc');
 
     document.querySelectorAll('#appointmentsSection .sortable').forEach(header => {
-        if (header !== th) {
-            header.classList.remove('asc', 'desc');
-        }
+        if (header !== th) header.classList.remove('asc', 'desc');
     });
-
-    th.classList.remove('asc', 'desc');
-    th.classList.add(isAsc ? 'asc' : 'desc');
+    th.classList.toggle('asc', isAsc);
+    th.classList.toggle('desc', !isAsc);
 
     rows.sort((a, b) => {
         const x = a.cells[col].textContent.trim();
         const y = b.cells[col].textContent.trim();
-
-        if (col === 0) { // ID (numeric)
-            return isAsc ? parseInt(x) - parseInt(y) : parseInt(y) - parseInt(x);
-        } else if (col === 2) { // Token (string)
-            return isAsc ? x.localeCompare(y) : y.localeCompare(x);
-        } else if (col === 3) { // Date & Time (date)
-            return isAsc ? new Date(x) - new Date(y) : new Date(y) - new Date(x);
-        } else if (col === 4) { // Priority (Emergency > Normal)
+        if (col === 0) return isAsc ? parseInt(x) - parseInt(y) : parseInt(y) - parseInt(x); // ID
+        if (col === 3) return isAsc ? new Date(x) - new Date(y) : new Date(y) - new Date(x); // DateTime
+        if (col === 4) {
             const priorityOrder = { 'Emergency': 1, 'Normal': 0 };
-            return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x];
-        } else { // Doctor (string)
-            return isAsc ? x.localeCompare(y) : y.localeCompare(x);
+            return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x]; // Priority
         }
+        return isAsc ? x.localeCompare(y) : y.localeCompare(x); // DoctorId, Token
     });
 
     rows.forEach(row => table.appendChild(row));

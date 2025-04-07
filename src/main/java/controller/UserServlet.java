@@ -8,15 +8,12 @@ import model.Appointment;
 import service.AppointmentService;
 import service.DoctorAvailabilityService;
 import service.FileHandler;
-
-import java.io.IOException;
-import java.util.ArrayList;
+import java.util.ArrayList; // Added import
 import java.util.List;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import com.google.gson.Gson;
-
 import jakarta.servlet.annotation.WebServlet;
 
 @WebServlet("/user")
@@ -38,7 +35,6 @@ public class UserServlet extends HttpServlet {
             availabilityService = new DoctorAvailabilityService(basePath + "doctors_availability.txt", appointmentService);
             doctorFileHandler = new FileHandler(basePath + "doctors.txt");
             userFileHandler = new FileHandler(basePath + "patients.txt");
-            LOGGER.info("Successfully initialized file handlers. Patients file: " + (basePath + "patients.txt"));
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize services", e);
             throw new ServletException("Failed to initialize UserServlet services", e);
@@ -50,10 +46,7 @@ public class UserServlet extends HttpServlet {
         String username = (String) request.getSession().getAttribute("username");
         String role = (String) request.getSession().getAttribute("role");
 
-        LOGGER.info("Session - username: " + username + ", role: " + role);
-
         if (username == null || !USER_ROLE.equals(role)) {
-            LOGGER.info("Unauthorized access attempt by: " + (username != null ? username : "anonymous") + " with role: " + role);
             response.sendRedirect(request.getContextPath() + "/pages/login.jsp?role=patient");
             return;
         }
@@ -63,51 +56,37 @@ public class UserServlet extends HttpServlet {
 
         if ("getAppointments".equals(action)) {
             try {
-                List<Appointment> allAppointments = appointmentService.getAllAppointments();
-                List<Appointment> userAppointments = allAppointments.stream()
-                        .filter(appt -> appt.getPatientId().equals(username))
-                        .collect(Collectors.toList());
-
+                List<Appointment> userAppointments = appointmentService.getAppointmentsByPatientId(username);
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 String json = GSON.toJson(userAppointments);
                 response.getWriter().write(json);
                 LOGGER.info("Sent appointments for user " + username + ": " + json);
-                return; // Exit after sending JSON
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error fetching appointments for " + username, e);
+                LOGGER.log(Level.SEVERE, "Error fetching appointments", e);
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                response.setContentType("application/json");
-                response.getWriter().write(GSON.toJson(new ErrorResponse("Error fetching appointments: " + e.getMessage())));
-                return;
+                response.getWriter().write(GSON.toJson(new ErrorResponse("Error fetching appointments")));
             }
+            return;
         }
 
-        // Load user details for page rendering
         try {
             List<String> userLines = userFileHandler.readLines();
-            LOGGER.info("Read " + userLines.size() + " lines from patients.txt: " + userLines);
             String userLine = userLines.stream()
                     .filter(line -> line.startsWith(username + ","))
                     .findFirst()
                     .orElse(username + ",pass123,John Doe,john.doe@example.com,123-456-7890,2000-01-01");
-            LOGGER.info("Selected user line for " + username + ": " + userLine);
             String[] userParts = userLine.split(",");
-            LOGGER.info("Parsed user parts: " + String.join(" | ", userParts));
             if (userParts.length >= 6) {
                 request.getSession().setAttribute("password", userParts[1]);
                 request.getSession().setAttribute("fullname", userParts[2]);
                 request.getSession().setAttribute("email", userParts[3]);
                 request.getSession().setAttribute("phone", userParts[4]);
                 request.getSession().setAttribute("birthday", userParts[5]);
-                LOGGER.info("Set session attributes - password: " + userParts[1] + ", fullname: " + userParts[2] +
-                        ", email: " + userParts[3] + ", phone: " + userParts[4] + ", birthday: " + userParts[5]);
-            } else {
-                LOGGER.warning("User line has insufficient parts: " + userLine);
             }
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching user details for " + username, e);
-            request.setAttribute("message", "Error loading user details: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error fetching user details", e);
+            request.setAttribute("message", "Error loading user details");
             request.setAttribute("messageType", "error");
         }
 
@@ -132,11 +111,10 @@ public class UserServlet extends HttpServlet {
                 String doctorId = request.getParameter("doctorId");
                 String date = request.getParameter("date");
                 String timeSlot = request.getParameter("timeSlot");
-                String token = request.getParameter("token"); // Changed from tokenID to token
+                String token = request.getParameter("token");
                 boolean isEmergency = "on".equals(request.getParameter("isEmergency"));
 
-                if (doctorId == null || date == null || timeSlot == null || token == null ||
-                        doctorId.trim().isEmpty() || date.trim().isEmpty() || timeSlot.trim().isEmpty() || token.trim().isEmpty()) {
+                if (doctorId == null || date == null || timeSlot == null || token == null) {
                     throw new IllegalArgumentException("Missing booking parameters");
                 }
 
@@ -146,19 +124,16 @@ public class UserServlet extends HttpServlet {
                 }
 
                 appointmentService.bookAppointment(username, doctorId, token, dateTime, isEmergency);
-
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().write(GSON.toJson(new SuccessResponse(true, "Appointment booked successfully! Token: " + token)));
                 LOGGER.info("Booked appointment for " + username + " with token: " + token);
-                return; // Exit after sending JSON
             } catch (Exception e) {
                 LOGGER.log(Level.WARNING, "Booking error: " + e.getMessage());
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                response.setContentType("application/json");
-                response.getWriter().write(GSON.toJson(new ErrorResponse("Error booking appointment: " + e.getMessage())));
-                return;
+                response.getWriter().write(GSON.toJson(new ErrorResponse("Error booking appointment")));
             }
+            return;
         } else if ("updateDetails".equals(action)) {
             try {
                 String fullName = request.getParameter("fullName");
@@ -167,9 +142,7 @@ public class UserServlet extends HttpServlet {
                 String password = request.getParameter("password");
                 String birthday = request.getParameter("birthday");
 
-                if (fullName == null || email == null || phone == null || password == null || birthday == null ||
-                        fullName.trim().isEmpty() || email.trim().isEmpty() || phone.trim().isEmpty() ||
-                        password.trim().isEmpty() || birthday.trim().isEmpty()) {
+                if (fullName == null || email == null || phone == null || password == null || birthday == null) {
                     throw new IllegalArgumentException("Missing user details");
                 }
 
@@ -197,15 +170,14 @@ public class UserServlet extends HttpServlet {
                 request.setAttribute("message", "Details updated successfully!");
                 request.setAttribute("messageType", "success");
             } catch (Exception e) {
-                LOGGER.log(Level.SEVERE, "Error updating user details: " + e.getMessage());
-                request.setAttribute("message", "Error updating details: " + e.getMessage());
+                LOGGER.log(Level.SEVERE, "Error updating user details", e);
+                request.setAttribute("message", "Error updating details");
                 request.setAttribute("messageType", "error");
             }
-            doGet(request, response); // Refresh page for UI updates
+            doGet(request, response);
         }
     }
 
-    // Helper classes for JSON responses
     private static class SuccessResponse {
         boolean success;
         String message;
