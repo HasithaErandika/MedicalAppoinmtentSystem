@@ -105,13 +105,13 @@ function updateAvailabilityTable() {
 
             allAvailability.forEach((avail) => {
                 const row = `
-                    <tr data-doctor="${avail.name}" data-date="${avail.date}">
-                        <td>${avail.name}</td>
+                    <tr data-doctor="${avail.doctorName}" data-date="${avail.date}">
+                        <td>${avail.doctorName}</td> <!-- Use doctorName -->
                         <td>${avail.date}</td>
                         <td>${avail.startTime}</td>
                         <td>${avail.endTime}</td>
-                        <td>${avail.appointmentCount}</td>
-                        <td><button class="book-btn" onclick="bookAppointment('${avail.username}', '${avail.date}', '${avail.startTime}')">Book</button></td>
+                        <td>${avail.appointmentCount}</td> <!-- Use appointmentCount -->
+                        <td><button class="book-btn" onclick="bookAppointment('${avail.doctorId}', '${avail.date}', '${avail.startTime}')">Book</button></td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
@@ -174,20 +174,20 @@ function showLoginPopup() {
     }, 1000);
 }
 
-function bookAppointment(username, date, startTime) {
+function bookAppointment(doctorId, date, startTime) {
     if (document.body.dataset.loggedIn !== "true") {
         showLoginPopup();
         return;
     }
 
-    console.log("Booking appointment:", { username, date, startTime });
+    console.log("Booking appointment:", { doctorId, date, startTime });
     fetch(`${contextPath}/AppointmentServlet`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             Accept: "application/json"
         },
-        body: JSON.stringify({ doctorUsername: username, date, time: startTime })
+        body: JSON.stringify({ doctorId: doctorId, date: date, time: startTime }) // Adjusted field names
     })
         .then((response) => {
             if (!response.ok) {
@@ -203,7 +203,7 @@ function bookAppointment(username, date, startTime) {
                 alert("Appointment booked successfully!");
                 updateAvailabilityTable();
             } else {
-                alert("Failed to book: " + data.message);
+                alert("Failed to book: " + (data.message || "Unknown error"));
             }
         })
         .catch((error) => {

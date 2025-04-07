@@ -177,16 +177,18 @@ async function updateAvailabilityTable() {
             );
             const token = bookedAppt ? bookedAppt.token : avail.nextToken;
             const isBooked = !!bookedAppt;
+            // Simulate server-side appointmentCount update locally for immediate feedback
+            const updatedCount = isBooked ? avail.appointmentCount : avail.appointmentCount;
             const row = `
-                <tr data-doctor="${avail.doctorId}" data-date="${avail.date}">
-                    <td>${avail.doctorId}</td> <!-- Using doctorId instead of name -->
+                <tr data-doctor="${avail.doctorName}" data-date="${avail.date}">
+                    <td>${avail.doctorName}</td>
                     <td>${avail.date}</td>
                     <td>${avail.startTime}</td>
                     <td>${avail.endTime}</td>
-                    <td>${avail.appointmentCount}</td>
+                    <td>${updatedCount}</td>
                     <td>${token}</td>
                     <td>
-                        ${!isBooked ? `<button class="book-btn" onclick="showBookingConfirmation('${avail.doctorId}', '${avail.doctorId}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}')">
+                        ${!isBooked ? `<button class="book-btn" onclick="showBookingConfirmation('${avail.doctorId}', '${avail.doctorName}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}')">
                             <i class="fas fa-calendar-check"></i> Book
                         </button>` : 'Booked'}
                     </td>
@@ -233,7 +235,7 @@ function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToke
 
     message.textContent = "Are you sure you want to book this appointment?";
     details.innerHTML = `
-        <p><strong>Doctor ID:</strong> ${doctorId}</p>
+        <p><strong>Doctor:</strong> ${doctorName}</p>
         <p><strong>Date:</strong> ${date}</p>
         <p><strong>Start Time:</strong> ${startTime}</p>
         <p><strong>Your Token:</strong> ${nextToken}</p>
@@ -279,7 +281,9 @@ function confirmBooking(doctorId, date, startTime, nextToken) {
         .then(data => {
             if (data.success) {
                 alert(`Appointment booked successfully! Token: ${nextToken}`);
+                // Update userAppointments with the new booking
                 userAppointments.push({ doctorId, date, timeSlot: startTime, token: nextToken });
+                // Refresh availability to get updated appointmentCount from server
                 updateAvailabilityTable();
             } else {
                 alert("Booking failed: " + (data.message || "Unknown error"));
@@ -307,10 +311,12 @@ async function fetchUserAppointmentsForTokens() {
             timeSlot: appt.dateTime.split(' ')[1],
             token: appt.tokenID
         }));
-        updateAvailabilityTable();
+        console.log("User appointments loaded:", userAppointments);
+        updateAvailabilityTable(); // Refresh table after loading appointments
     } catch (error) {
         console.error("Error fetching appointments:", error);
         userAppointments = [];
+        updateAvailabilityTable(); // Still update table to clear any stale data
     }
 }
 
@@ -343,7 +349,7 @@ async function fetchUserAppointments() {
             const row = `
                 <tr class="${rowClass}">
                     <td>${appt.id}</td>
-                    <td>${appt.doctorId}</td>
+                    <td>${appt.doctorId}</td> <!-- Doctor name not available yet; see note -->
                     <td>${appt.tokenID}</td>
                     <td>${dateTime}</td>
                     <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">

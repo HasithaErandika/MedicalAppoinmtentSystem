@@ -5,12 +5,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import model.Availability;
 import model.Doctor;
 import service.AppointmentService;
 import java.io.*;
-import java.time.LocalTime;
-import java.time.format.DateTimeParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime; // Added import for LocalTime
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -22,42 +22,6 @@ public class SortServlet extends HttpServlet {
     private static final String AVAILABILITY_FILE = "/data/doctors_availability.txt";
     private static final String DATE_FORMAT = "yyyy-MM-dd";
     private AppointmentService appointmentService;
-
-    static class Availability implements Comparable<Availability> {
-        String doctorId;    // Keep for internal logic
-        String doctorName;  // Add for frontend display
-        String date;
-        String startTime;
-        String endTime;
-        int appointmentCount;
-        String nextToken;
-
-        Availability(String doctorId, String doctorName, String date, String startTime, String endTime) {
-            this.doctorId = doctorId;
-            this.doctorName = doctorName;
-            this.date = date;
-            this.startTime = startTime;
-            this.endTime = endTime;
-            this.appointmentCount = 0;
-            this.nextToken = "TOK001";
-        }
-
-        public LocalTime getStartTimeAsLocalTime() {
-            try {
-                return LocalTime.parse(startTime);
-            } catch (DateTimeParseException e) {
-                LOGGER.warning("Invalid start time format: " + startTime + ", defaulting to 00:00");
-                return LocalTime.of(0, 0);
-            }
-        }
-
-        @Override
-        public int compareTo(Availability other) {
-            int dateComparison = this.date.compareTo(other.date);
-            if (dateComparison != 0) return dateComparison;
-            return this.getStartTimeAsLocalTime().compareTo(other.getStartTimeAsLocalTime());
-        }
-    }
 
     @Override
     public void init() throws ServletException {
@@ -131,10 +95,10 @@ public class SortServlet extends HttpServlet {
             String line;
             while ((line = br.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 4) { // Adjusted to match minimum required fields
+                if (parts.length >= 6) { // username,password,name,specialty,email,phone
                     doctorDetails.put(parts[0].trim(), new Doctor(
                             parts[0].trim(), // id
-                            parts[2].trim(), // name (adjusted index based on your comment)
+                            parts[2].trim(), // name
                             parts[3].trim(), // specialization
                             parts[5].trim()  // contact (phone)
                     ));
@@ -149,12 +113,11 @@ public class SortServlet extends HttpServlet {
     }
 
     private Map<String, List<String>> loadSpecialtiesAndDoctors(Map<String, Doctor> doctorDetails) {
-        Map<String, Set<String>> specialtyDoctorsSet = new HashMap<>(); // Use Set to avoid duplicates
+        Map<String, Set<String>> specialtyDoctorsSet = new HashMap<>();
         for (Doctor doctor : doctorDetails.values()) {
             String specialty = doctor.getSpecialization().toLowerCase();
             specialtyDoctorsSet.computeIfAbsent(specialty, k -> new HashSet<>()).add(doctor.getName());
         }
-        // Convert Set to List for response
         Map<String, List<String>> specialtyDoctors = new HashMap<>();
         specialtyDoctorsSet.forEach((specialty, names) -> specialtyDoctors.put(specialty, new ArrayList<>(names)));
         LOGGER.info("Specialty to doctors mapping: " + specialtyDoctors);
@@ -198,18 +161,18 @@ public class SortServlet extends HttpServlet {
     private List<Availability> filterAvailabilities(List<Availability> availabilities, Map<String, Doctor> doctorDetails,
                                                     String specialty, String doctorName, String date, String time) {
         List<Availability> filtered = new ArrayList<>();
-        LocalTime now = LocalTime.now();
+        LocalTime now = LocalTime.now(); // Uses LocalTime here
         String today = new SimpleDateFormat(DATE_FORMAT).format(new Date());
 
         for (Availability avail : availabilities) {
-            Doctor doc = doctorDetails.get(avail.doctorId);
+            Doctor doc = doctorDetails.get(avail.getDoctorId());
             if (doc == null) continue;
             boolean matches = true;
             if (specialty != null && !doc.getSpecialization().equalsIgnoreCase(specialty)) matches = false;
             if (doctorName != null && !doctorName.trim().isEmpty() && !doc.getName().equalsIgnoreCase(doctorName)) matches = false;
-            if (date != null && !date.trim().isEmpty() && !avail.date.equals(date)) matches = false;
+            if (date != null && !date.trim().isEmpty() && !avail.getDate().equals(date)) matches = false;
             if (time != null && !time.trim().isEmpty() && avail.getStartTimeAsLocalTime() != null) {
-                LocalTime start = avail.getStartTimeAsLocalTime();
+                LocalTime start = avail.getStartTimeAsLocalTime(); // Uses LocalTime here
                 switch (time.toLowerCase()) {
                     case "morning": if (start.isBefore(LocalTime.of(8, 0)) || start.isAfter(LocalTime.of(12, 0))) matches = false; break;
                     case "afternoon": if (start.isBefore(LocalTime.of(12, 0)) || start.isAfter(LocalTime.of(17, 0))) matches = false; break;
@@ -231,15 +194,15 @@ public class SortServlet extends HttpServlet {
             String appointmentDate = dateTime[0];
             String appointmentTime = dateTime[1];
             for (Availability avail : availabilities) {
-                if (avail.doctorId.equals(appt.getDoctorId()) &&
-                        avail.date.equals(appointmentDate) &&
-                        avail.startTime.equals(appointmentTime)) {
-                    avail.appointmentCount++;
+                if (avail.getDoctorId().equals(appt.getDoctorId()) &&
+                        avail.getDate().equals(appointmentDate) &&
+                        avail.getStartTime().equals(appointmentTime)) {
+                    avail.setAppointmentCount(avail.getAppointmentCount() + 1);
                 }
             }
         }
         for (Availability avail : availabilities) {
-            avail.nextToken = String.format("TOK%03d", avail.appointmentCount + 1);
+            avail.setNextToken(String.format("TOK%03d", avail.getAppointmentCount() + 1));
         }
     }
 }
