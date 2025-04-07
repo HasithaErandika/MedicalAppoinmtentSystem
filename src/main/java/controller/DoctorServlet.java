@@ -55,71 +55,116 @@ public class DoctorServlet extends HttpServlet {
             return;
         }
 
+        String section = request.getParameter("section") != null ? request.getParameter("section") : "dashboard";
         try {
-            // Fetch doctor details
             Doctor doctor = getDoctorByUsername(username);
             if (doctor == null) {
                 throw new IOException("Doctor not found for username: " + username);
             }
 
-            // Fetch all appointments for this doctor
             List<Appointment> appointments = appointmentService.getAppointmentsByDoctorId(doctor.getId());
             LocalDateTime now = LocalDateTime.now();
             LocalDate today = LocalDate.now();
 
-            // Categorize appointments
-            int totalAppointments = appointments.size();
-            int upcomingAppointments = (int) appointments.stream()
-                    .filter(appt -> LocalDateTime.parse(appt.getDateTime()).isAfter(now))
-                    .count();
-            int emergencyAppointments = (int) appointments.stream()
-                    .filter(appt -> appt.getPriority() == 1)
-                    .count();
-            int todayAppointments = (int) appointments.stream()
-                    .filter(appt -> LocalDate.parse(appt.getDateTime().split(" ")[0], DATE_FORMATTER).equals(today))
-                    .count();
-            List<Appointment> emergencyAppointmentsList = appointments.stream()
-                    .filter(appt -> appt.getPriority() == 1)
-                    .collect(Collectors.toList());
+            if ("dashboard".equals(section) || "appointments".equals(section)) {
+                int totalAppointments = appointments.size();
+                int upcomingAppointments = (int) appointments.stream()
+                        .filter(appt -> LocalDateTime.parse(appt.getDateTime()).isAfter(now))
+                        .count();
+                int emergencyAppointments = (int) appointments.stream()
+                        .filter(appt -> appt.getPriority() == 1)
+                        .count();
+                int todayAppointments = (int) appointments.stream()
+                        .filter(appt -> LocalDate.parse(appt.getDateTime().split(" ")[0], DATE_FORMATTER).equals(today))
+                        .count();
 
-            // Set patient names (fallback if not populated)
-            for (Appointment appt : appointments) {
-                if (appt.getPatientName() == null) {
-                    appt.setPatientName("Patient " + appt.getPatientId());
+                for (Appointment appt : appointments) {
+                    if (appt.getPatientName() == null) {
+                        appt.setPatientName("Patient " + appt.getPatientId());
+                    }
                 }
+
+                request.setAttribute("totalAppointments", totalAppointments);
+                request.setAttribute("upcomingAppointments", upcomingAppointments);
+                request.setAttribute("emergencyAppointments", emergencyAppointments);
+                request.setAttribute("todayAppointments", todayAppointments);
+                request.setAttribute("appointments", appointments);
             }
 
-            // Set request attributes
             request.setAttribute("doctor", doctor);
-            request.setAttribute("appointments", appointments);
-            request.setAttribute("totalAppointments", totalAppointments);
-            request.setAttribute("upcomingAppointments", upcomingAppointments);
-            request.setAttribute("emergencyAppointments", emergencyAppointments);
-            request.setAttribute("todayAppointments", todayAppointments);
-            request.setAttribute("emergencyAppointmentsList", emergencyAppointmentsList);
+            request.setAttribute("section", section);
 
-            LOGGER.info("Doctor dashboard data for " + username + ": Total=" + totalAppointments +
-                    ", Upcoming=" + upcomingAppointments + ", Emergency=" + emergencyAppointments +
-                    ", Today=" + todayAppointments);
+            LOGGER.info("Serving " + section + " section for " + username);
+            request.getRequestDispatcher("/pages/doctorProfile/doctorDashboard.jsp").forward(request, response);
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Error fetching doctor dashboard data for " + username, e);
-            request.setAttribute("error", "Error fetching dashboard data: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "Error fetching data for " + section + " section, user: " + username, e);
+            request.setAttribute("error", "Error fetching data: " + e.getMessage());
+            request.getRequestDispatcher("/pages/doctorProfile/doctorDashboard.jsp").forward(request, response);
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String username = (String) request.getSession().getAttribute("username");
+        String role = (String) request.getSession().getAttribute("role");
+        if (username == null || !DOCTOR_ROLE.equals(role)) {
+            response.sendRedirect(request.getContextPath() + "/pages/index.jsp");
+            return;
         }
 
-        request.getRequestDispatcher("/pages/doctorDashboard.jsp").forward(request, response);
+        String action = request.getParameter("action");
+        try {
+            if ("updateDetails".equals(action)) {
+                Doctor doctor = new Doctor(
+                        request.getParameter("id"),
+                        request.getParameter("name"),
+                        request.getParameter("specialization"),
+                        request.getParameter("contact")
+                );
+                String password = request.getParameter("password");
+                updateDoctorDetails(doctor, password);
+                request.setAttribute("message", "Details updated successfully");
+            } else if ("cancelAppointment".equals(action)) {
+                String appointmentIdStr = request.getParameter("appointmentId");
+                int appointmentId = Integer.parseInt(appointmentIdStr);
+                appointmentService.cancelAppointment(appointmentId);
+                request.setAttribute("message", "Appointment canceled successfully");
+            }
+            doGet(request, response);
+        } catch (NumberFormatException e) {
+            LOGGER.log(Level.SEVERE, "Invalid appointment ID format for user: " + username, e);
+            request.setAttribute("error", "Invalid appointment ID: " + e.getMessage());
+            doGet(request, response);
+        } catch (IOException e) {
+            LOGGER.log(Level.SEVERE, "Error processing action " + action + " for " + username, e);
+            request.setAttribute("error", "Error processing request: " + e.getMessage());
+            doGet(request, response);
+        }
     }
 
     private Doctor getDoctorByUsername(String username) throws IOException {
         List<String> lines = doctorFileHandler.readLines();
         for (String line : lines) {
             String[] parts = line.split(",");
-            if (parts.length >= 4 && parts[0].equals(username)) { // Assuming username = doctorId
-                return new Doctor(parts[0], parts[1], parts[2], parts[3]);
+            if (parts.length >= 6 && parts[0].equals(username)) {
+                return new Doctor(parts[0], parts[2], parts[3], parts[5]);
             }
         }
         LOGGER.warning("No doctor found for username: " + username);
         return null;
     }
 
-
+    private void updateDoctorDetails(Doctor doctor, String password) throws IOException {
+        List<String> lines = doctorFileHandler.readLines();
+        for (int i = 0; i < lines.size(); i++) {
+            String[] parts = lines.get(i).split(",");
+            if (parts[0].equals(doctor.getId())) {
+                lines.set(i, String.format("%s,%s,%s,%s,%s,%s",
+                        parts[0], password != null && !password.isEmpty() ? password : parts[1], // Update password if provided
+                        doctor.getName(), doctor.getSpecialization(), parts[4], doctor.getContact()));
+                break;
+            }
+        }
+        doctorFileHandler.writeLines(lines);
+    }
 }

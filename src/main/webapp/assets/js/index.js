@@ -6,7 +6,6 @@ let contextPath = window.contextPath || "";
 
 window.onload = function () {
     console.log("Loading specialties...");
-    document.getElementById("resultsContainer").innerHTML = "<p>Loading specialties...</p>";
     fetch(`${contextPath}/SortServlet`, {
         method: "GET",
         headers: { Accept: "application/json" },
@@ -22,19 +21,22 @@ window.onload = function () {
         })
         .then((data) => {
             console.log("Raw initial data:", JSON.stringify(data, null, 2));
-            // Remove or comment out this line
-            // document.getElementById("debugResponse").textContent = "Raw Server Response:\n" + JSON.stringify(data, null, 2);
             allSpecialties = data.specialties || [];
             if (allSpecialties.length === 0) {
                 console.warn("No specialties found in the response.");
             }
             populateSpecialties();
-            document.getElementById("resultsContainer").innerHTML = "";
         })
         .catch((error) => {
             console.error("Error loading specialties:", error);
-            document.getElementById("resultsContainer").innerHTML = "<p>Error loading specialties: " + error.message + "</p>";
+            document.getElementById("debugResponse").innerHTML = "<p>Error loading specialties: " + error.message + "</p>";
         });
+
+    // Attach event listener to the login button
+    document.getElementById("loginNowBtn").addEventListener("click", function() {
+        clearInterval(window.loginCountdownInterval); // Clear any existing countdown
+        window.location.href = `${contextPath}/pages/login.jsp?role=patient`;
+    });
 };
 
 function populateSpecialties() {
@@ -87,31 +89,29 @@ function updateAvailabilityTable() {
 
             if (allAvailability.length === 0) {
                 console.warn("No availability found for specialty:", specialty);
-                tbody.innerHTML = '<tr><td colspan="5">No availability found</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6">No availability found</td></tr>';
                 table.style.display = "table";
                 return;
             }
 
-            // Populate doctor filter
             allDoctors.forEach((doctor) => {
                 filterDoctor.innerHTML += `<option value="${doctor}">${doctor}</option>`;
             });
 
-            // Populate date filter
-            const uniqueDates = [...new Set(allAvailability.map((avail) => avail.date))].sort();
+            const uniqueDates = [...new Set(allAvailability.map((avail) => avail.date))];
             uniqueDates.forEach((date) => {
                 filterDate.innerHTML += `<option value="${date}">${date}</option>`;
             });
 
-            // Populate table
             allAvailability.forEach((avail) => {
                 const row = `
-                    <tr data-doctor="${avail.name}" data-date="${avail.date}">
-                        <td>${avail.name}</td>
+                    <tr data-doctor="${avail.doctorName}" data-date="${avail.date}">
+                        <td>${avail.doctorName}</td> <!-- Use doctorName -->
                         <td>${avail.date}</td>
                         <td>${avail.startTime}</td>
                         <td>${avail.endTime}</td>
-                        <td><button class="book-btn" onclick="bookAppointment('${avail.username}', '${avail.date}', '${avail.startTime}')">Book</button></td>
+                        <td>${avail.appointmentCount}</td> <!-- Use appointmentCount -->
+                        <td><button class="book-btn" onclick="bookAppointment('${avail.doctorId}', '${avail.date}', '${avail.startTime}')">Book</button></td>
                     </tr>
                 `;
                 tbody.innerHTML += row;
@@ -123,7 +123,7 @@ function updateAvailabilityTable() {
         })
         .catch((error) => {
             console.error("Error loading availability:", error);
-            tbody.innerHTML = `<tr><td colspan="5">Error loading availability: ${error.message}</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6">Error loading availability: ${error.message}</td></tr>`;
             table.style.display = "table";
         });
 }
@@ -146,25 +146,48 @@ function filterTable() {
     console.log("Table filtered with doctor:", filterDoctor, "and date:", filterDate);
 }
 
-function closePopup() {
-    document.getElementById("resultsPopup").style.display = "none";
+function showLoginPopup() {
+    const popup = document.getElementById("loginPopup");
+    const countdownMessage = document.getElementById("countdownMessage");
+    const timerElement = document.getElementById("countdownTimer");
+
+    // Reset and show popup
+    popup.style.display = "flex";
+    countdownMessage.style.display = "block";
+
+    let countdown = 3;
+    timerElement.textContent = countdown;
+
+    // Clear any existing interval
+    if (window.loginCountdownInterval) {
+        clearInterval(window.loginCountdownInterval);
+    }
+
+    // Start new countdown
+    window.loginCountdownInterval = setInterval(() => {
+        countdown--;
+        timerElement.textContent = countdown;
+        if (countdown <= 0) {
+            clearInterval(window.loginCountdownInterval);
+            window.location.href = `${contextPath}/pages/login.jsp?role=patient`;
+        }
+    }, 1000);
 }
 
-function bookAppointment(username, date, startTime) {
-    if (!document.body.dataset.loggedIn) {
-        alert("Please log in as a patient to book an appointment.");
-        window.location.href = `${contextPath}/pages/login.jsp?role=patient`;
+function bookAppointment(doctorId, date, startTime) {
+    if (document.body.dataset.loggedIn !== "true") {
+        showLoginPopup();
         return;
     }
 
-    console.log("Booking appointment:", { username, date, startTime });
+    console.log("Booking appointment:", { doctorId, date, startTime });
     fetch(`${contextPath}/AppointmentServlet`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
             Accept: "application/json"
         },
-        body: JSON.stringify({ doctorUsername: username, date, time: startTime })
+        body: JSON.stringify({ doctorId: doctorId, date: date, time: startTime }) // Adjusted field names
     })
         .then((response) => {
             if (!response.ok) {
@@ -178,9 +201,9 @@ function bookAppointment(username, date, startTime) {
             console.log("Booking response:", data);
             if (data.success) {
                 alert("Appointment booked successfully!");
-                updateAvailabilityTable(); // Refresh table after booking
+                updateAvailabilityTable();
             } else {
-                alert("Failed to book: " + data.message);
+                alert("Failed to book: " + (data.message || "Unknown error"));
             }
         })
         .catch((error) => {

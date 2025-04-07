@@ -4,9 +4,7 @@ import model.Appointment;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -21,12 +19,11 @@ public class AppointmentService {
     public AppointmentService(String filePath) throws IOException {
         this.filePath = filePath;
         this.fileHandler = new FileHandler(filePath);
-        this.emergencyQueue = new PriorityQueue<>((a1, a2) -> Integer.compare(a1.getPriority(), a2.getPriority()));
+        this.emergencyQueue = new PriorityQueue<>(Comparator.comparingInt(Appointment::getPriority));
         this.cachedAppointments = readAppointments();
         if (cachedAppointments != null) {
             emergencyQueue.addAll(cachedAppointments);
         } else {
-            LOGGER.warning("No appointments loaded from file: " + filePath);
             cachedAppointments = new ArrayList<>();
         }
     }
@@ -35,24 +32,24 @@ public class AppointmentService {
         return fileHandler.readAppointments();
     }
 
-    public synchronized void bookAppointment(String patientId, String doctorId, String dateTime, boolean isEmergency) throws IOException {
-        if (patientId == null || doctorId == null || dateTime == null || patientId.trim().isEmpty() || doctorId.trim().isEmpty() || dateTime.trim().isEmpty()) {
-            throw new IllegalArgumentException("Invalid appointment details: patientId, doctorId, and dateTime must not be null or empty");
+    public synchronized void bookAppointment(String patientId, String doctorId, String tokenID, String dateTime, boolean isEmergency) throws IOException {
+        if (patientId == null || doctorId == null || tokenID == null || dateTime == null) {
+            throw new IllegalArgumentException("Invalid appointment details");
         }
         int newId = cachedAppointments.stream().mapToInt(Appointment::getId).max().orElse(0) + 1;
         int priority = isEmergency ? 1 : 2;
-        Appointment newAppointment = new Appointment(newId, patientId, doctorId, dateTime, priority);
+        Appointment newAppointment = new Appointment(newId, patientId, doctorId, tokenID, dateTime, priority);
         cachedAppointments.add(newAppointment);
         if (isEmergency) emergencyQueue.add(newAppointment);
         writeAppointments(cachedAppointments);
         LOGGER.info("Booked appointment: " + newAppointment);
     }
 
-    public synchronized void updateAppointment(int id, String patientId, String doctorId, String dateTime, int priority) throws IOException {
+    public synchronized void updateAppointment(int id, String patientId, String doctorId, String tokenID, String dateTime, int priority) throws IOException {
         boolean found = false;
         for (int i = 0; i < cachedAppointments.size(); i++) {
             if (cachedAppointments.get(i).getId() == id) {
-                cachedAppointments.set(i, new Appointment(id, patientId, doctorId, dateTime, priority));
+                cachedAppointments.set(i, new Appointment(id, patientId, doctorId, tokenID, dateTime, priority));
                 found = true;
                 break;
             }
@@ -85,10 +82,16 @@ public class AppointmentService {
         return new ArrayList<>(cachedAppointments);
     }
 
-    public List<Appointment> getSortedAppointments() throws IOException {
-        List<Appointment> appointments = getAllAppointments();
-        appointments.sort((a1, a2) -> LocalDateTime.parse(a1.getDateTime(), DATE_TIME_FORMATTER)
-                .compareTo(LocalDateTime.parse(a2.getDateTime(), DATE_TIME_FORMATTER)));
+    public List<Appointment> getAppointmentsByPatientId(String patientId) {
+        return cachedAppointments.stream()
+                .filter(appt -> appt.getPatientId().equals(patientId))
+                .collect(Collectors.toList());
+    }
+
+    public List<Appointment> getSortedAppointments() {
+        List<Appointment> appointments = new ArrayList<>(cachedAppointments);
+        Collections.sort(appointments, Comparator.comparing(
+                appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER)));
         return appointments;
     }
 

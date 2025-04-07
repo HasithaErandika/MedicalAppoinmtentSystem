@@ -17,47 +17,52 @@ public class FileHandler {
         this.filePath = filePath;
     }
 
-    // Read all appointments from the appointments.txt file
     public List<Appointment> readAppointments() throws IOException {
         List<Appointment> appointments = new ArrayList<>();
         if (!Files.exists(Paths.get(filePath))) {
-            LOGGER.info("File does not exist yet: " + filePath + ". Returning empty list.");
+            LOGGER.info("File does not exist yet: " + filePath);
             return appointments;
         }
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length == 5) {
+                if (parts.length == 7) {
                     try {
+                        String dateTime = parts[4].trim() + " " + parts[5].trim();
                         Appointment appt = new Appointment(
                                 Integer.parseInt(parts[0].trim()), // id
                                 parts[1].trim(),                   // patientId
                                 parts[2].trim(),                   // doctorId
-                                parts[3].trim(),                   // dateTime
-                                Integer.parseInt(parts[4].trim())  // priority
+                                parts[3].trim(),                   // tokenID
+                                dateTime,                          // dateTime
+                                Integer.parseInt(parts[6].trim())  // priority
                         );
                         appointments.add(appt);
                     } catch (NumberFormatException e) {
                         LOGGER.log(Level.WARNING, "Invalid number format in line: " + line, e);
                     }
                 } else {
-                    LOGGER.warning("Skipping malformed line: " + line + " (Expected 5 parts, got " + parts.length + ")");
+                    LOGGER.warning("Skipping malformed line: " + line);
                 }
             }
         }
+        LOGGER.info("Loaded " + appointments.size() + " appointments from " + filePath);
         return appointments;
     }
 
-    // Write appointments to the appointments.txt file in CSV format
     public void writeAppointments(List<Appointment> appointments) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Appointment appt : appointments) {
-                String line = String.format("%d,%s,%s,%s,%d",
+                String[] dateTimeParts = appt.getDateTime().split(" ");
+                if (dateTimeParts.length != 2) continue;
+                String line = String.format("%d,%s,%s,%s,%s,%s,%d",
                         appt.getId(),
                         appt.getPatientId(),
                         appt.getDoctorId(),
-                        appt.getDateTime(),
+                        appt.getTokenID(),
+                        dateTimeParts[0],
+                        dateTimeParts[1],
                         appt.getPriority());
                 writer.write(line);
                 writer.newLine();
@@ -65,16 +70,14 @@ public class FileHandler {
         }
     }
 
-    // Generic method to read all lines from any file (e.g., doctors.txt, patients.txt)
     public List<String> readLines() throws IOException {
         if (!Files.exists(Paths.get(filePath))) {
-            LOGGER.info("File does not exist yet: " + filePath + ". Returning empty list.");
+            LOGGER.info("File does not exist yet: " + filePath);
             return new ArrayList<>();
         }
         return Files.readAllLines(Paths.get(filePath));
     }
 
-    // Generic method to write lines to any file
     public void writeLines(List<String> lines) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (String line : lines) {

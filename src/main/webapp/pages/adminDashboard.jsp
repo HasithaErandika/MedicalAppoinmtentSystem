@@ -48,6 +48,16 @@
             <h3>Total Appointments</h3>
             <p>${totalAppointments}</p>
         </div>
+        <div class="card" onclick="window.location.href='<%=request.getContextPath()%>/AdminServlet'">
+            <i class="ri-calendar-todo-line"></i>
+            <h3>Previous Appointments</h3>
+            <p>${previousAppointments}</p>
+        </div>
+        <div class="card" onclick="window.location.href='<%=request.getContextPath()%>/AdminServlet'">
+            <i class="ri-calendar-event-line"></i>
+            <h3>Future Appointments</h3>
+            <p>${futureAppointments}</p>
+        </div>
         <div class="card" onclick="window.location.href='<%=request.getContextPath()%>/ManageDoctorsServlet'">
             <i class="ri-stethoscope-line"></i>
             <h3>Doctors</h3>
@@ -111,7 +121,7 @@
     ];
     const appointments = [
         <c:forEach var="appt" items="${sortedAppointments}">
-        { id: '${appt.id}', patientId: '${appt.patientId}', doctorId: '${appt.doctorId}', dateTime: '${appt.dateTime}', priority: ${appt.priority} },
+        { id: '${appt.id}', patientId: '${appt.patientId}', doctorId: '${appt.doctorId}', tokenID: '${appt.tokenID}', dateTime: '${appt.dateTime}', priority: ${appt.priority} },
         </c:forEach>
     ];
 
@@ -136,6 +146,7 @@
             appt.id.toLowerCase().includes(input) ||
             appt.patientId.toLowerCase().includes(input) ||
             appt.doctorId.toLowerCase().includes(input) ||
+            appt.tokenID.toLowerCase().includes(input) ||
             appt.dateTime.toLowerCase().includes(input)
         );
     }
@@ -147,7 +158,7 @@
                 csv += `${item}\n`;
             } else {
                 const priority = item.priority === 1 ? 'Emergency' : 'Normal';
-                csv += `${item.id},${item.patientId},${item.doctorId},${item.dateTime},${priority}\n`;
+                csv += `${item.id},${item.patientId},${item.doctorId},${item.tokenID},${item.dateTime},${priority}\n`;
             }
         });
         const link = document.createElement('a');
@@ -170,38 +181,28 @@
 
     function exportAppointments() {
         const filteredAppointments = searchAppointments();
-        exportToCSV(filteredAppointments, 'appointments', 'ID,Patient ID,Doctor ID,Date & Time,Priority');
+        exportToCSV(filteredAppointments, 'appointments', 'ID,Patient ID,Doctor ID,Token ID,Date & Time,Priority');
     }
 
     document.addEventListener('DOMContentLoaded', function() {
-        const doctorStats = appointments.reduce((acc, appt) => {
-            const doctorId = appt.doctorId;
-            if (!acc[doctorId]) {
-                acc[doctorId] = { emergency: 0, normal: 0 };
-            }
-            if (appt.priority === 1) acc[doctorId].emergency++;
-            else acc[doctorId].normal++;
-            return acc;
-        }, {});
-
+        // Chart for Previous vs Future Appointments
         const ctx = document.getElementById('appointmentChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: {
-                labels: Object.keys(doctorStats),
+                labels: ['Previous Appointments', 'Future Appointments'],
                 datasets: [
                     {
-                        label: 'Emergency Appointments',
-                        data: Object.values(doctorStats).map(stat => stat.emergency),
-                        backgroundColor: 'rgba(239, 83, 80, 0.8)',
-                        borderColor: 'rgba(239, 83, 80, 1)',
-                        borderWidth: 1
-                    },
-                    {
-                        label: 'Normal Appointments',
-                        data: Object.values(doctorStats).map(stat => stat.normal),
-                        backgroundColor: 'rgba(38, 166, 154, 0.8)',
-                        borderColor: 'rgba(38, 166, 154, 1)',
+                        label: 'Appointment Count',
+                        data: [${previousAppointments}, ${futureAppointments}],
+                        backgroundColor: [
+                            'rgba(239, 83, 80, 0.8)', // Previous (red)
+                            'rgba(38, 166, 154, 0.8)' // Future (teal)
+                        ],
+                        borderColor: [
+                            'rgba(239, 83, 80, 1)',
+                            'rgba(38, 166, 154, 1)'
+                        ],
                         borderWidth: 1
                     }
                 ]
@@ -211,11 +212,9 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        stacked: true,
-                        title: { display: true, text: 'Doctor ID', color: '#2D3748' }
+                        title: { display: true, text: 'Appointment Type', color: '#2D3748' }
                     },
                     y: {
-                        stacked: true,
                         beginAtZero: true,
                         title: { display: true, text: 'Number of Appointments', color: '#2D3748' },
                         ticks: { stepSize: 1 }
@@ -225,7 +224,7 @@
                     legend: { position: 'top', labels: { font: { size: 14 } } },
                     title: {
                         display: true,
-                        text: 'Appointments by Doctor and Priority',
+                        text: 'Previous vs Future Appointments',
                         color: '#2D3748',
                         font: { size: 18 }
                     }

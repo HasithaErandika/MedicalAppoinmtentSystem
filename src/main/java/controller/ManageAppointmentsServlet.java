@@ -31,7 +31,7 @@ public class ManageAppointmentsServlet extends HttpServlet {
     @Override
     public void init() throws ServletException {
         String basePath = getServletContext().getRealPath("/data/");
-        LOGGER.info("Initializing AppointmentServlet with base path: " + basePath);
+        LOGGER.info("Initializing ManageAppointmentsServlet with base path: " + basePath);
         try {
             appointmentService = new AppointmentService(basePath + "appointments.txt");
             availabilityService = new DoctorAvailabilityService(basePath + "doctors_availability.txt", appointmentService);
@@ -39,7 +39,7 @@ public class ManageAppointmentsServlet extends HttpServlet {
             patientsFilePath = basePath + "patients.txt";
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize services", e);
-            throw new ServletException("Failed to initialize AppointmentServlet services", e);
+            throw new ServletException("Failed to initialize ManageAppointmentsServlet services", e);
         }
     }
 
@@ -82,7 +82,9 @@ public class ManageAppointmentsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String username = (String) request.getSession().getAttribute("username");
         String role = (String) request.getSession().getAttribute("role");
+        LOGGER.info("Accessing ManageAppointmentsServlet - Username: " + username + ", Role: " + role);
         if (username == null) {
+            LOGGER.info("Redirecting to login.jsp due to null username");
             response.sendRedirect(request.getContextPath() + "/pages/login.jsp");
             return;
         }
@@ -96,27 +98,22 @@ public class ManageAppointmentsServlet extends HttpServlet {
                     .collect(Collectors.toList());
         }
 
-        // Fetch doctors and patients
+        LOGGER.info("Fetched " + appointments.size() + " appointments for " + username + " (" + role + "): " + appointments);
         List<User> doctors = readUsers(doctorsFilePath, true);
         List<User> patients = readUsers(patientsFilePath, false);
+        LOGGER.info("Doctors: " + doctors.size() + ", Patients: " + patients.size());
 
-        // Enhance appointments with patient and doctor names
         for (Appointment appt : appointments) {
-            patients.stream()
-                    .filter(p -> p.getId().equals(appt.getPatientId()))
-                    .findFirst()
+            patients.stream().filter(p -> p.getId().equals(appt.getPatientId())).findFirst()
                     .ifPresent(p -> appt.setPatientName(p.getName()));
-            doctors.stream()
-                    .filter(d -> d.getId().equals(appt.getDoctorId()))
-                    .findFirst()
+            doctors.stream().filter(d -> d.getId().equals(appt.getDoctorId())).findFirst()
                     .ifPresent(d -> appt.setDoctorName(d.getName()));
         }
 
-        LOGGER.info("Fetched " + appointments.size() + " appointments for " + username + " (" + role + ")");
         request.setAttribute("appointments", appointments);
         request.setAttribute("patients", patients);
         request.setAttribute("doctors", doctors);
-
+        LOGGER.info("Forwarding to /pages/manageAppointments.jsp");
         request.getRequestDispatcher("/pages/manageAppointments.jsp").forward(request, response);
     }
 
@@ -138,17 +135,31 @@ public class ManageAppointmentsServlet extends HttpServlet {
             String doctorUsername = request.getParameter("doctorUsername");
             String date = request.getParameter("date");
             String time = request.getParameter("time");
+            String tokenID = request.getParameter("tokenID");
+            boolean isEmergency = Boolean.parseBoolean(request.getParameter("isEmergency")); // Allow emergency booking
             String dateTime = date + " " + time;
+
+            if (doctorUsername == null || date == null || time == null || doctorUsername.trim().isEmpty() || date.trim().isEmpty() || time.trim().isEmpty()) {
+                throw new IllegalArgumentException("Doctor username, date, and time are required");
+            }
+
+            if (tokenID == null || tokenID.trim().isEmpty()) {
+                tokenID = generateTokenID();
+            }
 
             if (!availabilityService.isTimeSlotAvailable(doctorUsername, dateTime)) {
                 responseData.put("success", false);
-                responseData.put("message", "Time slot not available");
+                responseData.put("message", "Time slot not available for doctor " + doctorUsername);
             } else {
-                appointmentService.bookAppointment(username, doctorUsername, dateTime, false); // Assuming non-emergency from index.js
+                // Use 0 for non-emergency, 1 for emergency to match appointments.txt
+                appointmentService.bookAppointment(username, doctorUsername, tokenID, dateTime, isEmergency);
                 responseData.put("success", true);
+                responseData.put("tokenID", tokenID);
+                responseData.put("message", "Appointment booked successfully");
+                LOGGER.info("Appointment booked by " + username + " with doctor " + doctorUsername + " at " + dateTime);
             }
         } catch (IllegalArgumentException | IOException e) {
-            LOGGER.log(Level.WARNING, "Booking error for " + username + ": " + e.getMessage());
+            LOGGER.log(Level.WARNING, "Booking error for " + username + ": " + e.getMessage(), e);
             responseData.put("success", false);
             responseData.put("message", "Error: " + e.getMessage());
         }
@@ -157,5 +168,18 @@ public class ManageAppointmentsServlet extends HttpServlet {
             out.print(gson.toJson(responseData));
             out.flush();
         }
+    }
+
+    // Generate a unique tokenID matching the TOKXXX format
+    private String generateTokenID() {
+        List<Appointment> appointments = appointmentService.getAllAppointments();
+        int maxTokenNum = appointments.stream()
+                .map(appt -> appt.getTokenID())
+                .filter(token -> token.startsWith("TOK"))
+                .map(token -> token.substring(3))
+                .mapToInt(Integer::parseInt)
+                .max()
+                .orElse(0);
+        return String.format("TOK%03d", maxTokenNum + 1); // e.g., TOK001, TOK002
     }
 }

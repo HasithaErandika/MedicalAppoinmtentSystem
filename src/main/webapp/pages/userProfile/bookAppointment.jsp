@@ -13,9 +13,6 @@
             <label for="specialty" class="form-label">Specialty</label>
             <select id="specialty" name="specialty" class="form-select" required aria-required="true" aria-describedby="specialty-error" onchange="updateAvailabilityTable()">
                 <option value="">Select Specialty</option>
-                <option value="cardiology">Cardiology</option>
-                <option value="neurology">Neurology</option>
-                <option value="orthopedics">Orthopedics</option>
             </select>
             <span class="error-text" id="specialty-error" aria-live="polite"></span>
         </div>
@@ -45,11 +42,12 @@
                     <th scope="col">Date</th>
                     <th scope="col">Start Time</th>
                     <th scope="col">End Time</th>
+                    <th scope="col">Appointments Booked</th>
+                    <th scope="col">Your Token</th>
                     <th scope="col">Action</th>
                 </tr>
                 </thead>
-                <tbody>
-                </tbody>
+                <tbody></tbody>
             </table>
             <div id="noResults" class="no-results" style="display: none;">
                 <i class="fas fa-calendar-times" aria-hidden="true"></i>
@@ -60,6 +58,7 @@
 </section>
 
 <style>
+    /* Existing CSS remains unchanged */
     :root {
         --primary: #2C5282;
         --secondary: #38B2AC;
@@ -308,99 +307,73 @@
             font-size: 0.9rem;
         }
     }
+
+    /* Modal Styles */
+    .modal {
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow);
+        padding: calc(var(--spacing-unit) * 1.5);
+        max-width: 500px;
+        width: 90%;
+        background: var(--card-bg);
+    }
+
+    .modal-content {
+        display: flex;
+        flex-direction: column;
+        gap: calc(var(--spacing-unit) * 1);
+    }
+
+    .modal-content h3 {
+        margin: 0;
+        color: var(--primary);
+        font-size: 1.5rem;
+    }
+
+    .modal-content p {
+        margin: 0;
+        color: var(--text-primary);
+    }
+
+    .appointment-details {
+        padding: var(--spacing-unit);
+        background: var(--bg-light);
+        border-radius: 8px;
+        color: var(--text-primary);
+    }
+
+    .modal-actions {
+        display: flex;
+        gap: var(--spacing-unit);
+        justify-content: flex-end;
+    }
+
+    .confirm-btn, .cancel-btn {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .confirm-btn {
+        background: var(--secondary);
+        color: #FFFFFF;
+    }
+
+    .confirm-btn:hover {
+        background: #2B928C;
+        box-shadow: 0 4px 12px rgba(56, 178, 172, 0.3);
+    }
+
+    .cancel-btn {
+        background: var(--accent);
+        color: #FFFFFF;
+    }
+
+    .cancel-btn:hover {
+        background: #C53030;
+        box-shadow: 0 4px 12px rgba(229, 62, 62, 0.3);
+    }
 </style>
-
-<script>
-    function updateAvailabilityTable() {
-        const specialty = document.getElementById('specialty').value;
-        const filterContainer = document.getElementById('filterContainer');
-        const table = document.getElementById('availabilityTable');
-        const tbody = table.querySelector('tbody');
-        const noResults = document.getElementById('noResults');
-
-        if (!specialty) {
-            document.getElementById('specialty-error').textContent = 'Please select a specialty';
-            filterContainer.style.display = 'none';
-            table.style.display = 'none';
-            noResults.style.display = 'none';
-            return;
-        }
-        document.getElementById('specialty-error').textContent = '';
-
-        // Simulate fetching data (replace with actual AJAX call)
-        const mockData = [
-            { doctor: 'Dr. Smith', date: '2025-04-10', start: '09:00', end: '09:30' },
-            { doctor: 'Dr. Jones', date: '2025-04-11', start: '14:00', end: '14:30' },
-            { doctor: 'Dr. Smith', date: '2025-04-12', start: '10:00', end: '10:30' }
-        ];
-
-        filterContainer.style.display = 'block';
-        table.style.display = 'table';
-        tbody.innerHTML = '';
-
-        if (mockData.length === 0) {
-            noResults.style.display = 'block';
-            table.style.display = 'none';
-        } else {
-            noResults.style.display = 'none';
-            mockData.forEach(slot => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${slot.doctor}</td>
-                    <td>${slot.date}</td>
-                    <td>${slot.start}</td>
-                    <td>${slot.end}</td>
-                    <td><button class="book-btn" onclick="bookAppointment('${slot.doctor}', '${slot.date}', '${slot.start}')">
-                        <i class="fas fa-calendar-check" aria-hidden="true"></i> Book
-                    </button></td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            // Populate filter dropdowns
-            const filterDoctor = document.getElementById('filterDoctor');
-            const filterDate = document.getElementById('filterDate');
-            const uniqueDoctors = [...new Set(mockData.map(slot => slot.doctor))];
-            const uniqueDates = [...new Set(mockData.map(slot => slot.date))];
-            filterDoctor.innerHTML = '<option value="">All Doctors</option>' +
-                uniqueDoctors.map(doc => `<option value="${doc}">${doc}</option>`).join('');
-            filterDate.innerHTML = '<option value="">All Dates</option>' +
-                uniqueDates.map(date => `<option value="${date}">${date}</option>`).join('');
-        }
-    }
-
-    function filterTable() {
-        const doctor = document.getElementById('filterDoctor').value;
-        const date = document.getElementById('filterDate').value;
-        const rows = document.querySelectorAll('#availabilityTable tbody tr');
-        const noResults = document.getElementById('noResults');
-        let visibleRows = 0;
-
-        rows.forEach(row => {
-            const rowDoctor = row.cells[0].textContent;
-            const rowDate = row.cells[1].textContent;
-            const matchesDoctor = !doctor || rowDoctor === doctor;
-            const matchesDate = !date || rowDate === date;
-
-            if (matchesDoctor && matchesDate) {
-                row.style.display = '';
-                visibleRows++;
-            } else {
-                row.style.display = 'none';
-            }
-        });
-
-        noResults.style.display = visibleRows === 0 ? 'block' : 'none';
-        document.getElementById('availabilityTable').style.display = visibleRows === 0 ? 'none' : 'table';
-    }
-
-    function bookAppointment(doctor, date, start) {
-        const modal = document.getElementById('confirmModal');
-        if (modal) {
-            document.getElementById('confirmMessage').textContent = `Confirm booking with ${doctor} on ${date} at ${start}?`;
-            modal.showModal(); // Use native dialog method
-        } else {
-            alert(`Booking confirmed with ${doctor} on ${date} at ${start}`);
-        }
-    }
-</script>
