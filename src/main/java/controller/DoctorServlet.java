@@ -24,7 +24,7 @@ public class DoctorServlet extends HttpServlet {
     private static final String APPOINTMENTS_FILE = "/data/appointments.txt";
     private static final String DOCTORS_FILE = "/data/doctors.txt";
     private static final String AVAILABILITY_FILE = "/data/doctors_availability.txt";
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
     private AppointmentService appointmentService;
     private DoctorAvailabilityService availabilityService;
