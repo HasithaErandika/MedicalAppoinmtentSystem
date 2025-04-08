@@ -180,4 +180,5 @@ public class DoctorServlet extends HttpServlet {
         }
         doctorFileHandler.writeLines(lines);
     }
+
 }
