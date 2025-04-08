@@ -81,12 +81,6 @@ public class DoctorServlet extends HttpServlet {
                     .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).isBefore(now))
                     .count();
 
-            for (Appointment appt : appointments) {
-                if (appt.getPatientName() == null || appt.getPatientName().isEmpty()) {
-                    appt.setPatientName("Patient " + appt.getPatientId());
-                }
-            }
-
             request.setAttribute("totalAppointments", totalAppointments);
             request.setAttribute("upcomingAppointments", upcomingAppointments);
             request.setAttribute("emergencyAppointments", emergencyAppointments);
@@ -180,5 +174,4 @@ public class DoctorServlet extends HttpServlet {
         }
         doctorFileHandler.writeLines(lines);
     }
-
 }

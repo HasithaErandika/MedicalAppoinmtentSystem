@@ -64,20 +64,20 @@
                 <div class="avatar" aria-hidden="true">
                     <c:out value="${not empty sessionScope.username ? sessionScope.username.substring(0, 1).toUpperCase() : 'D'}" />
                 </div>
-                <h1>Welcome,
+                <h1>Welcome, Dr.
                     <span class="doctor-name">
-                            <c:choose>
-                                <c:when test="${not empty doctor.name}">
-                                    <c:out value="${doctor.name}" />
-                                </c:when>
-                                <c:when test="${not empty sessionScope.username}">
-                                    <c:out value="${sessionScope.username}" />
-                                </c:when>
-                                <c:otherwise>
-                                    Doctor
-                                </c:otherwise>
-                            </c:choose>
-                        </span>!
+        <c:choose>
+            <c:when test="${not empty doctor.name}">
+                <c:out value="${doctor.name}" />
+            </c:when>
+            <c:when test="${not empty sessionScope.username}">
+                <c:out value="${sessionScope.username}" />
+            </c:when>
+            <c:otherwise>
+                Doctor
+            </c:otherwise>
+        </c:choose>
+    </span>!
                 </h1>
             </div>
             <time class="date" datetime="<fmt:formatDate value="<%= new java.util.Date() %>" pattern="yyyy-MM-dd" />">

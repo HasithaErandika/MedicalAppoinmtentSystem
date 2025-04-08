@@ -20,9 +20,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const doctorNameElement = document.querySelector('.doctor-name');
     if (doctorNameElement) {
         let doctorName = doctorNameElement.textContent.trim();
-        if (doctorName.startsWith('Dr.')) {
-            doctorNameElement.textContent = doctorName.replace('Dr.', '').trim();
+        console.log(`Original doctor name: ${doctorName}`);
+
+        // Check if it looks like a username (e.g., "doctor1") and handle it
+        if (/^doctor\d+$/.test(doctorName)) {
+            doctorName = "Doctor"; // Fallback to generic "Doctor" if username-like
+            console.warn("Doctor name appears to be a username; using fallback: 'Doctor'");
+        } else if (doctorName.startsWith('Dr.')) {
+            doctorName = doctorName.replace('Dr.', '').trim(); // Remove "Dr." if present
         }
+
+        doctorNameElement.textContent = doctorName;
+        console.log(`Updated doctor name: ${doctorName}`);
+    } else {
+        console.warn("Doctor name element not found in DOM");
     }
 });
 

@@ -15,6 +15,7 @@ public class AppointmentService {
     private final FileHandler fileHandler;
     private final PriorityQueue<Appointment> emergencyQueue;
     private List<Appointment> cachedAppointments;
+    private final String patientFilePath = "/data/patients.txt"; // Adjust as needed
 
     public AppointmentService(String filePath) throws IOException {
         this.filePath = filePath;
@@ -26,6 +27,7 @@ public class AppointmentService {
         } else {
             cachedAppointments = new ArrayList<>();
         }
+        enrichAppointmentsWithPatientNames();
     }
 
     public List<Appointment> readAppointments() throws IOException {
@@ -39,6 +41,8 @@ public class AppointmentService {
         int newId = cachedAppointments.stream().mapToInt(Appointment::getId).max().orElse(0) + 1;
         int priority = isEmergency ? 1 : 2;
         Appointment newAppointment = new Appointment(newId, patientId, doctorId, tokenID, dateTime, priority);
+        String patientName = fileHandler.getPatientNameByUsername(patientId, patientFilePath);
+        newAppointment.setPatientName(patientName);
         cachedAppointments.add(newAppointment);
         if (isEmergency) emergencyQueue.add(newAppointment);
         writeAppointments(cachedAppointments);
@@ -49,7 +53,10 @@ public class AppointmentService {
         boolean found = false;
         for (int i = 0; i < cachedAppointments.size(); i++) {
             if (cachedAppointments.get(i).getId() == id) {
-                cachedAppointments.set(i, new Appointment(id, patientId, doctorId, tokenID, dateTime, priority));
+                Appointment updated = new Appointment(id, patientId, doctorId, tokenID, dateTime, priority);
+                String patientName = fileHandler.getPatientNameByUsername(patientId, patientFilePath);
+                updated.setPatientName(patientName);
+                cachedAppointments.set(i, updated);
                 found = true;
                 break;
             }
@@ -72,6 +79,13 @@ public class AppointmentService {
 
     private void writeAppointments(List<Appointment> appointments) throws IOException {
         fileHandler.writeAppointments(appointments);
+    }
+
+    private void enrichAppointmentsWithPatientNames() throws IOException {
+        for (Appointment appt : cachedAppointments) {
+            String patientName = fileHandler.getPatientNameByUsername(appt.getPatientId(), patientFilePath);
+            appt.setPatientName(patientName);
+        }
     }
 
     public Appointment getNextEmergency() {
