@@ -4,128 +4,165 @@
 # Medical Appointment Scheduling System
 
 ## Overview
-The **Medical Appointment Scheduling System** is a web-based application developed as a 1st-year, 2nd-semester student project using Java Servlets and JSPs. It enables patients to book medical appointments, admins to manage system data, and incorporates priority queues for emergency scheduling and bubble sort for ordering appointments—all without a database, using plain text files for storage.
+
+The **Medical Appointment Scheduling System** is a web-based application developed as a 1st-year, 2nd-semester group project using Java Servlets and JSPs. It showcases fundamental programming concepts like **OOP principles**, **priority queues** for emergency scheduling, and **bubble sort** for ordering appointments. Instead of a database, it uses plain text files for persistence, emphasizing file handling skills.
 
 ### Key Features
-- **Role-Based Access**: Supports Patients (book appointments), Admins (manage system), and placeholder for Doctors.
-- **Appointment Management**: Book, edit, cancel appointments with priority (emergency vs. normal).
-- **Doctor Availability**: Admins manage doctor schedules; patients see available slots.
-- **File-Based Storage**: Data stored in `.txt` files (patients, doctors, appointments).
-- **Sorting**: Uses bubble sort to order appointments by date/time.
-- **Priority Queues**: Prioritizes emergency appointments using `PriorityQueue`.
+- **Role-Based Access**:
+    - Patients: Book and view appointments.
+    - Admins: Manage system data (appointments, doctors, patients, schedules).
+    - Doctors: Placeholder dashboard (no login yet).
+- **Appointment Management**: Book, edit, and cancel appointments with emergency prioritization.
+- **Doctor Availability**: Admins set schedules; patients see available slots.
+- **File-Based Storage**: Uses `.txt` files for data (patients, doctors, appointments, etc.).
+- **Sorting**: Bubble sort orders appointments by date/time.
+- **Priority Queues**: `PriorityQueue` prioritizes emergency appointments.
 
 ### Project Goals
-- Implement **priority queues** to handle emergency appointments.
-- Use **bubble sort** for sorting appointments (academic requirement).
+- Apply **OOP principles** (Encapsulation, Abstraction, Inheritance, Polymorphism).
+- Implement **priority queues** for emergency handling.
+- Use **bubble sort** for appointment ordering (academic requirement).
 - Demonstrate **file handling** for CRUD operations without a database.
 
+---
+
 ## Project Structure
+
 ```
 📁 MedicalAppointmentSystem
-│── 📁 src
+├── 📁 src
 │   ├── 📁 main
-│   │   ├── 📁 java                        # All backend logic (MVC style)
-│   │   │   ├── 📁 model                   # Data/Entity Classes (Encapsulation + OOP)
-│   │   │   │   ├── Patient.java           # Patient details (id, name, age, etc.)
-│   │   │   │   ├── Doctor.java            # Doctor details (name, specialization)
-│   │   │   │   ├── Appointment.java       # Appointment object (priority, time, doctor, patient)
-│   │   │   ├── 📁 service                  # Business Logic Layer
-│   │   │   │   ├── AppointmentService.java # Appointment scheduling & sorting (Bubble Sort)
-│   │   │   │   ├── FileHandler.java        # All file read/write CRUD methods
-│   │   │   │   ├── DoctorAvailabilityService.java # Search doctor availability
-│   │   │   │   ├── BackupService.java    # Get a back up from the Admin Panel
-│   │   │   │   ├── AuditService.java # Make Audits
-│   │   │   ├── 📁 controller               # Servlets (Handles HTTP Requests)
-│   │   │   │   ├── LoginServlet.java       # Handles user/admin login
-│   │   │   │   ├── RegisterServlet.java    # Handles patient registration
-│   │   │   │   ├── AppointmentServlet.java # Handles booking/canceling
-│   │   │   │   ├── AdminServlet.java       # Admin dashboard (view/manage data)
-│   │   │   │   ├── DataManagementServlet.java # Backup and log management
-│   │   │   │   ├── DoctorScheduleServlet.java # Doctor availability management
-│   │   │   │   ├── ManageDoctorsServlet.java  # CRUD for doctors
-│   │   │   │   ├── ManagePatientsServlet.java # CRUD for patients
-│   │   │   │   ├── UserServlet.java        # Patient dashboard
-│   │   ├── 📁 webapp                       # All frontend files (UI Pages + Data)
-│   │   │   ├── 📁 pages                    # All JSP Pages
-│   │   │   │   ├── index.jsp               # Home page (doctor search)
-│   │   │   │   ├── login.jsp               # Combined login page (user/admin)
-│   │   │   │   ├── adminDashboard.jsp      # Admin dashboard
-│   │   │   │   ├── bookingDetails.jsp      # booking details
-│   │   │   │   ├── doctorDashboard.jsp     # Doctor dashboard (placeholder)
-│   │   │   │   ├── appointment.jsp         # Appointment management
-│   │   │   │   ├── userProfile.jsp         # Patient profile (view appointments)
-│   │   │   │   ├── error.jsp               # Display errors
-│   │   │   │   ├── dataManagement.jsp      # Backup and audit logs
-│   │   │   │   ├── doctorSchedule.jsp      # Doctor schedule management
-│   │   │   │   ├── manageDoctors.jsp       # Manage doctor records
-│   │   │   │   ├── managePatients.jsp      # Manage patient records
-│   │   │   │   ├── register.jsp            # Patient registration
-│   │   │   ├── 📁 assets                   # Static files (CSS, JS, Images)
-│   │   │   │   ├── styles.css              # Custom styles
-│   │   │   │   ├── index.js               # Optional JS
+│   │   ├── 📁 java                        # Backend logic (MVC pattern)
+│   │   │   ├── 📁 model                   # Data entities
+│   │   │   │   ├── Availability.java     # Doctor availability slots
+│   │   │   │   ├── Appointment.java      # Appointment details
+│   │   │   │   ├── Patient.java          # Patient data
+│   │   │   │   ├── Doctor.java           # Doctor data
+│   │   │   ├── 📁 service                 # Business logic
+│   │   │   │   ├── AuditService.java     # Audit logging
+│   │   │   │   ├── AppointmentService.java # Appointment management with sorting
+│   │   │   │   ├── BackupService.java    # Backup functionality
+│   │   │   │   ├── DoctorAvailabilityService.java # Doctor slot management
+│   │   │   │   ├── FileHandler.java      # File I/O operations
+│   │   │   ├── 📁 controller              # Servlets for HTTP handling
+│   │   │   │   ├── AdminServlet.java     # Admin dashboard
+│   │   │   │   ├── DataManagementServlet.java # Backup and logs
+│   │   │   │   ├── DoctorServlet.java    # Doctor dashboard
+│   │   │   │   ├── DoctorScheduleServlet.java # Schedule management
+│   │   │   │   ├── LoginServlet.java     # User login
+│   │   │   │   ├── LogoutServlet.java    # User logout
+│   │   │   │   ├── ManageAppointmentsServlet.java # Appointment CRUD
+│   │   │   │   ├── ManageDoctorsServlet.java # Doctor CRUD
+│   │   │   │   ├── ManagePatientsServlet.java # Patient CRUD
+│   │   │   │   ├── RegisterServlet.java  # Patient registration
+│   │   │   │   ├── SortServlet.java      # Availability sorting
+│   │   │   │   ├── UserServlet.java      # Patient dashboard
+│   │   ├── 📁 webapp                      # Frontend files
+│   │   │   ├── 📁 pages                   # JSP pages
+│   │   │   │   ├── 📁 adminDashboard      # Admin dashboard pages
+│   │   │   │   │   ├── adminDashboard.jsp    # Admin dashboard
+│   │   │   │   │   ├── doctorSchedule.jsp    # Schedule management
+│   │   │   │   │   ├── manageDoctors.jsp     # Doctor management
+│   │   │   │   │   ├── managePatients.jsp    # Patient management
+│   │   │   │   │   ├── dataManagement.jsp    # Backup and logs
+│   │   │   │   │   ├── manageAppointments.jsp # Appointment management
+│   │   │   │   ├── 📁 doctorProfile       # Doctor dashboard pages
+│   │   │   │   │   ├── appointments.jsp   # Doctor appointments section
+│   │   │   │   │   ├── dashboard.jsp      # Doctor dashboard section
+│   │   │   │   │   ├── details.jsp        # Doctor details section
+│   │   │   │   │   ├── doctorDashboard.jsp # Main doctor dashboard
+│   │   │   │   ├── 📁 userProfile         # Patient dashboard pages
+│   │   │   │   │   ├── appointments.jsp   # Patient appointments section
+│   │   │   │   │   ├── bookAppointment.jsp # Booking section
+│   │   │   │   │   ├── userDetails.jsp    # Patient details section
+│   │   │   │   │   ├── userDashboard.jsp  # Main patient dashboard
+│   │   │   │   ├── index.jsp             # Home page
+│   │   │   │   ├── login.jsp             # Login page
+│   │   │   │   ├── register.jsp          # Registration page
+│   │   │   │   ├── error.jsp             # Error display
+│   │   │   ├── 📁 assets                  # Static files
+│   │   │   │   ├── 📁 css                 # CSS styling
+│   │   │   │   │   ├── adminDashboard.css # Admin dashboard styles
+│   │   │   │   │   ├── doctorDashboard.css # Doctor dashboard styles
+│   │   │   │   │   ├── index.css          # Home page styles
+│   │   │   │   │   ├── login.css          # Login page styles
+│   │   │   │   │   ├── manageOperations.css # Management page styles
+│   │   │   │   │   ├── register.css       # Registration page styles
+│   │   │   │   │   ├── userProfile.css    # Patient dashboard styles
+│   │   │   │   ├── 📁 js                  # JavaScript
+│   │   │   │   │   ├── doctorDashboard.js # Doctor dashboard scripts
+│   │   │   │   │   ├── index.js           # Home page scripts
+│   │   │   │   │   ├── userProfile.js     # Patient dashboard scripts
 │   │   │   ├── WEB-INF
-│   │   │   │   ├── web.xml                 # Servlet mappings
-│   │   │   ├── 📁 data                     # All system data (stored in plain files)
-│   │   │   │   ├── patients.txt            # Patient records
-│   │   │   │   ├── doctors.txt             # Doctor records
-│   │   │   │   ├── appointments.txt        # Appointments
-│   │   │   │   ├── audit.txt               # Admin credentials and logs
+│   │   │   │   ├── web.xml               # Servlet mappings
+│   │   │   ├── 📁 data                   # Text file storage
+│   │   │   │   ├── patients.txt          # Patient records
+│   │   │   │   ├── admins.txt            # Admin records
+│   │   │   │   ├── doctors.txt           # Doctor records
+│   │   │   │   ├── appointments.txt      # Appointment records
 │   │   │   │   ├── doctors_availability.txt # Doctor schedules
-│── 📁 target                               # Maven build output (ignore)
-│── 📄 pom.xml                              # Maven Config (dependencies)
-│── 📄 README.md                            # This file
-│── 📄 report.pdf                           # Final documentation (diagrams + Git log)
-│── 📄 .gitignore                           # Ignore files like target/, .idea/
+│   │   │   │   ├── audit.txt             # Audit logs
+├── 📁 target                              # Maven build output
+├── 📄 pom.xml                             # Maven configuration
+├── 📄 README.md                           # This file
+├── 📄 .gitignore                          # Git ignore rules
 ```
 
+---
+
 ## Technologies Used
-- **Backend**: Java (Servlets, JSTL)
-- **Frontend**: JSP, HTML, CSS, JavaScript (AJAX, modals)
+- **Backend**: Java (Servlets, JDK 8+)
+- **Frontend**: JSP, HTML, CSS, JavaScript (AJAX)
 - **Build Tool**: Maven
 - **Storage**: Plain text files (`.txt`)
-- **External Libraries**: Font Awesome (icons)
+- **Libraries**:
+    - Gson (JSON handling)
+    - Jakarta Servlet API
+
+---
 
 ## How It Works
 
 ### User Roles and Flow
-1. **Patients**:
-    - **Register**: Via `register.jsp` → `RegisterServlet` → `patients.txt`.
-    - **Login**: Via `login.jsp` → `LoginServlet`.
-    - **Book Appointment**: Via `userProfile.jsp` or `index.jsp` → `AppointmentServlet`.
-    - **View Appointments**: On `userProfile.jsp`.
+- **Patients**:
+    - Register: `register.jsp` → `RegisterServlet`.
+    - Login: `login.jsp` → `LoginServlet`.
+    - Book Appointments: `userProfile/bookAppointment.jsp` → `UserServlet`.
+    - View Appointments: `userProfile/appointments.jsp`.
 
-2. **Admins**:
-    - **Login**: Via `login.jsp` → `LoginServlet` (checks `admins.txt`).
-    - **Dashboard**: `adminDashboard.jsp` → `AdminServlet` (stats, sorted appointments).
-    - **Manage Appointments**: `appointment.jsp` → `AppointmentServlet`.
-    - **Manage Doctors**: `manageDoctors.jsp` → `ManageDoctorsServlet`.
-    - **Manage Patients**: `managePatients.jsp` → `ManagePatientsServlet`.
-    - **Set Schedules**: `doctorSchedule.jsp` → `DoctorScheduleServlet`.
-    - **Data Management**: `dataManagement.jsp` → `DataManagementServlet` (backups, logs).
+- **Admins**:
+    - Login: `login.jsp` → `LoginServlet` (checks `admins.txt`).
+    - Dashboard: `adminDashboard/adminDashboard.jsp` → `AdminServlet`.
+    - Manage Appointments: `adminDashboard/manageAppointments.jsp` → `ManageAppointmentsServlet`.
+    - Manage Doctors: `adminDashboard/manageDoctors.jsp` → `ManageDoctorsServlet`.
+    - Manage Patients: `adminDashboard/managePatients.jsp` → `ManagePatientsServlet`.
+    - Set Schedules: `adminDashboard/doctorSchedule.jsp` → `DoctorScheduleServlet`.
+    - Backups/Logs: `adminDashboard/dataManagement.jsp` → `DataManagementServlet`.
 
-3. **Doctors**:
-    - No direct UI; availability managed by admins.
+- **Doctors**:
+    - Placeholder: `doctorProfile/doctorDashboard.jsp` → `DoctorServlet` (stats only).
 
 ### Data Flow
-- **Frontend**: JSPs send HTTP requests to servlets.
-- **Controller**: Servlets process requests, call service classes.
-- **Service**: Business logic (e.g., `AppointmentService`) uses `FileHandler` for file I/O.
-- **Model**: Data stored as objects (e.g., `Patient`) and serialized to `.txt` files.
+1. **Frontend**: JSPs send HTTP requests to servlets.
+2. **Controller**: Servlets process requests and call services.
+3. **Service**: Services (e.g., `AppointmentService`) use `FileHandler` for file I/O.
+4. **Model**: Data objects (e.g., `Appointment`) are read/written to `.txt` files.
 
 ### Example: Booking an Appointment
-1. Patient logs in (`login.jsp` → `LoginServlet`).
-2. Goes to `userProfile.jsp`, selects doctor/date.
-3. AJAX call to `AppointmentServlet` (`getTimeSlots`) fetches slots from `doctors_availability.txt` via `DoctorAvailabilityService`.
-4. Submits booking (`AppointmentServlet` → `AppointmentService`).
-5. `AppointmentService` assigns ID, sets priority, and writes to `appointments.txt`.
-6. Admin views sorted list in `appointment.jsp`.
+1. Patient logs in via `LoginServlet` (validates `patients.txt`).
+2. Navigates to `userProfile/bookAppointment.jsp`, selects slot via `SortServlet`.
+3. Submits booking to `UserServlet` → `AppointmentService.bookAppointment()`.
+4. `AppointmentService` prioritizes emergencies with `PriorityQueue` and updates `appointments.txt`.
+5. Admin views sorted appointments (bubble sort) on `adminDashboard/manageAppointments.jsp`.
+
+---
 
 ## Setup Instructions
 
 ### Prerequisites
 - **Java**: JDK 8 or higher
-- **Maven**: For dependency management
-- **Servlet Container**: Apache Tomcat 9.x or similar
+- **Maven**: 3.x
+- **Servlet Container**: Apache Tomcat 9.x
 
 ### Steps
 1. **Clone the Repository**:
@@ -135,37 +172,31 @@ The **Medical Appointment Scheduling System** is a web-based application develop
    ```
 
 2. **Install Dependencies**:
-    - Ensure `pom.xml` includes:
+    - Update `pom.xml`:
       ```xml
       <dependencies>
-          <dependency>
-            <groupId>jakarta.servlet</groupId>
-            <artifactId>jakarta.servlet-api</artifactId>
-            <version>5.0.0</version>
-            <scope>provided</scope>
-          </dependency>
-          <dependency>
+         <dependency>
             <groupId>jakarta.servlet.jsp.jstl</groupId>
             <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
             <version>2.0.0</version>
-          </dependency>
-          <dependency>
+         </dependency>
+         <dependency>
             <groupId>org.glassfish.web</groupId>
             <artifactId>jakarta.servlet.jsp.jstl</artifactId>
             <version>2.0.0</version>
-          </dependency>
-          <dependency>
+         </dependency>
+         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>3.8.1</version>
             <scope>test</scope>
-          </dependency>
-          <dependency>
+         </dependency>
+         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.10.1</version>
-          </dependency>
-        </dependencies>
+         </dependency>
+      </dependencies>
       ```
     - Run:
       ```bash
@@ -173,7 +204,7 @@ The **Medical Appointment Scheduling System** is a web-based application develop
       ```
 
 3. **Deploy to Tomcat**:
-    - Copy the generated `.war` file from `target/` to `Tomcat/webapps/`.
+    - Copy `target/MedicalAppointmentSystem.war` to `Tomcat/webapps/`.
     - Start Tomcat:
       ```bash
       <tomcat-dir>/bin/startup.sh  # Linux/Mac
@@ -181,55 +212,401 @@ The **Medical Appointment Scheduling System** is a web-based application develop
       ```
 
 4. **Access the Application**:
-    - Open `http://localhost:8080/MedicalAppointmentSystem` in a browser.
+    - Visit: `http://localhost:8080/MedicalAppointmentSystem`
 
 5. **Initial Data**:
-    - Populate `data/` files manually or via the app:
-        - `patients.txt`: `id,name,age,contact,password,dob`
-        - `doctors.txt`: `id,name,specialization,contact`
-        - `audit.txt`: `admin,admin123` (default admin credentials)
+    - Populate `data/` files:
+        - `patients.txt`: `username,password,name,email,phone,dob`
+        - `admins.txt`: `admin,admin123` (default admin)
+        - `doctors.txt`: `username,password,name,specialization,email,phone`
+        - `appointments.txt`: (empty initially)
+        - `doctors_availability.txt`: (empty initially)
+        - `audit.txt`: (empty initially)
+
+---
 
 ## Usage
 - **Patient**:
-    - Register at `/pages/register.jsp`.
-    - Login at `/pages/login.jsp`.
-    - Book appointments via `/pages/userProfile.jsp`.
-
+    - Register: `/pages/register.jsp`
+    - Login: `/pages/login.jsp`
+    - Book/View: `/pages/userProfile/userDashboard.jsp`
 - **Admin**:
-    - Login at `/pages/login.jsp` (e.g., `admin/admin123`).
-    - View dashboard at `/pages/adminDashboard.jsp`.
-    - Manage data via respective JSPs (`manageDoctors.jsp`, etc.).
+    - Login: `/pages/login.jsp` (e.g., `admin/admin123`)
+    - Manage: `/pages/adminDashboard/adminDashboard.jsp`
+- **Doctor**:
+    - View Stats: `/pages/doctorProfile/doctorDashboard.jsp` (no login)
+
+---
+
+## OOP Concepts Analysis
+
+### Model Package
+- **Availability.java**:
+    - **Encapsulation**: Private fields with getters; setters for mutable fields.
+    - **Abstraction**: Hides time parsing logic.
+    - **Inheritance**: Implements `Comparable<Availability>`.
+    - **Polymorphism**: `compareTo` for sorting.
+- **Appointment.java**:
+    - **Encapsulation**: Private fields with getters/setters.
+    - **Abstraction**: Represents appointment data.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: None.
+- **Patient.java**:
+    - **Encapsulation**: Private immutable fields with getters.
+    - **Abstraction**: Patient entity.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: None.
+- **Doctor.java**:
+    - **Encapsulation**: Private immutable fields with getters.
+    - **Abstraction**: Doctor entity.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: None.
+
+### Service Package
+- **AuditService.java**:
+    - **Encapsulation**: Private `fileHandler`.
+    - **Abstraction**: Audit log management.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: None.
+- **AppointmentService.java**:
+    - **Encapsulation**: Private fields with controlled access.
+    - **Abstraction**: Appointment logic with sorting/priority.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: Uses `PriorityQueue` indirectly.
+- **BackupService.java**:
+    - **Encapsulation**: Private fields.
+    - **Abstraction**: Backup operations.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: None.
+- **DoctorAvailabilityService.java**:
+    - **Encapsulation**: Private fields.
+    - **Abstraction**: Availability management.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: None.
+- **FileHandler.java**:
+    - **Encapsulation**: Private `filePath`.
+    - **Abstraction**: File I/O abstraction.
+    - **Inheritance**: Extends `Object`.
+    - **Polymorphism**: None.
+
+### Controller Package
+- **AdminServlet.java**:
+    - **Encapsulation**: Private fields.
+    - **Abstraction**: Admin dashboard.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **DataManagementServlet.java**:
+    - **Encapsulation**: Private services.
+    - **Abstraction**: Backup/logs.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **DoctorServlet.java**:
+    - **Encapsulation**: Private fields.
+    - **Abstraction**: Doctor dashboard.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **DoctorScheduleServlet.java**:
+    - **Encapsulation**: Private `FileHandler`s.
+    - **Abstraction**: Schedule management.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **LoginServlet.java**:
+    - **Encapsulation**: Weak; no fields.
+    - **Abstraction**: Login process.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **LogoutServlet.java**:
+    - **Encapsulation**: None; session-based.
+    - **Abstraction**: Logout process.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **ManageAppointmentsServlet.java**:
+    - **Encapsulation**: Private fields.
+    - **Abstraction**: Appointment CRUD.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **ManageDoctorsServlet.java**:
+    - **Encapsulation**: Private `FileHandler`.
+    - **Abstraction**: Doctor CRUD.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **ManagePatientsServlet.java**:
+    - **Encapsulation**: Private `FileHandler`.
+    - **Abstraction**: Patient CRUD.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **RegisterServlet.java**:
+    - **Encapsulation**: Private `FileHandler`.
+    - **Abstraction**: Registration.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+- **SortServlet.java**:
+    - **Encapsulation**: Private service.
+    - **Abstraction**: Availability sorting.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: Uses `Comparable`.
+- **UserServlet.java**:
+    - **Encapsulation**: Private fields.
+    - **Abstraction**: Patient actions.
+    - **Inheritance**: Extends `HttpServlet`.
+    - **Polymorphism**: None.
+
+**OOP Summary**: Strong encapsulation and abstraction across all layers. Inheritance is prominent in controllers (`HttpServlet`) and minimal elsewhere. Polymorphism is used sparingly (`Comparable` in `Availability`, `PriorityQueue` in `AppointmentService`).
+
+---
+
+## Class Diagrams
+
+### Model Package
+```plantuml
+@startuml
+class Availability {
+  -doctorId: String
+  -doctorName: String
+  -date: String
+  -startTime: String
+  -endTime: String
+  -appointmentCount: int
+  -nextToken: String
+  +getDoctorId(): String
+  +getStartTimeAsLocalTime(): LocalTime
+  +compareTo(other: Availability): int
+}
+interface Comparable<T>
+Availability .|> Comparable
+
+class Appointment {
+  -id: int
+  -patientId: String
+  -doctorId: String
+  -tokenID: String
+  -dateTime: String
+  -priority: int
+  -patientName: String
+  -doctorName: String
+  +getId(): int
+  +setPatientName(name: String): void
+}
+
+class Patient {
+  -name: String
+  -age: int
+  -contact: String
+  -username: String
+  -password: String
+  +getName(): String
+}
+
+class Doctor {
+  -id: String
+  -name: String
+  -specialization: String
+  -contact: String
+  +getId(): String
+}
+@enduml
+```
+
+### Service Package
+```plantuml
+@startuml
+class AuditService {
+  -fileHandler: FileHandler
+  +readAuditLogs(): List<String>
+  +addAuditLog(log: String): void
+}
+
+class AppointmentService {
+  -fileHandler: FileHandler
+  -emergencyQueue: PriorityQueue<Appointment>
+  -cachedAppointments: List<Appointment>
+  +bookAppointment(patientId: String, ...): void
+  +getSortedAppointments(): List<Appointment>
+}
+
+class BackupService {
+  -basePath: String
+  -auditService: AuditService
+  +createBackup(username: String): void
+}
+
+class DoctorAvailabilityService {
+  -fileHandler: FileHandler
+  -appointmentService: AppointmentService
+  +getAvailableTimeSlots(doctorId: String, date: String): List<String>
+}
+
+class FileHandler {
+  -filePath: String
+  +readLines(): List<String>
+  +writeLines(lines: List<String>): void
+  +readAppointments(): List<Appointment>
+}
+
+AuditService o--> FileHandler
+AppointmentService o--> FileHandler
+AppointmentService o--> "many" Appointment
+BackupService o--> AuditService
+DoctorAvailabilityService o--> FileHandler
+DoctorAvailabilityService o--> AppointmentService
+@enduml
+```
+
+### Controller Package
+```plantuml
+@startuml
+class AdminServlet {
+  -appointmentService: AppointmentService
+  -availabilityService: DoctorAvailabilityService
+  -doctorFileHandler: FileHandler
+  -patientFileHandler: FileHandler
+  +doGet(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class DataManagementServlet {
+  -auditService: AuditService
+  -backupService: BackupService
+  +doGet(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class DoctorServlet {
+  -appointmentService: AppointmentService
+  -availabilityService: DoctorAvailabilityService
+  -doctorFileHandler: FileHandler
+  +doGet(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class DoctorScheduleServlet {
+  -availabilityFileHandler: FileHandler
+  -doctorFileHandler: FileHandler
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class LoginServlet {
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class LogoutServlet {
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class ManageAppointmentsServlet {
+  -appointmentService: AppointmentService
+  -availabilityService: DoctorAvailabilityService
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class ManageDoctorsServlet {
+  -doctorFileHandler: FileHandler
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class ManagePatientsServlet {
+  -patientFileHandler: FileHandler
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class RegisterServlet {
+  -patientFileHandler: FileHandler
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class SortServlet {
+  -appointmentService: AppointmentService
+  +doGet(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class UserServlet {
+  -appointmentService: AppointmentService
+  -availabilityService: DoctorAvailabilityService
+  -doctorFileHandler: FileHandler
+  -userFileHandler: FileHandler
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+class HttpServlet {
+  +doGet(request: HttpServletRequest, response: HttpServletResponse): void
+  +doPost(request: HttpServletRequest, response: HttpServletResponse): void
+}
+
+AdminServlet -|> HttpServlet
+DataManagementServlet -|> HttpServlet
+DoctorServlet -|> HttpServlet
+DoctorScheduleServlet -|> HttpServlet
+LoginServlet -|> HttpServlet
+LogoutServlet -|> HttpServlet
+ManageAppointmentsServlet -|> HttpServlet
+ManageDoctorsServlet -|> HttpServlet
+ManagePatientsServlet -|> HttpServlet
+RegisterServlet -|> HttpServlet
+SortServlet -|> HttpServlet
+UserServlet -|> HttpServlet
+
+AdminServlet o--> AppointmentService
+AdminServlet o--> DoctorAvailabilityService
+AdminServlet o--> FileHandler
+DataManagementServlet o--> AuditService
+DataManagementServlet o--> BackupService
+DoctorServlet o--> AppointmentService
+DoctorServlet o--> DoctorAvailabilityService
+DoctorServlet o--> FileHandler
+DoctorScheduleServlet o--> FileHandler
+ManageAppointmentsServlet o--> AppointmentService
+ManageAppointmentsServlet o--> DoctorAvailabilityService
+ManageDoctorsServlet o--> FileHandler
+ManagePatientsServlet o--> FileHandler
+RegisterServlet o--> FileHandler
+SortServlet o--> AppointmentService
+UserServlet o--> AppointmentService
+UserServlet o--> DoctorAvailabilityService
+UserServlet o--> FileHandler
+@enduml
+```
+- **To visualize the class diagrams, use a tool like [PlantUML](http://www.plantuml.com/plantuml) by pasting the code.**:
+
+---
 
 ## Project Highlights
-- **Priority Queues**: `AppointmentService.java` uses `PriorityQueue` to prioritize emergencies (`priority=1`).
-- **Bubble Sort**: Implemented in `AppointmentService.java`:
-  ```java
-  public List<Appointment> getSortedAppointments() {
-      List<Appointment> list = getAllAppointments();
-      for (int i = 0; i < list.size() - 1; i++) {
-          for (int j = 0; j < list.size() - i - 1; j++) {
-              if (list.get(j).getDateTime().isAfter(list.get(j + 1).getDateTime())) {
-                  Appointment temp = list.get(j);
-                  list.set(j, list.get(j + 1));
-                  list.set(j + 1, temp);
+- **Priority Queues**:
+    - `AppointmentService` uses `PriorityQueue` to prioritize emergencies (`priority=1`).
+- **Bubble Sort**:
+    - Implemented in `AppointmentService`:
+      ```java
+      public List<Appointment> getSortedAppointments() {
+          List<Appointment> list = getAllAppointments();
+          for (int i = 0; i < list.size() - 1; i++) {
+              for (int j = 0; j < list.size() - i - 1; j++) {
+                  LocalDateTime time1 = LocalDateTime.parse(list.get(j).getDateTime(), DATE_TIME_FORMATTER);
+                  LocalDateTime time2 = LocalDateTime.parse(list.get(j + 1).getDateTime(), DATE_TIME_FORMATTER);
+                  if (time1.isAfter(time2)) {
+                      Appointment temp = list.get(j);
+                      list.set(j, list.get(j + 1));
+                      list.set(j + 1, temp);
+                  }
               }
           }
+          return list;
       }
-      return list;
-  }
-  ```
-- **File Handling**: `FileHandler.java` manages all `.txt` file operations with synchronized methods.
+      ```
+- **File Handling**:
+    - `FileHandler` manages CRUD operations on `.txt` files.
+
+---
 
 ## Limitations
-- **No Doctor UI**: Doctors can’t log in or manage schedules.
-- **Security**: Plain-text passwords (recommend hashing with `SecurityUtil`).
-- **Scalability**: File-based storage lacks concurrency control for multi-user scenarios.
+- **Security**: Plain-text passwords stored in files.
+- **Scalability**: File-based storage lacks efficiency for large datasets.
+- **Doctor Role**: No login or full functionality implemented.
+
+---
 
 ## Future Improvements
-- Add doctor login and dashboard (`doctorDashboard.jsp`).
-- Implement password hashing.
-- Replace file storage with a lightweight database (e.g., SQLite).
-- Enhance UI with more interactivity (e.g., real-time updates).
+- Implement password hashing (e.g., BCrypt).
+- Replace file storage with SQLite.
+- Add doctor login and dashboard functionality.
+- Enhance UI with real-time updates (e.g., WebSockets).
+
+---
 
 ## Contributors
 - Ashen Geeth
@@ -238,7 +615,10 @@ The **Medical Appointment Scheduling System** is a web-based application develop
 - Abhishek Bogahawaththa
 - Maleesha Wickramaarachchi
 
+---
+
 ## License
-This project is for educational purposes and not licensed for commercial use.
+This is an educational project and not intended for commercial use.
 
 ---
+
