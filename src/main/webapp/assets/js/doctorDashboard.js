@@ -3,13 +3,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const contentArea = document.getElementById('content-area');
     const currentSection = new URLSearchParams(window.location.search).get('section') || 'dashboard';
 
-    // Log initial state
     console.log(`Initial section: ${currentSection}`);
-
-    // Load the section content and initialize it
     loadSection(currentSection);
 
-    // Sidebar navigation
     sidebarLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
@@ -21,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Fix duplicate "Dr." in welcome message
     const doctorNameElement = document.querySelector('.doctor-name');
     if (doctorNameElement) {
         let doctorName = doctorNameElement.textContent.trim();
@@ -31,14 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-/**
- * Loads a section via AJAX and updates the content area
- * @param {string} section - The section to load (dashboard, details, appointments)
- */
 function loadSection(section) {
     console.log(`Loading section: ${section}`);
     const spinner = contentArea.querySelector('.loading-spinner');
-    if (spinner) spinner.classList.add('active'); // Show spinner
+    if (spinner) spinner.classList.add('active');
 
     fetch(`${window.contextPath}/DoctorServlet?section=${section}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -50,18 +41,149 @@ function loadSection(section) {
         .then(html => {
             console.log(`Section ${section} loaded successfully`);
             contentArea.innerHTML = html;
-            if (spinner) spinner.classList.remove('active'); // Hide spinner
-            const doctorName = contentArea.querySelector('.doctor-name')?.textContent || 'Not found';
-            console.log(`Doctor Name: ${doctorName}`);
+            if (spinner) spinner.classList.remove('active');
             initializeSection(section);
         })
         .catch(error => {
             console.error(`Error loading ${section}:`, error);
             contentArea.innerHTML = `<div class="alert alert-danger">Error loading ${section}: ${error.message}. Please try again later.</div>`;
-            if (spinner) spinner.classList.remove('active'); // Hide spinner on error
+            if (spinner) spinner.classList.remove('active');
         });
 }
 
+function initializeSection(section) {
+    console.log(`Initializing section: ${section}`);
+    switch (section) {
+        case 'dashboard': initDashboard(); break;
+        case 'details': initDetails(); break;
+        case 'appointments': initAppointments(); break;
+        default: console.warn(`Unknown section: ${section}`);
+    }
+}
+
+function initDashboard() {
+    console.log("Initializing Dashboard...");
+    const cards = document.querySelectorAll('.dashboard-grid .card');
+    cards.forEach(card => {
+        card.addEventListener('click', () => {
+            const metric = card.dataset.metric || 'N/A';
+            const title = card.querySelector('h3')?.textContent || 'Card';
+            console.log(`Clicked ${title}: ${metric}`);
+        });
+    });
+
+    // Chart initialization
+    const categoryChartCanvas = document.getElementById('categoryChart');
+    const trendChartCanvas = document.getElementById('trendChart');
+
+    if (!categoryChartCanvas || !trendChartCanvas) {
+        console.warn("Chart canvases not found in DOM");
+        return;
+    }
+
+    // Prepare data from DOM (assuming JSP variables are passed as data attributes or JSON)
+    const dashboardData = {
+        categoryData: {
+            total: parseInt(document.querySelector('.card[title="Total number of appointments scheduled"]').dataset.metric) || 0,
+            upcoming: parseInt(document.querySelector('.card[title="Appointments scheduled in the future"]').dataset.metric) || 0,
+            emergency: parseInt(document.querySelector('.card[title="High-priority appointments"]').dataset.metric) || 0,
+            today: parseInt(document.querySelector('.card[title="Appointments scheduled for today"]').dataset.metric) || 0,
+            completed: parseInt(document.querySelector('.card[title="Appointments completed"]').dataset.metric) || 0
+        },
+        appointments: window.dashboardData?.appointments || [] // Assuming this is set elsewhere or fetched
+    };
+
+    console.log('Dashboard Data:', dashboardData);
+
+    if (!Object.values(dashboardData.categoryData).some(val => val > 0)) {
+        document.querySelector('.charts-section').innerHTML = '<p class="no-data">No appointment data available to display charts.</p>';
+        return;
+    }
+
+    // Category Chart
+    const categoryCtx = categoryChartCanvas.getContext('2d');
+    new Chart(categoryCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Total', 'Upcoming', 'Emergency', 'Today', 'Completed'],
+            datasets: [{
+                label: 'Appointments',
+                data: [
+                    dashboardData.categoryData.total,
+                    dashboardData.categoryData.upcoming,
+                    dashboardData.categoryData.emergency,
+                    dashboardData.categoryData.today,
+                    dashboardData.categoryData.completed
+                ],
+                backgroundColor: ['#2c3e50', '#38b2ac', '#e53e3e', '#667eea', '#2ecc71'],
+                borderColor: ['#2c3e50', '#38b2ac', '#e53e3e', '#667eea', '#2ecc71'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Appointments' }, ticks: { stepSize: 1 } },
+                x: { title: { display: true, text: 'Category' } }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Appointment Categories', font: { size: 16 } }
+            }
+        }
+    });
+
+    // Trend Chart
+    const trendCtx = trendChartCanvas.getContext('2d');
+    const trendData = processTrendData(dashboardData.appointments);
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: trendData.labels,
+            datasets: [{
+                label: 'Appointments',
+                data: trendData.counts,
+                fill: true,
+                borderColor: '#38b2ac',
+                backgroundColor: 'rgba(56, 178, 172, 0.2)',
+                tension: 0.3,
+                pointBackgroundColor: '#38b2ac',
+                pointBorderColor: '#fff',
+                pointHoverRadius: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, title: { display: true, text: 'Appointments' }, ticks: { stepSize: 1 } },
+                x: { title: { display: true, text: 'Date' } }
+            },
+            plugins: {
+                legend: { position: 'top' },
+                title: { display: true, text: 'Appointment Trends (Last 7 Days)', font: { size: 16 } }
+            }
+        }
+    });
+}
+
+function processTrendData(appointments) {
+    const today = new Date();
+    const labels = [];
+    const counts = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        labels.push(dateStr);
+        const count = appointments.filter(appt => appt.dateTime.startsWith(dateStr)).length;
+        counts.push(count);
+    }
+    return { labels, counts };
+}
+
+// [Rest of the file remains unchanged: initDetails, initAppointments, sortTable, showMessage]
 /**
  * Initializes functionality for the loaded section
  * @param {string} section - The section to initialize

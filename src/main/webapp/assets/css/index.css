@@ -1,0 +1,346 @@
+/* Root Variables for Professional Medical Theme */
+:root {
+    --primary: #2C6E8F;    /* Deep teal - Professional and calming */
+    --secondary: #5BB9A8;  /* Soft green - Trust and health */
+    --accent: #E8F0F2;     /* Light gray-blue - Clean and neutral */
+    --text: #1A2E44;       /* Dark blue-gray - Readable and serious */
+    --white: #FFFFFF;      /* Pure white - Clarity and simplicity */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    --highlight: #F4A261;  /* Warm orange - Subtle accent for CTAs */
+    --border-radius: 8px;  /* Consistent rounding */
+    --transition: all 0.3s ease; /* Smooth transitions */
+}
+
+/* General Body Styles */
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, var(--accent), var(--white));
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Navigation */
+nav {
+    background: var(--white);
+    box-shadow: var(--shadow);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+}
+
+.logo {
+    color: var(--primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.logo:hover {
+    color: var(--secondary);
+}
+
+.nav-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.dropdown-btn, .register-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    border: none;
+    background: var(--primary);
+    color: var(--white);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.dropdown-btn:hover, .register-btn:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* Dropdown Menu */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: var(--transition);
+    padding: 0.5rem;
+}
+
+.dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-menu a {
+    padding: 0.75rem 1.5rem;
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: var(--transition);
+}
+
+.dropdown-menu a:hover {
+    background: var(--secondary);
+    color: var(--white);
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: var(--white);
+    padding: 5rem 2rem;
+    text-align: center;
+    clip-path: polygon(0 0, 100% 0, 100% 85%, 0 100%);
+}
+
+.hero-content h1 {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    animation: fadeInUp 1s ease;
+}
+
+.cta-btn {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--white);
+    color: var(--primary);
+    border-radius: 25px;
+    text-decoration: none;
+    margin-top: 2rem;
+    transition: var(--transition);
+}
+
+.cta-btn:hover {
+    background: var(--highlight);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
+/* Search Section */
+.search-section {
+    padding: 4rem 2rem;
+    background: var(--white);
+    border-radius: 16px;
+    margin: -3rem 2rem 0;
+    position: relative;
+    box-shadow: var(--shadow);
+}
+
+.search-form {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin: 1rem 0;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-input {
+    padding: 0.75rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--border-radius);
+    background: var(--accent);
+    transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+    border-color: var(--primary);
+    outline: none;
+}
+
+.availability-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.availability-table th {
+    background: var(--primary);
+    color: var(--white);
+    padding: 1rem;
+}
+
+.availability-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--accent);
+}
+
+/* Login Popup */
+.login-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.login-popup-content {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 400px;
+    margin: 2rem auto;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.3s ease;
+}
+
+.login-btn {
+    background: var(--primary);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.login-btn:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* Features Section */
+.features {
+    padding: 4rem 2rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.feature-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Specialties Section */
+.specialties {
+    padding: 4rem 2rem;
+}
+
+.specialties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+.specialty-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.specialty-card:hover {
+    transform: translateY(-5px);
+}
+
+.specialty-card img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto;
+    display: block;
+}
+
+.specialty-card-content {
+    margin-top: 1rem;
+}
+
+.specialty-card h3 {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.specialty-card p {
+    font-size: 0.9rem;
+    color: var(--text);
+}
+
+/* Footer */
+footer {
+    background: var(--text);
+    color: var(--white);
+    padding: 2rem;
+    text-align: center;
+}
+
+.footer-links a {
+    color: var(--accent);
+    margin: 0 1rem;
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+.footer-links a:hover {
+    color: var(--secondary);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
