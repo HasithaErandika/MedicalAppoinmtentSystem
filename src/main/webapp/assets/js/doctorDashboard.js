@@ -62,7 +62,7 @@ function initializeSection(section) {
 }
 
 function initDashboard() {
-    console.log("Initializing Dashboard...");
+    console.log("Initializing Dashboard... (Confirmed)");
     const cards = document.querySelectorAll('.dashboard-grid .card');
     cards.forEach(card => {
         card.addEventListener('click', () => {
@@ -72,16 +72,16 @@ function initDashboard() {
         });
     });
 
-    // Chart initialization
     const categoryChartCanvas = document.getElementById('categoryChart');
     const trendChartCanvas = document.getElementById('trendChart');
+    console.log("Category Chart Canvas:", categoryChartCanvas);
+    console.log("Trend Chart Canvas:", trendChartCanvas);
 
     if (!categoryChartCanvas || !trendChartCanvas) {
         console.warn("Chart canvases not found in DOM");
         return;
     }
 
-    // Prepare data from DOM (assuming JSP variables are passed as data attributes or JSON)
     const dashboardData = {
         categoryData: {
             total: parseInt(document.querySelector('.card[title="Total number of appointments scheduled"]').dataset.metric) || 0,
@@ -90,9 +90,8 @@ function initDashboard() {
             today: parseInt(document.querySelector('.card[title="Appointments scheduled for today"]').dataset.metric) || 0,
             completed: parseInt(document.querySelector('.card[title="Appointments completed"]').dataset.metric) || 0
         },
-        appointments: window.dashboardData?.appointments || [] // Assuming this is set elsewhere or fetched
+        appointments: window.dashboardData?.appointments || []
     };
-
     console.log('Dashboard Data:', dashboardData);
 
     if (!Object.values(dashboardData.categoryData).some(val => val > 0)) {
@@ -108,13 +107,7 @@ function initDashboard() {
             labels: ['Total', 'Upcoming', 'Emergency', 'Today', 'Completed'],
             datasets: [{
                 label: 'Appointments',
-                data: [
-                    dashboardData.categoryData.total,
-                    dashboardData.categoryData.upcoming,
-                    dashboardData.categoryData.emergency,
-                    dashboardData.categoryData.today,
-                    dashboardData.categoryData.completed
-                ],
+                data: Object.values(dashboardData.categoryData),
                 backgroundColor: ['#2c3e50', '#38b2ac', '#e53e3e', '#667eea', '#2ecc71'],
                 borderColor: ['#2c3e50', '#38b2ac', '#e53e3e', '#667eea', '#2ecc71'],
                 borderWidth: 1
@@ -168,21 +161,6 @@ function initDashboard() {
     });
 }
 
-function processTrendData(appointments) {
-    const today = new Date();
-    const labels = [];
-    const counts = [];
-    for (let i = 6; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        const dateStr = date.toISOString().split('T')[0];
-        labels.push(dateStr);
-        const count = appointments.filter(appt => appt.dateTime.startsWith(dateStr)).length;
-        counts.push(count);
-    }
-    return { labels, counts };
-}
-
 // [Rest of the file remains unchanged: initDetails, initAppointments, sortTable, showMessage]
 /**
  * Initializes functionality for the loaded section
@@ -201,17 +179,7 @@ function initializeSection(section) {
 /**
  * Initializes the dashboard section with charts
  */
-function initDashboard() {
-    console.log("Initializing Dashboard...");
-    const cards = document.querySelectorAll('.dashboard-grid .card');
-    cards.forEach(card => {
-        card.addEventListener('click', () => {
-            const metric = card.dataset.metric || 'N/A';
-            const title = card.querySelector('h3')?.textContent || 'Card';
-            console.log(`Clicked ${title}: ${metric}`);
-        });
-    });
-}
+
 
 /**
  * Processes appointment data for trend chart
