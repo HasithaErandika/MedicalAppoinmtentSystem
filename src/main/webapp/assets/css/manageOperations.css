@@ -1,19 +1,28 @@
+/* Root Variables - Matching Admin Theme from adminDashboard.css */
 :root {
-    --primary: #4A90E2;
-    --secondary: #26A69A;
-    --accent: #EF5350;
-    --bg-light: #F5F6F5;
-    --text-primary: #333333;
-    --text-muted: #666666;
-    --card-bg: #FFFFFF;
-    --shadow: 0 6px 15px rgba(0, 0, 0, 0.08); /* Slightly more pronounced shadow */
-    --border: #E0E0E0;
-    --hover: #F9FAFB;
+    --primary: #6B7280;    /* Slate Gray - Admin primary color */
+    --secondary: #5BB9A8;  /* Soft green - Trust and health */
+    --general-primary: #2C6E8F; /* Deep teal - General primary from other pages */
+    --accent: #E8F0F2;     /* Light gray-blue - Clean and neutral */
+    --bg-light: #F7FAFC;   /* Very light gray-blue for background */
+    --text-primary: #1A2E44; /* Dark blue-gray - Readable and serious */
+    --text-muted: #718096; /* Neutral gray for muted text */
+    --card-bg: #FFFFFF;    /* Pure white for cards */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    --border: #DCE3E8;     /* Light gray border */
+    --hover: #E6F0F5;      /* Light hover state */
+    --error: #E57373;      /* Soft red for errors and danger */
     --transition: all 0.25s ease-in-out; /* Faster transitions */
     --border-radius: 10px; /* Consistent border radius */
 }
 
-* { margin: 0; padding: 0; box-sizing: border-box; }
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     background: var(--bg-light);
@@ -23,6 +32,7 @@ body {
     -webkit-font-smoothing: antialiased; /* Smoother font rendering */
 }
 
+/* Container */
 .container {
     max-width: 1200px; /* Slightly reduced max-width */
     margin: 2rem auto;
@@ -38,16 +48,18 @@ body {
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border);
 }
+
 .header h1 {
-    color: var(--primary);
+    color: var(--primary); /* Slate gray for admin */
     font-size: 2rem;
     font-weight: 600;
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
+
 .back-btn {
-    color: var(--primary);
+    color: var(--primary); /* Slate gray */
     text-decoration: none;
     font-weight: 500;
     padding: 0.5rem 1rem;
@@ -57,9 +69,10 @@ body {
     align-items: center;
     gap: 0.5rem;
 }
+
 .back-btn:hover {
     background: var(--hover);
-    color: #357ABD;
+    color: #5F6673; /* Slightly darker gray for hover */
 }
 
 /* Table */
@@ -67,6 +80,7 @@ body {
     overflow-x: auto;
     margin-bottom: 2rem;
 }
+
 table {
     width: 100%;
     border-collapse: separate;
@@ -76,26 +90,31 @@ table {
     box-shadow: var(--shadow);
     overflow: hidden;
 }
+
 th {
-    background: var(--primary);
-    color: #FFFFFF;
+    background: var(--primary); /* Slate gray for table headers */
+    color: var(--white);
     font-weight: 600;
     padding: 1rem;
     text-align: left;
     font-size: 1rem;
 }
+
 td {
     padding: 1rem;
     border-bottom: 1px solid var(--border);
     vertical-align: middle;
 }
+
 tr {
     transition: var(--transition);
 }
+
 tr:hover {
     background: var(--hover);
     cursor: pointer;
 }
+
 .action-cell {
     display: flex;
     gap: 0.5rem;
@@ -115,33 +134,39 @@ tr:hover {
     align-items: center;
     gap: 0.5rem;
 }
+
 .btn-edit {
-    background: var(--secondary);
-    color: #FFFFFF;
+    background: var(--secondary); /* Soft green for edit */
+    color: var(--white);
 }
+
 .btn-edit:hover {
-    background: #00897B;
-    box-shadow: 0 2px 8px rgba(38, 166, 154, 0.3);
+    background: #4A9C8C; /* Darker green for hover */
+    box-shadow: 0 2px 8px rgba(91, 185, 168, 0.3); /* Matches --secondary */
 }
+
 .btn-danger {
-    background: var(--accent);
-    color: #FFFFFF;
+    background: var(--error); /* Soft red for danger */
+    color: var(--white);
 }
+
 .btn-danger:hover {
-    background: #D32F2F;
-    box-shadow: 0 2px 8px rgba(239, 83, 80, 0.3);
+    background: #D32F2F; /* Darker red for hover */
+    box-shadow: 0 2px 8px rgba(229, 115, 115, 0.3); /* Matches --error */
 }
+
 .btn-primary {
-    background: var(--primary);
-    color: #FFFFFF;
+    background: var(--primary); /* Slate gray for primary actions */
+    color: var(--white);
 }
+
 .btn-primary:hover {
-    background: #357ABD;
-    box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+    background: #5F6673; /* Darker gray for hover */
+    box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3); /* Matches --primary */
 }
 
 /* Modal */
-.modal { /* same modal as last response */
+.modal {
     display: none;
     position: fixed;
     top: 0;
@@ -179,7 +204,7 @@ tr:hover {
 
 .modal-content h2 {
     font-size: 1.5rem;
-    color: var(--primary);
+    color: var(--primary); /* Slate gray */
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -196,9 +221,10 @@ tr:hover {
 }
 
 .modal-close:hover {
-    color: var(--accent);
+    color: var(--error); /* Soft red for close button hover */
 }
 
+/* Form Grid */
 .form-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -206,9 +232,9 @@ tr:hover {
     margin-bottom: 1.5rem;
 }
 
- .form-group {
-     margin-bottom: 1.5rem; /* Increased margin for better spacing */
- }
+.form-group {
+    margin-bottom: 1.5rem; /* Increased margin for better spacing */
+}
 
 .form-group label {
     font-size: 0.95rem;
@@ -221,13 +247,13 @@ tr:hover {
 
 .form-group input,
 .form-group textarea,
-.form-group select { /* Apply styles to textarea and select */
+.form-group select {
     width: 100%;
     padding: 0.875rem 1rem; /* Adjusted padding */
     border: 1px solid var(--border);
     border-radius: 10px; /* Consistent border-radius */
     font-size: 1rem;
-    background: #FFFFFF;
+    background: var(--white);
     transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     outline: none; /* Remove default outline */
 }
@@ -235,12 +261,12 @@ tr:hover {
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px ;
+    border-color: var(--primary); /* Slate gray */
+    box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2); /* Matches --primary */
 }
 
 .form-group input::placeholder,
-.form-group textarea::placeholder { /* Style placeholders */
+.form-group textarea::placeholder {
     color: var(--text-muted);
     opacity: 0.8; /* Slightly reduced opacity */
 }
@@ -252,26 +278,58 @@ tr:hover {
 
 .form-group select {
     appearance: none; /* Remove default select styling */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23666666'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Custom dropdown arrow */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23718096'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Custom dropdown arrow with --text-muted */
     background-repeat: no-repeat;
     background-position: right 1rem center;
     background-size: 16px;
 }
 
 .form-group select:focus {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234A90E2'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Change arrow color on focus */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%236B7280'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); /* Slate gray arrow on focus */
 }
 
 .form-group.error input,
 .form-group.error textarea,
-.form-group.error select { /* Style error state */
-    border-color: var(--accent);
+.form-group.error select {
+    border-color: var(--error); /* Soft red for error state */
 }
 
 .form-group .error-message {
-    color: var(--accent);
+    color: var(--error);
     font-size: 0.875rem;
     margin-top: 0.5rem;
+}
+
+/* Card */
+.card {
+    background: var(--card-bg);
+    padding: 1.5rem; /* Reduced padding */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    margin-bottom: 1.5rem; /* Reduced margin */
+}
+
+/* Search Container */
+.search-container {
+    margin-bottom: 1rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+.search-input {
+    padding: 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--border-radius);
+    font-size: 0.95rem;
+    width: 250px;
+    transition: var(--transition);
+}
+
+.search-input:focus {
+    border-color: var(--primary); /* Slate gray */
+    box-shadow: 0 0 0 2px rgba(107, 114, 128, 0.2); /* Matches --primary */
+    outline: none;
 }
 
 /* Animations */
@@ -279,6 +337,7 @@ tr:hover {
     from { opacity: 0; }
     to { opacity: 1; }
 }
+
 @keyframes slideIn {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
@@ -291,31 +350,4 @@ tr:hover {
     .container { padding: 0 1rem; }
     .btn { width: 100%; justify-content: center; }
     .action-cell { flex-direction: column; gap: 0.5rem; }
-}
-.card {
-    background: var(--card-bg);
-    padding: 1.5rem; /* Reduced padding */
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow);
-    margin-bottom: 1.5rem; /* Reduced margin */
-}
-
-.search-container {
-    margin-bottom: 1rem;
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
-}
-.search-input {
-    padding: 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: var(--border-radius);
-    font-size: 0.95rem;
-    width: 250px;
-    transition: var(--transition);
-}
-.search-input:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 2px ;
-    outline: none;
 }

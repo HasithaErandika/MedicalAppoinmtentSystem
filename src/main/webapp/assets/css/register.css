@@ -1,0 +1,260 @@
+/* Root Variables - Matching index.jsp Professional Medical Theme */
+:root {
+    --primary: #2C6E8F;    /* Deep teal - Professional and calming */
+    --secondary: #5BB9A8;  /* Soft green - Trust and health */
+    --accent: #E8F0F2;     /* Light gray-blue - Clean and neutral */
+    --text: #1A2E44;       /* Dark blue-gray - Readable and serious */
+    --white: #FFFFFF;      /* Pure white - Clarity and simplicity */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    --highlight: #F4A261;  /* Warm orange - Subtle accent for CTAs */
+    --border: #DCE3E8;     /* Light gray border */
+    --hover: #E6F0F5;      /* Light hover state */
+    --success: #5BB9A8;    /* Matches secondary for success */
+    --danger: #E57373;     /* Soft red for errors */
+    --input-focus: rgba(44, 110, 143, 0.2); /* Focus ring matching primary */
+    --progress-fill: #2C6E8F; /* Matches primary */
+}
+
+/* Reset and Base Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--white) 100%);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem; /* Reduced padding */
+}
+
+/* Container */
+.container {
+    background: var(--white);
+    border-radius: 16px; /* Slightly smaller radius */
+    box-shadow: var(--shadow);
+    padding: 2rem; /* Reduced from 3rem */
+    width: 100%;
+    max-width: 460px; /* Reduced from 520px */
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+.container:hover {
+    transform: translateY(-2px);
+}
+
+/* Progress Bar */
+.progress-bar {
+    width: 100%;
+    height: 4px; /* Reduced from 6px */
+    background: var(--border);
+    border-radius: 2px; /* Reduced from 3px */
+    overflow: hidden;
+    margin-bottom: 1.5rem; /* Reduced from 2rem */
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background: var(--progress-fill);
+    transition: width 0.3s ease;
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 2rem; /* Reduced from 2.5rem */
+}
+
+.header h1 {
+    color: var(--primary);
+    font-size: 1.75rem; /* Reduced from 2rem */
+    font-weight: 700;
+    letter-spacing: -0.025em;
+}
+
+.header p {
+    color: #718096;
+    font-size: 0.9rem; /* Reduced from 1rem */
+    font-weight: 400;
+}
+
+/* Message */
+.message {
+    padding: 0.75rem; /* Reduced from 1rem */
+    border-radius: 8px; /* Reduced from 10px */
+    margin-bottom: 1.5rem; /* Reduced from 2rem */
+    font-size: 0.85rem; /* Reduced from 0.95rem */
+    font-weight: 500;
+    text-align: center;
+    animation: fadeIn 0.4s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.message.success {
+    background: rgba(91, 185, 168, 0.1); /* Matches --success */
+    color: var(--success);
+}
+
+.message.error {
+    background: rgba(229, 115, 115, 0.1); /* Matches --danger */
+    color: var(--danger);
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    gap: 1rem; /* Reduced from 1.5rem */
+}
+
+/* Form Group */
+.form-group {
+    position: relative;
+}
+
+.form-group label {
+    font-size: 0.85rem; /* Reduced from 0.95rem */
+    font-weight: 600;
+    margin-bottom: 0.4rem; /* Reduced from 0.5rem */
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.4rem; /* Reduced from 0.5rem */
+}
+
+.form-group input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 2rem; /* Reduced padding */
+    border: 1px solid var(--border);
+    border-radius: 8px; /* Reduced from 10px */
+    font-size: 0.9rem; /* Reduced from 1rem */
+    background: var(--accent);
+    transition: all 0.3s ease;
+}
+
+.form-group i {
+    position: absolute;
+    left: 0.75rem; /* Adjusted for smaller input */
+    top: 2.25rem; /* Adjusted for smaller input */
+    color: #A0AEC0;
+    font-size: 1rem; /* Reduced from 1.1rem */
+    transition: color 0.3s ease;
+}
+
+.form-group .status-icon {
+    position: absolute;
+    right: 0.75rem; /* Adjusted for smaller input */
+    top: 2.25rem; /* Adjusted for smaller input */
+    font-size: 1rem; /* Reduced from 1.1rem */
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.form-group input:focus {
+    border-color: var(--primary);
+    background: var(--white);
+    box-shadow: 0 0 0 3px var(--input-focus); /* Slightly smaller focus ring */
+    outline: none;
+}
+
+.form-group input:focus + i {
+    color: var(--primary);
+}
+
+.form-group input.valid {
+    border-color: var(--success);
+}
+
+.form-group input.invalid:not(:placeholder-shown) {
+    border-color: var(--danger);
+}
+
+.form-group .valid + i + .status-icon.ri-check-line {
+    color: var(--success);
+    opacity: 1;
+}
+
+.form-group .invalid:not(:placeholder-shown) + i + .status-icon.ri-close-line {
+    color: var(--danger);
+    opacity: 1;
+}
+
+.form-group .error-text {
+    color: var(--danger);
+    font-size: 0.75rem; /* Reduced from 0.85rem */
+    margin-top: 0.2rem; /* Reduced from 0.25rem */
+    padding-left: 2rem; /* Adjusted for smaller input */
+    display: none;
+}
+
+.form-group input.invalid:not(:placeholder-shown) + i + .status-icon + .error-text {
+    display: block;
+}
+
+/* Button */
+.btn {
+    padding: 0.75rem; /* Reduced from 1rem */
+    border: none;
+    border-radius: 8px; /* Reduced from 10px */
+    font-weight: 600;
+    font-size: 0.9rem; /* Reduced from 1rem */
+    cursor: pointer;
+    background: var(--primary);
+    color: var(--white);
+    width: 100%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem; /* Reduced from 0.5rem */
+}
+
+.btn:hover {
+    background: var(--secondary);
+    box-shadow: 0 4px 12px rgba(44, 110, 143, 0.2);
+}
+
+/* Footer */
+.footer {
+    text-align: center;
+    margin-top: 1.5rem; /* Reduced from 2rem */
+    font-size: 0.85rem; /* Reduced from 0.95rem */
+    color: #718096;
+}
+
+.footer a {
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s ease;
+}
+
+.footer a:hover {
+    color: var(--secondary);
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    .container {
+        padding: 1.5rem; /* Reduced from 2rem */
+    }
+    .header h1 {
+        font-size: 1.5rem; /* Reduced from 1.75rem */
+    }
+}
