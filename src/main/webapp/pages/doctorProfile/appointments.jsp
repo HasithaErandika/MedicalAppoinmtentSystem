@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <div class="section">
-  <h2><i class="ri-calendar-2-line"></i> Your Appointments</h2>
+  <h2><i class="fas fa-calendar-alt"></i> Your Appointments</h2>
   <c:choose>
     <c:when test="${not empty appointments}">
       <table>
@@ -18,15 +18,15 @@
         <tbody>
         <c:forEach var="appt" items="${appointments}">
           <tr>
-            <td>${appt.id}</td>
-            <td>${appt.patientName != null ? appt.patientName : 'Unknown'}</td>
-            <td>${appt.dateTime}</td>
-            <td>${appt.priority == 1 ? 'Emergency' : 'Regular'}</td>
+            <td><c:out value="${appt.id}" /></td>
+            <td><c:out value="${appt.patientName != null ? appt.patientName : 'Unknown'}" /></td>
+            <td><c:out value="${appt.dateTime}" /></td>
+            <td><c:out value="${appt.priority == 1 ? 'Emergency' : 'Regular'}" /></td>
             <td>
               <form action="<%=request.getContextPath()%>/DoctorServlet" method="post" style="display:inline;">
                 <input type="hidden" name="action" value="cancelAppointment">
                 <input type="hidden" name="appointmentId" value="${appt.id}">
-                <button type="submit" class="btn btn-cancel"><i class="ri-close-line"></i> Cancel</button>
+                <button type="submit" class="btn btn-cancel"><i class="fas fa-times"></i> Cancel</button>
               </form>
             </td>
           </tr>

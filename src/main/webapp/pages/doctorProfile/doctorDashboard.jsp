@@ -6,61 +6,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MediSchedule - Doctor Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/doctorDashboard.css">
 </head>
 <body>
-<%
-    String username = (String) session.getAttribute("username");
-    if (username == null || !"doctor".equals(session.getAttribute("role"))) {
-        response.sendRedirect(request.getContextPath() + "/pages/index.jsp");
-        return;
-    }
-    String section = request.getParameter("section") != null ? request.getParameter("section") : "dashboard";
-%>
-<div class="sidebar">
-    <h2><i class="ri-stethoscope-line"></i> Doctor Panel</h2>
-    <ul>
-        <li><a href="<%=request.getContextPath()%>/DoctorServlet?section=dashboard" class="<%= "dashboard".equals(section) ? "active" : "" %>"><i class="ri-dashboard-line"></i> Dashboard</a></li>
-        <li><a href="<%=request.getContextPath()%>/DoctorServlet?section=details" class="<%= "details".equals(section) ? "active" : "" %>"><i class="ri-user-line"></i> Personal Details</a></li>
-        <li><a href="<%=request.getContextPath()%>/DoctorServlet?section=appointments" class="<%= "appointments".equals(section) ? "active" : "" %>"><i class="ri-calendar-2-line"></i> Appointments</a></li>
-    </ul>
-</div>
+<c:if test="${empty sessionScope.username || sessionScope.role != 'doctor'}">
+    <c:redirect url="/pages/login.jsp?role=doctor"/>
+</c:if>
 
-<div class="main-content">
-    <div class="container">
-        <div class="header">
-            <h1><i class="ri-stethoscope-line"></i> Doctor Dashboard</h1>
-            <form action="<%=request.getContextPath()%>/LogoutServlet" method="post">
-                <button type="submit" class="logout-btn"><i class="ri-logout-box-line"></i> Logout</button>
-            </form>
-        </div>
-
-        <c:if test="${not empty error}">
-            <div class="message error-message">${error}</div>
-        </c:if>
-        <c:if test="${not empty message}">
-            <div class="message success-message">${message}</div>
-        </c:if>
-
-        <c:choose>
-            <c:when test="${section == 'dashboard'}">
-                <jsp:include page="dashboard.jsp" />
-            </c:when>
-            <c:when test="${section == 'details'}">
-                <jsp:include page="doctorDetails.jsp" />
-            </c:when>
-            <c:when test="${section == 'appointments'}">
-                <jsp:include page="appointments.jsp" />
-            </c:when>
-            <c:otherwise>
-                <p>Section not found.</p>
-            </c:otherwise>
-        </c:choose>
+<aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <button class="sidebar-toggle" aria-label="Toggle sidebar" type="button">
+        <i class="fas fa-bars"></i>
+    </button>
+    <div class="logo">
+        <i class="fas fa-stethoscope" aria-hidden="true"></i>
+        <span>MediSchedule</span>
     </div>
-</div>
+    <nav class="sidebar-nav">
+        <ul>
+            <li>
+                <a href="#" data-section="dashboard" class="nav-link ${param.section == null || param.section == 'dashboard' ? 'active' : ''}">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="details" class="nav-link ${param.section == 'details' ? 'active' : ''}">
+                    <i class="fas fa-user-md"></i>
+                    <span>Personal Details</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-section="appointments" class="nav-link ${param.section == 'appointments' ? 'active' : ''}">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Appointments</span>
+                </a>
+            </li>
+            <li>
+                <form action="<%= request.getContextPath() %>/LogoutServlet" method="post" class="logout-form">
+                    <a href="#" onclick="this.parentNode.submit();" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </form>
+            </li>
+        </ul>
+    </nav>
+</aside>
 
-<script src="<%= request.getContextPath() %>/js/doctorDashboard.js"></script>
+<main class="main-content" id="main-content" aria-live="polite">
+    <div class="container">
+        <header class="dashboard-header">
+            <div class="user-info">
+                <div class="avatar" aria-hidden="true">
+                    <c:out value="${not empty sessionScope.username ? sessionScope.username.substring(0, 1).toUpperCase() : 'D'}" />
+                </div>
+                <h1>Welcome, Dr.
+                    <span>
+                        <c:choose>
+                            <c:when test="${not empty sessionScope.fullname}">
+                                <c:out value="${sessionScope.fullname}" />
+                            </c:when>
+                            <c:when test="${not empty sessionScope.username}">
+                                <c:out value="${sessionScope.username}" />
+                            </c:when>
+                            <c:otherwise>
+                                Doctor
+                            </c:otherwise>
+                        </c:choose>
+                    </span>!
+                </h1>
+            </div>
+            <time class="date" datetime="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
+                <%= new java.text.SimpleDateFormat("MMMM dd, yyyy").format(new java.util.Date()) %>
+            </time>
+        </header>
+
+        <c:if test="${not empty message}">
+            <div class="toast ${messageType}" role="alert" aria-live="assertive">
+                <i class="fas ${messageType == 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+                <span><c:out value="${message}" /></span>
+            </div>
+            <c:remove var="message" scope="request" />
+            <c:remove var="messageType" scope="request" />
+        </c:if>
+
+        <section id="content-area" class="content-area">
+            <jsp:include page="${param.section != null ? param.section : 'dashboard'}.jsp" />
+        </section>
+    </div>
+</main>
+
+<script src="<%= request.getContextPath() %>/assets/js/doctorDashboard.js"></script>
+<script>
+    window.contextPath = '<%= request.getContextPath() %>';
+</script>
 </body>
 </html>

@@ -17,7 +17,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public class DoctorServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(DoctorServlet.class.getName());
@@ -25,7 +24,7 @@ public class DoctorServlet extends HttpServlet {
     private static final String APPOINTMENTS_FILE = "/data/appointments.txt";
     private static final String DOCTORS_FILE = "/data/doctors.txt";
     private static final String AVAILABILITY_FILE = "/data/doctors_availability.txt";
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd,HH:mm");
 
     private AppointmentService appointmentService;
     private DoctorAvailabilityService availabilityService;
@@ -56,6 +55,8 @@ public class DoctorServlet extends HttpServlet {
         }
 
         String section = request.getParameter("section") != null ? request.getParameter("section") : "dashboard";
+        boolean isAjax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
         try {
             Doctor doctor = getDoctorByUsername(username);
             if (doctor == null) {
@@ -66,40 +67,54 @@ public class DoctorServlet extends HttpServlet {
             LocalDateTime now = LocalDateTime.now();
             LocalDate today = LocalDate.now();
 
-            if ("dashboard".equals(section) || "appointments".equals(section)) {
-                int totalAppointments = appointments.size();
-                int upcomingAppointments = (int) appointments.stream()
-                        .filter(appt -> LocalDateTime.parse(appt.getDateTime()).isAfter(now))
-                        .count();
-                int emergencyAppointments = (int) appointments.stream()
-                        .filter(appt -> appt.getPriority() == 1)
-                        .count();
-                int todayAppointments = (int) appointments.stream()
-                        .filter(appt -> LocalDate.parse(appt.getDateTime().split(" ")[0], DATE_FORMATTER).equals(today))
-                        .count();
+            int totalAppointments = appointments.size();
+            int upcomingAppointments = (int) appointments.stream()
+                    .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).isAfter(now))
+                    .count();
+            int emergencyAppointments = (int) appointments.stream()
+                    .filter(appt -> appt.getPriority() == 1)
+                    .count();
+            int todayAppointments = (int) appointments.stream()
+                    .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).toLocalDate().equals(today))
+                    .count();
+            int completedAppointments = (int) appointments.stream()
+                    .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).isBefore(now))
+                    .count();
 
-                for (Appointment appt : appointments) {
-                    if (appt.getPatientName() == null) {
-                        appt.setPatientName("Patient " + appt.getPatientId());
-                    }
+            for (Appointment appt : appointments) {
+                if (appt.getPatientName() == null || appt.getPatientName().isEmpty()) {
+                    appt.setPatientName("Patient " + appt.getPatientId());
                 }
-
-                request.setAttribute("totalAppointments", totalAppointments);
-                request.setAttribute("upcomingAppointments", upcomingAppointments);
-                request.setAttribute("emergencyAppointments", emergencyAppointments);
-                request.setAttribute("todayAppointments", todayAppointments);
-                request.setAttribute("appointments", appointments);
             }
 
+            request.setAttribute("totalAppointments", totalAppointments);
+            request.setAttribute("upcomingAppointments", upcomingAppointments);
+            request.setAttribute("emergencyAppointments", emergencyAppointments);
+            request.setAttribute("todayAppointments", todayAppointments);
+            request.setAttribute("completedAppointments", completedAppointments);
+            request.setAttribute("appointments", appointments);
             request.setAttribute("doctor", doctor);
             request.setAttribute("section", section);
 
-            LOGGER.info("Serving " + section + " section for " + username);
-            request.getRequestDispatcher("/pages/doctorProfile/doctorDashboard.jsp").forward(request, response);
-        } catch (IOException e) {
+            LOGGER.info("Serving " + section + " section for " + username + " (AJAX: " + isAjax + ")");
+            LOGGER.info("Appointments: " + appointments.size() + ", Doctor: " + doctor.getId());
+            String jspPath = "/pages/doctorProfile/" + section + ".jsp";
+            if (isAjax) {
+                LOGGER.info("Forwarding AJAX request to: " + jspPath);
+                response.setContentType("text/html;charset=UTF-8");
+                request.getRequestDispatcher(jspPath).forward(request, response);
+            } else {
+                request.getRequestDispatcher("/pages/doctorProfile/doctorDashboard.jsp").forward(request, response);
+            }
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error fetching data for " + section + " section, user: " + username, e);
             request.setAttribute("error", "Error fetching data: " + e.getMessage());
-            request.getRequestDispatcher("/pages/doctorProfile/doctorDashboard.jsp").forward(request, response);
+            if (isAjax) {
+                response.setContentType("text/html;charset=UTF-8");
+                response.getWriter().write("<p>Error loading " + section + ": " + e.getMessage() + "</p>");
+            } else {
+                request.getRequestDispatcher("/pages/doctorProfile/doctorDashboard.jsp").forward(request, response);
+            }
         }
     }
 
@@ -113,6 +128,8 @@ public class DoctorServlet extends HttpServlet {
         }
 
         String action = request.getParameter("action");
+        boolean isAjax = "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+
         try {
             if ("updateDetails".equals(action)) {
                 Doctor doctor = new Doctor(
@@ -131,11 +148,7 @@ public class DoctorServlet extends HttpServlet {
                 request.setAttribute("message", "Appointment canceled successfully");
             }
             doGet(request, response);
-        } catch (NumberFormatException e) {
-            LOGGER.log(Level.SEVERE, "Invalid appointment ID format for user: " + username, e);
-            request.setAttribute("error", "Invalid appointment ID: " + e.getMessage());
-            doGet(request, response);
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error processing action " + action + " for " + username, e);
             request.setAttribute("error", "Error processing request: " + e.getMessage());
             doGet(request, response);
@@ -160,7 +173,7 @@ public class DoctorServlet extends HttpServlet {
             String[] parts = lines.get(i).split(",");
             if (parts[0].equals(doctor.getId())) {
                 lines.set(i, String.format("%s,%s,%s,%s,%s,%s",
-                        parts[0], password != null && !password.isEmpty() ? password : parts[1], // Update password if provided
+                        parts[0], password != null && !password.isEmpty() ? password : parts[1],
                         doctor.getName(), doctor.getSpecialization(), parts[4], doctor.getContact()));
                 break;
             }
