@@ -1,4 +1,3 @@
-// doctorDashboard.js
 document.addEventListener('DOMContentLoaded', () => {
     const sidebarLinks = document.querySelectorAll('.sidebar-nav .nav-link');
     const contentArea = document.getElementById('content-area');
@@ -21,6 +20,15 @@ document.addEventListener('DOMContentLoaded', () => {
             loadSection(section);
         });
     });
+
+    // Fix duplicate "Dr." in welcome message
+    const doctorNameElement = document.querySelector('.doctor-name');
+    if (doctorNameElement) {
+        let doctorName = doctorNameElement.textContent.trim();
+        if (doctorName.startsWith('Dr.')) {
+            doctorNameElement.textContent = doctorName.replace('Dr.', '').trim();
+        }
+    }
 });
 
 /**
@@ -29,6 +37,9 @@ document.addEventListener('DOMContentLoaded', () => {
  */
 function loadSection(section) {
     console.log(`Loading section: ${section}`);
+    const spinner = contentArea.querySelector('.loading-spinner');
+    if (spinner) spinner.classList.add('active'); // Show spinner
+
     fetch(`${window.contextPath}/DoctorServlet?section=${section}`, {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
@@ -39,6 +50,7 @@ function loadSection(section) {
         .then(html => {
             console.log(`Section ${section} loaded successfully`);
             contentArea.innerHTML = html;
+            if (spinner) spinner.classList.remove('active'); // Hide spinner
             const doctorName = contentArea.querySelector('.doctor-name')?.textContent || 'Not found';
             console.log(`Doctor Name: ${doctorName}`);
             initializeSection(section);
@@ -46,6 +58,7 @@ function loadSection(section) {
         .catch(error => {
             console.error(`Error loading ${section}:`, error);
             contentArea.innerHTML = `<div class="alert alert-danger">Error loading ${section}: ${error.message}. Please try again later.</div>`;
+            if (spinner) spinner.classList.remove('active'); // Hide spinner on error
         });
 }
 
@@ -64,14 +77,14 @@ function initializeSection(section) {
 }
 
 /**
- * Initializes the dashboard section
+ * Initializes the dashboard section with charts
  */
 function initDashboard() {
     console.log("Initializing Dashboard...");
     const cards = document.querySelectorAll('.dashboard-grid .card');
     cards.forEach(card => {
         card.addEventListener('click', () => {
-            const metric = card.querySelector('.metric')?.textContent || 'N/A';
+            const metric = card.dataset.metric || 'N/A';
             const title = card.querySelector('h3')?.textContent || 'Card';
             console.log(`Clicked ${title}: ${metric}`);
         });
@@ -79,11 +92,55 @@ function initDashboard() {
 }
 
 /**
- * Initializes the details section with form handling
+ * Processes appointment data for trend chart
+ * @param {Array} appointments - List of appointment objects
+ * @returns {Object} Labels and counts for the chart
+ */
+function processTrendData(appointments) {
+    const today = new Date();
+    const labels = [];
+    const counts = [];
+    for (let i = 6; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        const dateStr = date.toISOString().split('T')[0];
+        labels.push(dateStr);
+        const count = appointments.filter(appt => appt.dateTime.startsWith(dateStr)).length;
+        counts.push(count);
+    }
+    return { labels, counts };
+}
+
+/**
+ * Initializes the details section with form handling and popup
  */
 function initDetails() {
     console.log("Initializing Details...");
+    const editBtn = document.getElementById('editDetailsBtn');
+    const cancelBtn = document.getElementById('cancelEditBtn');
+    const editPopup = document.getElementById('editPopup');
+    const detailsView = document.getElementById('detailsView');
     const form = document.querySelector('#detailsForm');
+
+    if (editBtn && cancelBtn && editPopup && detailsView) {
+        editBtn.addEventListener('click', () => {
+            detailsView.style.opacity = '0';
+            setTimeout(() => {
+                detailsView.style.display = 'none';
+                editPopup.style.display = 'flex';
+            }, 300);
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            editPopup.style.display = 'none';
+            detailsView.style.opacity = '0';
+            setTimeout(() => {
+                detailsView.style.display = 'block';
+                detailsView.style.opacity = '1';
+            }, 50);
+        });
+    }
+
     if (!form) {
         console.warn("Details form not found in DOM");
         return;
@@ -93,7 +150,8 @@ function initDetails() {
         e.preventDefault();
         const name = form.querySelector('#name')?.value;
         const contact = form.querySelector('#contact')?.value;
-        if (!name || !contact) {
+        const specialization = form.querySelector('#specialization')?.value;
+        if (!name || !contact || !specialization) {
             showMessage('Please fill in all required fields.', 'danger');
             return;
         }
@@ -165,8 +223,11 @@ function initAppointments() {
  * @param {string} dataType - Optional data type (number, date, priority)
  */
 function sortTable(col, dataType) {
-    const tbody = document.querySelector('.section table tbody');
-    if (!tbody) return;
+    const tbody = document.querySelector('.appointments-section table tbody');
+    if (!tbody) {
+        console.warn('Table body not found for sorting');
+        return;
+    }
 
     const rows = Array.from(tbody.rows);
     const isAsc = tbody.dataset.sort !== `${col}-asc`;

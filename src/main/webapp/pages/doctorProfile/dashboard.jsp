@@ -46,96 +46,15 @@
   </div>
 </div>
 
+<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/doctorDashboard.css">
+
 <style>
-  .dashboard-container {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
 
-  .dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1.5rem;
-    margin-bottom: 2rem;
-  }
-
-  .card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .card-icon {
-    font-size: 2rem;
-    color: var(--secondary);
-    margin-bottom: 1rem;
-  }
-
-  .card h3 {
-    font-size: 1.2rem;
-    margin: 0.5rem 0;
-    color: var(--text);
-  }
-
-  .card .metric {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--primary);
-    margin: 0;
-  }
-
-  .charts-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1.5rem;
-  }
-
-  .chart-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.5rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-
-  .chart-card h2 {
-    font-size: 1.3rem;
-    margin: 0 0 1rem;
-    color: var(--text);
-    display: flex;
-    align-items: center;
-  }
-
-  .chart-card h2 i {
-    margin-right: 0.5rem;
-    color: var(--secondary);
-  }
-
-  .chart-container {
-    position: relative;
-    height: 300px;
-  }
-
-  @media (max-width: 768px) {
-    .charts-section {
-      grid-template-columns: 1fr;
-    }
-  }
 </style>
 
 <script>
-  // Chart initialization moved to doctorDashboard.js, but data is prepared here
-  window.dashboardData = {
+  // Prepare dashboard data
+  const dashboardData = {
     appointments: [
       <c:forEach var="appt" items="${appointments}" varStatus="loop">
       { id: '${appt.id}', patientId: '${appt.patientId}', dateTime: '${appt.dateTime}', priority: ${appt.priority} }${loop.last ? '' : ','}
@@ -149,4 +68,96 @@
       completed: ${completedAppointments != null ? completedAppointments : 0}
     }
   };
+  console.log('Dashboard Data:', dashboardData);
+
+  // Check if there's data to display
+  if (!dashboardData.appointments.length && !Object.values(dashboardData.categoryData).some(val => val > 0)) {
+    document.querySelector('.charts-section').innerHTML = '<p class="no-data">No appointment data available to display charts.</p>';
+  } else {
+    // Initialize charts when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      // Category Chart
+      const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+      new Chart(categoryCtx, {
+        type: 'bar',
+        data: {
+          labels: ['Total', 'Upcoming', 'Emergency', 'Today', 'Completed'],
+          datasets: [{
+            label: 'Appointments',
+            data: [
+              dashboardData.categoryData.total,
+              dashboardData.categoryData.upcoming,
+              dashboardData.categoryData.emergency,
+              dashboardData.categoryData.today,
+              dashboardData.categoryData.completed
+            ],
+            backgroundColor: ['#2c3e50', '#38b2ac', '#e53e3e', '#667eea', '#2ecc71'],
+            borderColor: ['#2c3e50', '#38b2ac', '#e53e3e', '#667eea', '#2ecc71'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Appointments' }, ticks: { stepSize: 1 } },
+            x: { title: { display: true, text: 'Category' } }
+          },
+          plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: 'Appointment Categories', font: { size: 16 } }
+          }
+        }
+      });
+
+      // Trend Chart
+      const trendCtx = document.getElementById('trendChart').getContext('2d');
+      const trendData = processTrendData(dashboardData.appointments);
+      new Chart(trendCtx, {
+        type: 'line',
+        data: {
+          labels: trendData.labels,
+          datasets: [{
+            label: 'Appointments',
+            data: trendData.counts,
+            fill: true,
+            borderColor: '#38b2ac',
+            backgroundColor: 'rgba(56, 178, 172, 0.2)',
+            tension: 0.3,
+            pointBackgroundColor: '#38b2ac',
+            pointBorderColor: '#fff',
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: { beginAtZero: true, title: { display: true, text: 'Appointments' }, ticks: { stepSize: 1 } },
+            x: { title: { display: true, text: 'Date' } }
+          },
+          plugins: {
+            legend: { position: 'top' },
+            title: { display: true, text: 'Appointment Trends (Last 7 Days)', font: { size: 16 } }
+          }
+        }
+      });
+    });
+  }
+
+  // Process trend data for the line chart
+  function processTrendData(appointments) {
+    const today = new Date();
+    const labels = [];
+    const counts = [];
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(today.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+      labels.push(dateStr);
+      const count = appointments.filter(appt => appt.dateTime.startsWith(dateStr)).length;
+      counts.push(count);
+    }
+    return { labels, counts };
+  }
 </script>
