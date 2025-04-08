@@ -50,6 +50,7 @@ The **Medical Appointment Scheduling System** is a web-based application develop
 │   │   │   │   ├── index.jsp               # Home page (doctor search)
 │   │   │   │   ├── login.jsp               # Combined login page (user/admin)
 │   │   │   │   ├── adminDashboard.jsp      # Admin dashboard
+│   │   │   │   ├── bookingDetails.jsp      # booking details
 │   │   │   │   ├── doctorDashboard.jsp     # Doctor dashboard (placeholder)
 │   │   │   │   ├── appointment.jsp         # Appointment management
 │   │   │   │   ├── userProfile.jsp         # Patient profile (view appointments)
@@ -61,7 +62,7 @@ The **Medical Appointment Scheduling System** is a web-based application develop
 │   │   │   │   ├── register.jsp            # Patient registration
 │   │   │   ├── 📁 assets                   # Static files (CSS, JS, Images)
 │   │   │   │   ├── styles.css              # Custom styles
-│   │   │   │   ├── script.js               # Optional JS
+│   │   │   │   ├── index.js               # Optional JS
 │   │   │   ├── WEB-INF
 │   │   │   │   ├── web.xml                 # Servlet mappings
 │   │   │   ├── 📁 data                     # All system data (stored in plain files)

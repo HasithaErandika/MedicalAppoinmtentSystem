@@ -30,7 +30,7 @@ public class LoginServlet extends HttpServlet {
         if (username == null || password == null || role == null ||
                 username.trim().isEmpty() || password.trim().isEmpty() || role.trim().isEmpty()) {
             request.setAttribute("error", "All fields are required.");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/pages/login.jsp").forward(request, response);
             return;
         }
 
@@ -96,9 +96,9 @@ public class LoginServlet extends HttpServlet {
     private String getRedirectUrl(String role) {
         switch (role.toLowerCase()) {
             case "patient":
-                return "/pages/userProfile.jsp";
+                return "/pages/userProfile/userProfile.jsp";
             case "doctor":
-                return "/pages/doctorDashboard.jsp";
+                return "/pages/doctorProfile/doctorDashboard.jsp";
             case "admin":
                 return "/pages/adminDashboard.jsp";
             default:
