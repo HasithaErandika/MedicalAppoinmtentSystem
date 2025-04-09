@@ -22,7 +22,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let doctorName = doctorNameElement.textContent.trim();
         console.log(`Original doctor name: ${doctorName}`);
 
-        // Check if it looks like a username (e.g., "doctor1") and handle it
         if (/^doctor\d+$/.test(doctorName)) {
             doctorName = "Doctor"; // Fallback to generic "Doctor" if username-like
             console.warn("Doctor name appears to be a username; using fallback: 'Doctor'");
@@ -110,7 +109,6 @@ function initDashboard() {
         return;
     }
 
-    // Category Chart
     const categoryCtx = categoryChartCanvas.getContext('2d');
     new Chart(categoryCtx, {
         type: 'bar',
@@ -138,7 +136,6 @@ function initDashboard() {
         }
     });
 
-    // Trend Chart
     const trendCtx = trendChartCanvas.getContext('2d');
     const trendData = processTrendData(dashboardData.appointments);
     new Chart(trendCtx, {
@@ -172,31 +169,6 @@ function initDashboard() {
     });
 }
 
-// [Rest of the file remains unchanged: initDetails, initAppointments, sortTable, showMessage]
-/**
- * Initializes functionality for the loaded section
- * @param {string} section - The section to initialize
- */
-function initializeSection(section) {
-    console.log(`Initializing section: ${section}`);
-    switch (section) {
-        case 'dashboard': initDashboard(); break;
-        case 'details': initDetails(); break;
-        case 'appointments': initAppointments(); break;
-        default: console.warn(`Unknown section: ${section}`);
-    }
-}
-
-/**
- * Initializes the dashboard section with charts
- */
-
-
-/**
- * Processes appointment data for trend chart
- * @param {Array} appointments - List of appointment objects
- * @returns {Object} Labels and counts for the chart
- */
 function processTrendData(appointments) {
     const today = new Date();
     const labels = [];
@@ -212,9 +184,6 @@ function processTrendData(appointments) {
     return { labels, counts };
 }
 
-/**
- * Initializes the details section with form handling and popup
- */
 function initDetails() {
     console.log("Initializing Details...");
     const editBtn = document.getElementById('editDetailsBtn');
@@ -279,50 +248,77 @@ function initDetails() {
     });
 }
 
-/**
- * Initializes the appointments section with sorting and cancellation
- */
 function initAppointments() {
     console.log("Initializing Appointments...");
     const tableHeaders = document.querySelectorAll('.appointments-section table th');
     tableHeaders.forEach(th => {
         th.addEventListener('click', () => sortTable(th.cellIndex, th.dataset.type));
     });
-
-    const cancelButtons = document.querySelectorAll('.btn-cancel');
-    cancelButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (!confirm('Are you sure you want to cancel this appointment?')) return;
-
-            const form = btn.closest('form');
-            fetch(form.action, {
-                method: 'POST',
-                body: new FormData(form),
-                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-            })
-                .then(response => {
-                    if (!response.ok) throw new Error('Cancellation failed');
-                    return response.text();
-                })
-                .then(html => {
-                    contentArea.innerHTML = html;
-                    showMessage('Appointment canceled successfully!', 'success');
-                    initializeSection('appointments');
-                })
-                .catch(error => {
-                    console.error('Error canceling appointment:', error);
-                    showMessage(`Error canceling appointment: ${error.message}`, 'danger');
-                });
-        });
-    });
 }
 
-/**
- * Sorts the appointments table based on column index and data type
- * @param {number} col - Column index to sort
- * @param {string} dataType - Optional data type (number, date, priority)
- */
+function showCancelModal(appointmentId, patientName, dateTime) {
+    const modal = document.getElementById('cancelModal');
+    const message = document.getElementById('cancelMessage');
+    const details = document.getElementById('cancelAppointmentDetails');
+
+    if (!modal || !message || !details) {
+        console.error("Cancel modal elements not found.");
+        return;
+    }
+
+    message.textContent = "Are you sure you want to cancel this appointment?";
+    details.innerHTML = `
+        <p><strong>Patient:</strong> ${patientName}</p>
+        <p><strong>Date & Time:</strong> ${dateTime}</p>
+    `;
+
+    const confirmBtn = document.getElementById('cancelModalConfirmBtn');
+    const newConfirmBtn = confirmBtn.cloneNode(true); // Clone to avoid event stacking
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    newConfirmBtn.onclick = () => {
+        cancelAppointment(appointmentId);
+        closeCancelModal();
+    };
+
+    document.body.classList.add('modal-open');
+    modal.showModal();
+}
+
+function closeCancelModal() {
+    const modal = document.getElementById('cancelModal');
+    if (modal) {
+        modal.close();
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function cancelAppointment(appointmentId) {
+    fetch(`${window.contextPath}/DoctorServlet`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: new URLSearchParams({
+            action: 'cancelAppointment',
+            appointmentId: appointmentId
+        })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`Cancellation failed: ${response.statusText}`);
+            return response.text(); // DoctorServlet returns HTML due to forwarding
+        })
+        .then(html => {
+            showMessage('Appointment canceled successfully!', 'success');
+            loadSection('appointments'); // Reload the appointments section
+        })
+        .catch(error => {
+            console.error('Error canceling appointment:', error);
+            showMessage(`Error canceling appointment: ${error.message}`, 'danger');
+        });
+}
+
 function sortTable(col, dataType) {
     const tbody = document.querySelector('.appointments-section table tbody');
     if (!tbody) {
@@ -354,11 +350,6 @@ function sortTable(col, dataType) {
     rows.forEach(row => tbody.appendChild(row));
 }
 
-/**
- * Displays a temporary message to the user
- * @param {string} text - Message text
- * @param {string} type - Message type (success, danger)
- */
 function showMessage(text, type) {
     const alert = document.createElement('div');
     alert.className = `alert alert-${type} fade-out`;

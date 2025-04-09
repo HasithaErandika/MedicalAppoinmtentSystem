@@ -27,6 +27,7 @@
                 <th scope="col" data-sort="4" class="sortable" onclick="sortTable(4)">
                     Priority <i class="fas fa-sort" aria-hidden="true"></i>
                 </th>
+                <th scope="col">Actions</th> <!-- New column for actions -->
             </tr>
             </thead>
             <tbody>
@@ -38,6 +39,19 @@
             <p>No appointments found.</p>
         </div>
     </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <dialog id="cancelModal" class="modal" aria-labelledby="cancel-modal-title">
+        <div class="modal-content">
+            <h3 id="cancel-modal-title">Confirm Cancellation</h3>
+            <p id="cancelMessage">Are you sure you want to cancel this appointment?</p>
+            <div id="cancelAppointmentDetails" class="appointment-details"></div>
+            <div class="modal-actions">
+                <button id="cancelModalCancelBtn" class="cancel-btn" type="button" onclick="closeCancelModal()">No, Keep</button>
+                <button id="cancelModalConfirmBtn" class="confirm-btn" type="button">Yes, Cancel</button>
+            </div>
+        </div>
+    </dialog>
 </section>
 
 <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/userProfile.css">

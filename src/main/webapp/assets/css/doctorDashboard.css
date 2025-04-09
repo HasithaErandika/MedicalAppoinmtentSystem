@@ -673,3 +673,119 @@ tr:hover {
 .loading-spinner.active {
     display: block;
 }
+
+/* Modal Styling */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    max-width: 400px;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    padding: 0;
+    background: transparent;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.modal[open]::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+}
+
+#cancel-modal-title {
+    margin: 0 0 15px;
+    font-size: 1.5em;
+    color: #333;
+    font-weight: 600;
+}
+
+#cancelMessage {
+    margin: 0 0 20px;
+    color: #666;
+    font-size: 1em;
+    line-height: 1.4;
+}
+
+.appointment-details {
+    margin-bottom: 20px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    text-align: left;
+    font-size: 0.9em;
+    color: #555;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.cancel-btn,
+.confirm-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancel-btn {
+    background: #f1f3f5;
+    color: #333;
+}
+
+.cancel-btn:hover {
+    background: #e9ecef;
+}
+
+.confirm-btn {
+    background: #dc3545;
+    color: white;
+}
+
+.confirm-btn:hover {
+    background: #c82333;
+}
+
+.modal[open] {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Adjust existing cancel button style if needed */
+.btn-cancel {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.btn-cancel:hover {
+    background: #c82333;
+}

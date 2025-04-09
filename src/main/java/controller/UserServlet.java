@@ -175,6 +175,42 @@ public class UserServlet extends HttpServlet {
                 request.setAttribute("messageType", "error");
             }
             doGet(request, response);
+        } else if ("cancelAppointment".equals(action)) {
+            try {
+                String appointmentIdStr = request.getParameter("appointmentId");
+                if (appointmentIdStr == null) {
+                    throw new IllegalArgumentException("Missing appointment ID");
+                }
+                int appointmentId = Integer.parseInt(appointmentIdStr);
+
+                // Check if the appointment belongs to the user
+                List<Appointment> userAppointments = appointmentService.getAppointmentsByPatientId(username);
+                boolean isUserAppointment = userAppointments.stream().anyMatch(appt -> appt.getId() == appointmentId);
+                if (!isUserAppointment) {
+                    response.setContentType("application/json");
+                    response.setCharacterEncoding("UTF-8");
+                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    response.getWriter().write(GSON.toJson(new ErrorResponse("You can only cancel your own appointments")));
+                    LOGGER.warning("User " + username + " attempted to cancel an appointment they don't own: " + appointmentId);
+                    return;
+                }
+
+                // Cancel the appointment
+                appointmentService.cancelAppointment(appointmentId);
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.getWriter().write(GSON.toJson(new SuccessResponse(true, "Appointment cancelled successfully")));
+                LOGGER.info("User " + username + " cancelled appointment ID: " + appointmentId);
+            } catch (NumberFormatException e) {
+                LOGGER.log(Level.WARNING, "Invalid appointment ID format: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().write(GSON.toJson(new ErrorResponse("Invalid appointment ID format")));
+            } catch (Exception e) {
+                LOGGER.log(Level.SEVERE, "Error cancelling appointment: " + e.getMessage());
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write(GSON.toJson(new ErrorResponse("Error cancelling appointment: " + e.getMessage())));
+            }
+            return;
         }
     }
 

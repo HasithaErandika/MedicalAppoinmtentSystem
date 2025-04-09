@@ -135,10 +135,5 @@
 <script>
     window.contextPath = '<%= request.getContextPath() %>';
 </script>
-
-<style>
-    /* Modal Styles (inline for simplicity, can move to userProfile.css) */
-
-</style>
 </body>
 </html>

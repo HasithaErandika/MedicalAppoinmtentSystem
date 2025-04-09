@@ -1,4 +1,4 @@
-patient1,pass123,Hasitha Erandika,pacdti@hospital.net,0778449035,2015-03-01
+patient1,pass123,Hasitha Erandika,parggcdti@hospital.net,0778449035,2015-03-01
 patient2,pass123,Amandi Rashmika,patient2@hospital.net,0778449036,2008-06-12
 patient3,pass123,Julana Premasekara,patient3@hospital.net,0778449037,2006-11-25
 patient4,pass123,Jayindu Karunanayake,patient4@hospital.net,0778449038,2010-04-18
