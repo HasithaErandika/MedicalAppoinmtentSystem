@@ -34,7 +34,7 @@ function initBookAppointment() {
     console.log("Initializing Book Appointment...");
     fetchSpecialties();
     fetchUserAppointmentsForTokens();
-    setupConfirmButton();
+    setupConfirmButton(); // Set up modal buttons after section is loaded
     const specialtySelect = document.getElementById('specialty');
     if (specialtySelect) {
         specialtySelect.addEventListener('change', updateAvailabilityTable);
@@ -177,7 +177,6 @@ async function updateAvailabilityTable() {
             );
             const token = bookedAppt ? bookedAppt.token : avail.nextToken;
             const isBooked = !!bookedAppt;
-            // Simulate server-side appointmentCount update locally for immediate feedback
             const updatedCount = isBooked ? avail.appointmentCount : avail.appointmentCount;
             const row = `
                 <tr data-doctor="${avail.doctorName}" data-date="${avail.date}">
@@ -188,7 +187,7 @@ async function updateAvailabilityTable() {
                     <td>${updatedCount}</td>
                     <td>${token}</td>
                     <td>
-                        ${!isBooked ? `<button class="book-btn" onclick="showBookingConfirmation('${avail.doctorId}', '${avail.doctorName}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}')">
+                        ${!isBooked ? `<button class="book-btn" onclick="event.preventDefault(); showBookingConfirmation('${avail.doctorId}', '${avail.doctorName}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}')">
                             <i class="fas fa-calendar-check"></i> Book
                         </button>` : 'Booked'}
                     </td>
@@ -231,7 +230,10 @@ function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToke
     const message = document.getElementById('confirmMessage');
     const details = document.getElementById('appointmentDetails');
 
-    if (!modal || !message || !details) return;
+    if (!modal || !message || !details) {
+        console.error("Modal elements not found. Ensure bookAppointment section is loaded.");
+        return;
+    }
 
     message.textContent = "Are you sure you want to book this appointment?";
     details.innerHTML = `
@@ -242,18 +244,32 @@ function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToke
     `;
 
     pendingBooking = { doctorId, date, startTime, nextToken };
+    document.body.classList.add('modal-open');
     modal.showModal();
 }
 
 function setupConfirmButton() {
     const confirmBtn = document.getElementById('confirmBtn');
+    const cancelBtn = document.getElementById('cancelBtn');
+
     if (confirmBtn) {
-        confirmBtn.addEventListener('click', () => {
+        confirmBtn.addEventListener('click', (e) => {
+            e.preventDefault();
             if (pendingBooking) {
                 confirmBooking(pendingBooking.doctorId, pendingBooking.date, pendingBooking.startTime, pendingBooking.nextToken);
                 pendingBooking = null;
             }
             closeModal();
+            loadSection('bookAppointment');
+        });
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            pendingBooking = null;
+            closeModal();
+            loadSection('bookAppointment');
         });
     }
 }
@@ -280,18 +296,16 @@ function confirmBooking(doctorId, date, startTime, nextToken) {
         })
         .then(data => {
             if (data.success) {
-                alert(`Appointment booked successfully! Token: ${nextToken}`);
-                // Update userAppointments with the new booking
+                showToast(`Appointment booked successfully! Token: ${nextToken}`, 'success');
                 userAppointments.push({ doctorId, date, timeSlot: startTime, token: nextToken });
-                // Refresh availability to get updated appointmentCount from server
                 updateAvailabilityTable();
             } else {
-                alert("Booking failed: " + (data.message || "Unknown error"));
+                showToast("Booking failed: " + (data.message || "Unknown error"), 'error');
             }
         })
         .catch(error => {
             console.error("Booking error:", error);
-            alert(`Error booking appointment: ${error.message}`);
+            showToast(`Error booking appointment: ${error.message}`, 'error');
         });
 }
 
@@ -312,11 +326,11 @@ async function fetchUserAppointmentsForTokens() {
             token: appt.tokenID
         }));
         console.log("User appointments loaded:", userAppointments);
-        updateAvailabilityTable(); // Refresh table after loading appointments
+        updateAvailabilityTable();
     } catch (error) {
         console.error("Error fetching appointments:", error);
         userAppointments = [];
-        updateAvailabilityTable(); // Still update table to clear any stale data
+        updateAvailabilityTable();
     }
 }
 
@@ -326,7 +340,7 @@ async function fetchUserAppointments() {
     if (!table || !noAppointmentsMessage) return;
 
     const url = `${window.contextPath}/user?action=getAppointments`;
-    const currentDate = new Date('2025-04-07'); // Matches your context date
+    const currentDate = new Date('2025-04-08'); // Matches context date (April 08, 2025)
 
     try {
         const response = await fetch(url, {
@@ -349,11 +363,14 @@ async function fetchUserAppointments() {
             const row = `
                 <tr class="${rowClass}">
                     <td>${appt.id}</td>
-                    <td>${appt.doctorId}</td> <!-- Doctor name not available yet; see note -->
+                    <td>${appt.doctorId}</td>
                     <td>${appt.tokenID}</td>
                     <td>${dateTime}</td>
                     <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">
                         ${appt.priority == 1 ? 'Emergency' : 'Normal'}
+                    </td>
+                    <td>
+                        ${isUpcoming ? `<button class="cancel-appointment-btn" onclick="showCancelModal(${appt.id}, '${appt.doctorId}', '${dateTime}', '${appt.tokenID}')">Cancel</button>` : '-'}
                     </td>
                 </tr>
             `;
@@ -361,9 +378,77 @@ async function fetchUserAppointments() {
         });
     } catch (error) {
         console.error("Error fetching appointments:", error);
-        table.innerHTML = `<tr><td colspan="5">Error: ${error.message}</td></tr>`;
+        table.innerHTML = `<tr><td colspan="6">Error: ${error.message}</td></tr>`;
         noAppointmentsMessage.style.display = 'none';
     }
+}
+
+function showCancelModal(appointmentId, doctorId, dateTime, tokenID) {
+    const modal = document.getElementById('cancelModal');
+    const message = document.getElementById('cancelMessage');
+    const details = document.getElementById('cancelAppointmentDetails');
+
+    if (!modal || !message || !details) {
+        console.error("Cancel modal elements not found. Ensure appointments section is loaded.");
+        return;
+    }
+
+    message.textContent = "Are you sure you want to cancel this appointment?";
+    details.innerHTML = `
+        <p><strong>Doctor:</strong> ${doctorId}</p>
+        <p><strong>Date & Time:</strong> ${dateTime}</p>
+        <p><strong>Token:</strong> ${tokenID}</p>
+    `;
+
+    const confirmBtn = document.getElementById('cancelModalConfirmBtn');
+    const newConfirmBtn = confirmBtn.cloneNode(true);
+    confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+    newConfirmBtn.onclick = () => {
+        cancelAppointment(appointmentId);
+        closeCancelModal();
+    };
+
+    document.body.classList.add('modal-open');
+    modal.showModal();
+}
+
+function closeCancelModal() {
+    const modal = document.getElementById('cancelModal');
+    if (modal) {
+        modal.close();
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function cancelAppointment(appointmentId) {
+    fetch(`${window.contextPath}/user`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json'
+        },
+        body: new URLSearchParams({
+            action: 'cancelAppointment',
+            appointmentId: appointmentId
+        })
+    })
+        .then(response => {
+            if (!response.ok) throw new Error(`Cancellation failed: ${response.statusText}`);
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                showToast('Appointment cancelled successfully', 'success');
+                fetchUserAppointments(); // Refresh the appointments list
+                fetchUserAppointmentsForTokens(); // Update booking availability
+            } else {
+                showToast('Failed to cancel appointment: ' + (data.message || 'Unknown error'), 'error');
+            }
+        })
+        .catch(error => {
+            console.error("Cancellation error:", error);
+            showToast(`Error cancelling appointment: ${error.message}`, 'error');
+        });
 }
 
 function sortTable(col) {
@@ -410,5 +495,19 @@ function validateForm(form) {
 
 function closeModal() {
     const modal = document.getElementById('confirmModal');
-    if (modal) modal.close();
+    if (modal) {
+        modal.close();
+        document.body.classList.remove('modal-open');
+    }
+}
+
+function showToast(message, type) {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `
+        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+        <span>${message}</span>
+    `;
+    document.querySelector('.container').appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
 }
