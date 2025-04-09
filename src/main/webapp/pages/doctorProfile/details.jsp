@@ -79,6 +79,7 @@
                                     <option value="Gynecology">Gynecology</option>
                                     <option value="Ayurvedic Medicine">Ayurvedic Medicine</option>
                                     <option value="Pediatrics">Pediatrics</option>
+                                    <option value="Other">Other</option>
                                 </select>
                                 <span class="error-text" id="specialization-error" aria-live="polite"></span>
                             </div>
