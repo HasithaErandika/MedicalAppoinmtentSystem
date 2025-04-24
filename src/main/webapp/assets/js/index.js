@@ -3,6 +3,7 @@ let allDoctors = [];
 let allAvailability = [];
 let userAppointments = []; // User's booked appointments with tokens
 let pendingBooking = null; // Temporary storage for booking details
+let doctorIdToNameMap = {}; // Map to store doctorId to doctorName mappings
 
 window.onload = function () {
     console.log("Initializing index page...");
@@ -10,8 +11,9 @@ window.onload = function () {
     pendingBooking = null;
     // Fetch specialties for booking section
     fetchSpecialties();
-    // Fetch user appointments if logged in as patient
+    // Fetch user appointments and doctor details if logged in as patient
     if (document.body.dataset.loggedIn === "true" && document.body.dataset.role === "patient") {
+        fetchDoctorDetails(); // New function to fetch doctor names
         fetchUserAppointments();
         fetchUserAppointmentsForTokens();
         setupTabNavigation();
@@ -23,6 +25,29 @@ window.onload = function () {
     // Handle query parameters
     handleQueryParameters();
 };
+
+// Fetch Doctor Details
+async function fetchDoctorDetails() {
+    try {
+        const response = await fetch(`${window.contextPath}/SortServlet?action=getDoctors`, {
+            method: 'GET',
+            headers: { Accept: 'application/json' },
+            cache: 'no-store'
+        });
+        if (!response.ok) {
+            throw new Error(`Failed to fetch doctors: ${response.statusText}`);
+        }
+        const doctors = await response.json();
+        doctorIdToNameMap = {};
+        doctors.forEach(doctor => {
+            doctorIdToNameMap[doctor.doctorId] = doctor.doctorName;
+        });
+        console.log("Doctor details loaded:", doctorIdToNameMap);
+    } catch (error) {
+        console.error("Error fetching doctor details:", error);
+        showToast(`Error loading doctor details: ${error.message}`, 'error');
+    }
+}
 
 // Handle Query Parameters
 function handleQueryParameters() {
@@ -220,6 +245,11 @@ async function updateAvailabilityTable() {
         const data = await response.json();
         allAvailability = data.availability || [];
         allDoctors = data.doctors || [];
+
+        // Update doctorIdToNameMap with availability data
+        allAvailability.forEach(avail => {
+            doctorIdToNameMap[avail.doctorId] = avail.doctorName;
+        });
 
         if (allAvailability.length === 0) {
             tbody.innerHTML = '<tr><td colspan="7">No availability found</td></tr>';
@@ -453,17 +483,22 @@ async function fetchUserAppointments() {
             const currentDate = new Date('2025-04-23'); // Current date
             const isUpcoming = apptDateTime >= currentDate;
             const rowClass = isUpcoming ? 'upcoming-appointment' : 'past-appointment';
+            // Use doctor name from doctorIdToNameMap, fallback to doctorId
+            const doctorName = doctorIdToNameMap[appt.doctorId] || appt.doctorId;
+            if (!doctorIdToNameMap[appt.doctorId]) {
+                console.warn(`Doctor name not found for ID: ${appt.doctorId}. Displaying ID as fallback.`);
+            }
             const row = `
                 <tr class="${rowClass}">
                     <td>${appt.id}</td>
-                    <td>${appt.doctorId}</td>
+                    <td>${doctorName}</td>
                     <td>${appt.tokenID}</td>
                     <td>${dateTime}</td>
                     <td class="${appt.priority == 1 ? 'priority-high' : 'priority-normal'}">
                         ${appt.priority == 1 ? 'Emergency' : 'Normal'}
                     </td>
                     <td>
-                        ${isUpcoming ? `<button class="cancel-appointment-btn" onclick="showCancelModal(${appt.id}, '${appt.doctorId}', '${dateTime}', '${appt.tokenID}')">Cancel</button>` : '-'}
+                        ${isUpcoming ? `<button class="cancel-appointment-btn" onclick="showCancelModal(${appt.id}, '${doctorName}', '${dateTime}', '${appt.tokenID}')">Cancel</button>` : '-'}
                     </td>
                 </tr>
             `;
@@ -503,7 +538,7 @@ async function fetchUserAppointmentsForTokens() {
 }
 
 // Cancel Appointment Modal
-function showCancelModal(appointmentId, doctorId, dateTime, tokenID) {
+function showCancelModal(appointmentId, doctorName, dateTime, tokenID) {
     const modal = document.getElementById('cancelModal');
     const message = document.getElementById('cancelMessage');
     const details = document.getElementById('cancelAppointmentDetails');
@@ -516,7 +551,7 @@ function showCancelModal(appointmentId, doctorId, dateTime, tokenID) {
 
     message.textContent = "Are you sure you want to cancel this appointment?";
     details.innerHTML = `
-        <p><strong>Doctor:</strong> ${doctorId}</p>
+        <p><strong>Doctor:</strong> ${doctorName}</p>
         <p><strong>Date & Time:</strong> ${dateTime}</p>
         <p><strong>Token:</strong> ${tokenID}</p>
     `;
@@ -594,7 +629,7 @@ function sortTable(col) {
             const priorityOrder = { 'Emergency': 1, 'Normal': 0 };
             return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x]; // Priority
         }
-        return isAsc ? x.localeCompare(y) : y.localeCompare(x); // DoctorId, Token
+        return isAsc ? x.localeCompare(y) : y.localeCompare(x); // DoctorName, Token
     });
 
     rows.forEach(row => table.appendChild(row));
