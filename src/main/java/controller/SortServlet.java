@@ -40,14 +40,36 @@ public class SortServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
 
+        String action = request.getParameter("action");
         String specialty = request.getParameter("specialty");
         String doctorName = request.getParameter("doctor");
         String date = request.getParameter("date");
         String time = request.getParameter("time");
 
-        LOGGER.info("Request params - specialty: " + specialty + ", doctor: " + doctorName + ", date: " + date + ", time: " + time);
+        LOGGER.info("Request params - action: " + action + ", specialty: " + specialty + ", doctor: " + doctorName + ", date: " + date + ", time: " + time);
 
         Map<String, Doctor> doctorDetails = loadDoctorDetails(request);
+
+        if ("getDoctors".equals(action)) {
+            // Return list of all doctors with ID and name
+            List<Map<String, String>> doctorsList = new ArrayList<>();
+            for (Doctor doctor : doctorDetails.values()) {
+                Map<String, String> doctorInfo = new HashMap<>();
+                doctorInfo.put("doctorId", doctor.getId());
+                doctorInfo.put("doctorName", doctor.getName());
+                doctorsList.add(doctorInfo);
+            }
+            bubbleSortDoctors(doctorsList); // Sort by doctorName
+            Gson gson = new Gson();
+            String jsonResponse = gson.toJson(doctorsList);
+            LOGGER.info("Response JSON (getDoctors): " + jsonResponse);
+            try (PrintWriter out = response.getWriter()) {
+                out.print(jsonResponse);
+                out.flush();
+            }
+            return;
+        }
+
         Map<String, List<String>> specialtyDoctors = loadSpecialtiesAndDoctors(doctorDetails);
         List<Availability> allAvailabilities = loadAvailabilities(request, doctorDetails);
 
@@ -69,7 +91,6 @@ public class SortServlet extends HttpServlet {
         } else {
             String specialtyLower = specialty.toLowerCase();
             List<String> doctorsForSpecialty = specialtyDoctors.getOrDefault(specialtyLower, new ArrayList<>());
-            // Sort doctors using bubble sort
             bubbleSortStrings(doctorsForSpecialty);
             responseData.put("doctors", doctorsForSpecialty);
 
@@ -218,7 +239,6 @@ public class SortServlet extends HttpServlet {
         for (int i = 0; i < n - 1; i++) {
             for (int j = 0; j < n - i - 1; j++) {
                 if (list.get(j).compareToIgnoreCase(list.get(j + 1)) > 0) {
-                    // Swap elements
                     String temp = list.get(j);
                     list.set(j, list.get(j + 1));
                     list.set(j + 1, temp);
@@ -234,14 +254,28 @@ public class SortServlet extends HttpServlet {
             for (int j = 0; j < n - i - 1; j++) {
                 Availability a = list.get(j);
                 Availability b = list.get(j + 1);
-                // Compare by doctorName, then date, then startTime
                 int cmp = a.getDoctorName().compareToIgnoreCase(b.getDoctorName());
                 if (cmp == 0) cmp = a.getDate().compareTo(b.getDate());
                 if (cmp == 0) cmp = a.getStartTime().compareTo(b.getStartTime());
                 if (cmp > 0) {
-                    // Swap elements
                     list.set(j, b);
                     list.set(j + 1, a);
+                }
+            }
+        }
+    }
+
+    // Bubble sort for doctors list (by doctorName)
+    private void bubbleSortDoctors(List<Map<String, String>> list) {
+        int n = list.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                String nameA = list.get(j).get("doctorName");
+                String nameB = list.get(j + 1).get("doctorName");
+                if (nameA.compareToIgnoreCase(nameB) > 0) {
+                    Map<String, String> temp = list.get(j);
+                    list.set(j, list.get(j + 1));
+                    list.set(j + 1, temp);
                 }
             }
         }
