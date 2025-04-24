@@ -19,7 +19,7 @@ window.onload = function () {
     // Setup event listeners
     setupFormListeners();
     setupModalListeners();
-    setupLoginPopup();
+    setupLoginRegisterModal();
     // Handle query parameters
     handleQueryParameters();
 };
@@ -104,7 +104,7 @@ function setupModalListeners() {
     if (confirmBtn) {
         confirmBtn.addEventListener('click', () => {
             if (pendingBooking) {
-                confirmBooking(pendingBooking.doctorId, pendingBooking.date, pendingBooking.startTime, pendingBooking.nextToken);
+                confirmBooking(pendingBooking.doctorId, pendingBooking.doctorName, pendingBooking.date, pendingBooking.startTime, pendingBooking.nextToken);
                 pendingBooking = null;
             }
             closeModal();
@@ -126,14 +126,26 @@ function setupModalListeners() {
     }
 }
 
-// Login Popup
-function setupLoginPopup() {
-    const loginBtn = document.getElementById('loginNowBtn');
+// Login/Register Modal
+function setupLoginRegisterModal() {
+    const loginBtn = document.getElementById('loginModalBtn');
+    const registerBtn = document.getElementById('registerModalBtn');
+    const cancelBtn = document.getElementById('cancelLoginModalBtn');
+
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
-            clearInterval(window.loginCountdownInterval);
+            closeLoginRegisterModal();
             window.location.href = `${window.contextPath}/pages/login.jsp?role=patient`;
         });
+    }
+    if (registerBtn) {
+        registerBtn.addEventListener('click', () => {
+            closeLoginRegisterModal();
+            window.location.href = `${window.contextPath}/pages/register.jsp`;
+        });
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeLoginRegisterModal);
     }
 }
 
@@ -243,7 +255,7 @@ async function updateAvailabilityTable() {
                     <td>${token}</td>
                     <td>
                         ${!isBooked ?
-                `<button class="book-btn" onclick="handleBookClick('${avail.doctorId}', '${avail.doctorName}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}')">
+                `<button class="book-btn" onclick="handleBookClick('${avail.doctorId}', '${avail.doctorName}', '${avail.date}', '${avail.startTime}', '${avail.nextToken}', event)">
                                 <i class="fas fa-calendar-check"></i> Book
                             </button>` :
                 'Booked'}
@@ -284,16 +296,25 @@ function filterTable() {
 }
 
 // Handle Book Button Click
-function handleBookClick(doctorId, doctorName, date, startTime, nextToken) {
+function handleBookClick(doctorId, doctorName, date, startTime, nextToken, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
     if (document.body.dataset.loggedIn !== "true" || document.body.dataset.role !== "patient") {
-        showLoginPopup();
+        showLoginRegisterModal();
         return;
     }
-    showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken);
+    showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken, event);
 }
 
 // Booking Confirmation Modal
-function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken) {
+function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+
     const modal = document.getElementById('confirmModal');
     const message = document.getElementById('confirmMessage');
     const details = document.getElementById('appointmentDetails');
@@ -579,35 +600,24 @@ function sortTable(col) {
     rows.forEach(row => table.appendChild(row));
 }
 
-// Login Popup
-function showLoginPopup() {
-    const popup = document.getElementById('loginPopup');
-    const countdownMessage = document.getElementById('countdownMessage');
-    const timerElement = document.getElementById('countdownTimer');
-
-    if (!popup || !countdownMessage || !timerElement) {
-        console.error("Login popup elements not found.");
+// Login/Register Modal Functions
+function showLoginRegisterModal() {
+    const modal = document.getElementById('loginRegisterModal');
+    if (!modal) {
+        console.error("Login/Register modal not found.");
+        showToast("Unable to show login/register prompt. Please try again.", 'error');
         return;
     }
+    document.body.classList.add('modal-open');
+    modal.showModal();
+}
 
-    popup.style.display = 'flex';
-    countdownMessage.style.display = 'block';
-
-    let countdown = 3;
-    timerElement.textContent = countdown;
-
-    if (window.loginCountdownInterval) {
-        clearInterval(window.loginCountdownInterval);
+function closeLoginRegisterModal() {
+    const modal = document.getElementById('loginRegisterModal');
+    if (modal) {
+        modal.close();
+        document.body.classList.remove('modal-open');
     }
-
-    window.loginCountdownInterval = setInterval(() => {
-        countdown--;
-        timerElement.textContent = countdown;
-        if (countdown <= 0) {
-            clearInterval(window.loginCountdownInterval);
-            window.location.href = `${window.contextPath}/pages/login.jsp?role=patient`;
-        }
-    }, 1000);
 }
 
 // Toast Notification

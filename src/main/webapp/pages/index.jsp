@@ -258,19 +258,18 @@
     </div>
 </dialog>
 
-<div class="login-popup" id="loginPopup" role="dialog" aria-labelledby="popup-heading" aria-hidden="true">
-    <div class="login-popup-content">
-        <div class="popup-header">
-            <i class="fas fa-lock"></i>
-            <h2 id="popup-heading">Please Log In</h2>
+<!-- Login/Register Modal for Non-Logged-In Users -->
+<dialog id="loginRegisterModal" class="modal" aria-labelledby="login-register-modal-title" aria-modal="true">
+    <div class="modal-content">
+        <h3 id="login-register-modal-title">Action Required</h3>
+        <p>Please log in or register to book an appointment.</p>
+        <div class="modal-actions">
+            <button id="loginModalBtn" class="confirm-btn" type="button">Log In</button>
+            <button id="registerModalBtn" class="confirm-btn" type="button">Register</button>
+            <button id="cancelLoginModalBtn" class="cancel-btn" type="button">Cancel</button>
         </div>
-        <p>You need to log in as a patient to book an appointment.</p>
-        <div class="countdown" id="countdownMessage" style="display: none;">
-            Redirecting in <span id="countdownTimer">3</span> seconds...
-        </div>
-        <button class="login-btn" id="loginNowBtn" aria-label="Log in now">Log In Now</button>
     </div>
-</div>
+</dialog>
 
 <section class="features" aria-labelledby="features-heading">
     <div class="container">
