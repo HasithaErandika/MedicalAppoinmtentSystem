@@ -46,12 +46,12 @@ public class LoginServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + redirectUrl);
             } else {
                 request.setAttribute("error", "Invalid username or password.");
-                request.getRequestDispatcher("/login.jsp").forward(request, response);
+                request.getRequestDispatcher("/pages/login.jsp").forward(request, response);
             }
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error accessing user data file", e);
             request.setAttribute("error", "Unable to process login. Please try again later.");
-            request.getRequestDispatcher("/login.jsp").forward(request, response);
+            request.getRequestDispatcher("/pages/login.jsp").forward(request, response);
         }
     }
 
@@ -96,7 +96,7 @@ public class LoginServlet extends HttpServlet {
     private String getRedirectUrl(String role) {
         switch (role.toLowerCase()) {
             case "patient":
-                return "/pages/userProfile/userProfile.jsp";
+                return "/pages/index.jsp"; // Changed from /pages/userProfile/userProfile.jsp
             case "doctor":
                 return "/pages/doctorProfile/doctorDashboard.jsp";
             case "admin":
