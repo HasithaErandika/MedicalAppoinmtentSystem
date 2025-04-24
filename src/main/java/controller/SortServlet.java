@@ -10,7 +10,7 @@ import model.Doctor;
 import service.AppointmentService;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime; // Added import for LocalTime
+import java.time.LocalTime;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,8 +55,13 @@ public class SortServlet extends HttpServlet {
 
         Map<String, Object> responseData = new HashMap<>();
         List<String> specialties = new ArrayList<>(specialtyDoctors.keySet());
-        Collections.sort(specialties, String.CASE_INSENSITIVE_ORDER);
-        responseData.put("specialties", specialties);
+        // Capitalize first letter of specialties and sort using bubble sort
+        List<String> capitalizedSpecialties = new ArrayList<>();
+        for (String spec : specialties) {
+            capitalizedSpecialties.add(capitalizeFirstLetter(spec));
+        }
+        bubbleSortStrings(capitalizedSpecialties);
+        responseData.put("specialties", capitalizedSpecialties);
 
         if (specialty == null || specialty.trim().isEmpty()) {
             responseData.put("doctors", new ArrayList<>());
@@ -64,11 +69,12 @@ public class SortServlet extends HttpServlet {
         } else {
             String specialtyLower = specialty.toLowerCase();
             List<String> doctorsForSpecialty = specialtyDoctors.getOrDefault(specialtyLower, new ArrayList<>());
-            Collections.sort(doctorsForSpecialty, String.CASE_INSENSITIVE_ORDER);
+            // Sort doctors using bubble sort
+            bubbleSortStrings(doctorsForSpecialty);
             responseData.put("doctors", doctorsForSpecialty);
 
             List<Availability> filteredAvailabilities = filterAvailabilities(allAvailabilities, doctorDetails, specialtyLower, doctorName, date, time);
-            Collections.sort(filteredAvailabilities);
+            bubbleSortAvailabilities(filteredAvailabilities);
             responseData.put("availability", filteredAvailabilities);
         }
 
@@ -161,7 +167,7 @@ public class SortServlet extends HttpServlet {
     private List<Availability> filterAvailabilities(List<Availability> availabilities, Map<String, Doctor> doctorDetails,
                                                     String specialty, String doctorName, String date, String time) {
         List<Availability> filtered = new ArrayList<>();
-        LocalTime now = LocalTime.now(); // Uses LocalTime here
+        LocalTime now = LocalTime.now();
         String today = new SimpleDateFormat(DATE_FORMAT).format(new Date());
 
         for (Availability avail : availabilities) {
@@ -172,7 +178,7 @@ public class SortServlet extends HttpServlet {
             if (doctorName != null && !doctorName.trim().isEmpty() && !doc.getName().equalsIgnoreCase(doctorName)) matches = false;
             if (date != null && !date.trim().isEmpty() && !avail.getDate().equals(date)) matches = false;
             if (time != null && !time.trim().isEmpty() && avail.getStartTimeAsLocalTime() != null) {
-                LocalTime start = avail.getStartTimeAsLocalTime(); // Uses LocalTime here
+                LocalTime start = avail.getStartTimeAsLocalTime();
                 switch (time.toLowerCase()) {
                     case "morning": if (start.isBefore(LocalTime.of(8, 0)) || start.isAfter(LocalTime.of(12, 0))) matches = false; break;
                     case "afternoon": if (start.isBefore(LocalTime.of(12, 0)) || start.isAfter(LocalTime.of(17, 0))) matches = false; break;
@@ -204,5 +210,46 @@ public class SortServlet extends HttpServlet {
         for (Availability avail : availabilities) {
             avail.setNextToken(String.format("TOK%03d", avail.getAppointmentCount() + 1));
         }
+    }
+
+    // Bubble sort for strings (case-insensitive)
+    private void bubbleSortStrings(List<String> list) {
+        int n = list.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                if (list.get(j).compareToIgnoreCase(list.get(j + 1)) > 0) {
+                    // Swap elements
+                    String temp = list.get(j);
+                    list.set(j, list.get(j + 1));
+                    list.set(j + 1, temp);
+                }
+            }
+        }
+    }
+
+    // Bubble sort for Availability objects
+    private void bubbleSortAvailabilities(List<Availability> list) {
+        int n = list.size();
+        for (int i = 0; i < n - 1; i++) {
+            for (int j = 0; j < n - i - 1; j++) {
+                Availability a = list.get(j);
+                Availability b = list.get(j + 1);
+                // Compare by doctorName, then date, then startTime
+                int cmp = a.getDoctorName().compareToIgnoreCase(b.getDoctorName());
+                if (cmp == 0) cmp = a.getDate().compareTo(b.getDate());
+                if (cmp == 0) cmp = a.getStartTime().compareTo(b.getStartTime());
+                if (cmp > 0) {
+                    // Swap elements
+                    list.set(j, b);
+                    list.set(j + 1, a);
+                }
+            }
+        }
+    }
+
+    // Capitalize first letter of a string
+    private String capitalizeFirstLetter(String str) {
+        if (str == null || str.isEmpty()) return str;
+        return str.substring(0, 1).toUpperCase() + str.substring(1).toLowerCase();
     }
 }
