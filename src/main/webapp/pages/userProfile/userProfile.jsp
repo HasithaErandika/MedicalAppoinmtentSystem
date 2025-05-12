@@ -41,18 +41,6 @@
     <nav class="sidebar-nav">
         <ul>
             <li>
-                <a href="#" data-section="bookAppointment" class="nav-link active">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Book Appointment</span>
-                </a>
-            </li>
-            <li>
-                <a href="#" data-section="appointments" class="nav-link">
-                    <i class="fas fa-list"></i>
-                    <span>My Appointments</span>
-                </a>
-            </li>
-            <li>
                 <a href="#" data-section="userDetails" class="nav-link">
                     <i class="fas fa-user"></i>
                     <span>User Details</span>
@@ -109,25 +97,11 @@
             <c:remove var="messageType" scope="request" />
         </c:if>
 
-        <!-- Dynamic Content Section -->
-        <section id="content-area" class="content-area">
-            <jsp:include page="${param.section != null ? param.section : 'bookAppointment.jsp'}" />
-        </section>
+
     </div>
 </main>
 
-<!-- Confirmation Modal -->
-<dialog id="confirmModal" class="modal" aria-labelledby="modal-title">
-    <div class="modal-content">
-        <h3 id="modal-title">Confirm Booking</h3>
-        <p id="confirmMessage">Are you sure you want to book this appointment?</p>
-        <div id="appointmentDetails" class="appointment-details"></div>
-        <div class="modal-actions">
-            <button id="cancelBtn" class="cancel-btn" type="button" onclick="closeModal()">Cancel</button>
-            <button id="confirmBtn" class="confirm-btn" type="button">Confirm</button>
-        </div>
-    </div>
-</dialog>
+
 
 <!-- Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
