@@ -12,5 +12,4 @@ doctor11,pass123,Dr. Lakmali Pathiraja,Dermatology,pathiraja@hospital.lk,0778896
 doctor12,pass234,Dr. I L Jayaweera,Venereology,jayaweera@hospital.lk,0778896512
 doctor13,pass345,Dr. Indika Boteju,Consultant Physician,boteju@hospital.lk,0778896513
 doctor14,pass456,Dr. Jeyakumar Janaarthanan,Orthopedic Surgery,janaarthanan@hospital.lk,0778896514
-doctor15,pass567,Dr. Uditha Kodithuwakku,Pediatrics,kodithuwakku@hospital.lk,0778896517
-doctor16,pass123,Dr. Dineth Nirosian,Cardiology,dineth@hospital.lk,0778449035
+doctor15,pass567,Dr. Uditha Kodithuwakku,Radiology,kodithuwakku@hospital.lk,0778896515
