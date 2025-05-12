@@ -4,6 +4,9 @@
 
 The **Medical Appointment Scheduling System** is a web-based application developed as a first-year, second-semester group project. Built using **Java Servlets**, **JSP**, and **Maven**, it demonstrates core programming concepts including **Object-Oriented Programming (OOP)**, **priority queues** for emergency scheduling, and **bubble sort** for appointment ordering. The system uses **plain text files** for data persistence to emphasize file handling skills, avoiding the complexity of a database.
 
+📄 **For details on OOP usage, see [`docs/OOP.md`](docs/OOP.md)**  
+🔧 **For setup instructions, see [`docs/SetupGuide.md`](docs/SetupGuide.md)**
+
 ### Key Features
 - **Role-Based Access**:
   - **Patients**: Register, book, view, and cancel appointments.
