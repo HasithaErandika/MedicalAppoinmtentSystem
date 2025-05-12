@@ -84,7 +84,7 @@
                                 ${appt.priority == 1 ? 'Emergency' : 'Normal'}
                         </td>
                         <td>
-                            <button class="btn btn-edit" onclick="openEditModal(${appt.id}, '${appt.patientId}', '${appt.doctorId}', '${appt.tokenID}', '${appt.dateTime.substring(0,10)}', '${appt.dateTime.substring(11)}', ${appt.priority == 1})">
+                            <button class="btn btn-edit" onclick="openEditModal('${appt.id}', '${appt.patientId}', '${appt.doctorId}', '${appt.tokenID}', '${appt.dateTime.substring(0,10)}', '${appt.dateTime.substring(11)}', '${appt.priority == 1}')">
                                 <i class="ri-edit-line"></i> Edit
                             </button>
                             <form action="<%=request.getContextPath()%>/AdminServlet" method="post" style="display:inline;" onsubmit="return confirmCancel()">

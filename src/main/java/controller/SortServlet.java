@@ -10,6 +10,7 @@ import model.Doctor;
 import service.AppointmentService;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.logging.Level;
@@ -189,12 +190,25 @@ public class SortServlet extends HttpServlet {
                                                     String specialty, String doctorName, String date, String time) {
         List<Availability> filtered = new ArrayList<>();
         LocalTime now = LocalTime.now();
-        String today = new SimpleDateFormat(DATE_FORMAT).format(new Date());
+        LocalDate today = LocalDate.now();
+        String todayStr = new SimpleDateFormat(DATE_FORMAT).format(new Date());
 
         for (Availability avail : availabilities) {
             Doctor doc = doctorDetails.get(avail.getDoctorId());
             if (doc == null) continue;
             boolean matches = true;
+
+            // Exclude past dates
+            try {
+                LocalDate availDate = LocalDate.parse(avail.getDate());
+                if (availDate.isBefore(today)) {
+                    matches = false;
+                }
+            } catch (Exception e) {
+                LOGGER.warning("Invalid date format for availability: " + avail.getDate());
+                matches = false;
+            }
+
             if (specialty != null && !doc.getSpecialization().equalsIgnoreCase(specialty)) matches = false;
             if (doctorName != null && !doctorName.trim().isEmpty() && !doc.getName().equalsIgnoreCase(doctorName)) matches = false;
             if (date != null && !date.trim().isEmpty() && !avail.getDate().equals(date)) matches = false;
@@ -206,7 +220,7 @@ public class SortServlet extends HttpServlet {
                     default: LOGGER.warning("Unknown time filter: " + time);
                 }
             }
-            if (date != null && date.equals(today) && avail.getStartTimeAsLocalTime().isBefore(now)) matches = false;
+            if (date != null && date.equals(todayStr) && avail.getStartTimeAsLocalTime() != null && avail.getStartTimeAsLocalTime().isBefore(now)) matches = false;
             if (matches) filtered.add(avail);
         }
         LOGGER.info("Filtered availabilities: " + filtered.size() + " entries");

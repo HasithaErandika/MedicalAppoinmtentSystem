@@ -299,70 +299,70 @@
         <h2 id="specialties-heading">Specialized Care Solutions</h2>
         <div class="specialties-grid">
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/cardiology.jpg" alt="Cardiology care">
+                <img src="<%=request.getContextPath()%>/assets/images/Cardiology.jpg" alt="Cardiology care">
                 <div class="specialty-card-content">
                     <h3>Cardiology</h3>
                     <p>Expert care for your heart health.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/dentistry.jpg" alt="Dentistry care">
+                <img src="<%=request.getContextPath()%>/assets/images/Dentist.jpg" alt="Dentistry care">
                 <div class="specialty-card-content">
                     <h3>Dentistry</h3>
                     <p>Perfect smiles, one visit at a time.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/psychology.jpg" alt="Psychology care">
+                <img src="<%=request.getContextPath()%>/assets/images/Psycology.jpg" alt="Psychology care">
                 <div class="specialty-card-content">
                     <h3>Psychology</h3>
                     <p>Support for your mental well-being.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/pediatrics.jpg" alt="Pediatrics care">
+                <img src="<%=request.getContextPath()%>/assets/images/Pediatrics.jpg" alt="Pediatrics care">
                 <div class="specialty-card-content">
                     <h3>Pediatrics</h3>
                     <p>Gentle care for little ones.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/orthopedics.jpg" alt="Orthopedics care">
+                <img src="<%=request.getContextPath()%>/assets/images/Orthopedics.png" alt="Orthopedics care">
                 <div class="specialty-card-content">
                     <h3>Orthopedics</h3>
                     <p>Strengthening bones and joints.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/neurology.jpg" alt="Neurology care">
+                <img src="<%=request.getContextPath()%>/assets/images/Neurology.png" alt="Neurology care">
                 <div class="specialty-card-content">
                     <h3>Neurology</h3>
                     <p>Advanced care for your brain.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/dermatology.jpg" alt="Dermatology care">
+                <img src="<%=request.getContextPath()%>/assets/images/Dermatology.png" alt="Dermatology care">
                 <div class="specialty-card-content">
                     <h3>Dermatology</h3>
                     <p>Healthy skin starts here.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/ophthalmology.jpg" alt="Ophthalmology care">
+                <img src="<%=request.getContextPath()%>/assets/images/Ophthalmology.png" alt="Ophthalmology care">
                 <div class="specialty-card-content">
                     <h3>Ophthalmology</h3>
                     <p>Clear vision, expert care.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/endocrinology.jpg" alt="Endocrinology care">
+                <img src="<%=request.getContextPath()%>/assets/images/Endocrinology.png" alt="Endocrinology care">
                 <div class="specialty-card-content">
                     <h3>Endocrinology</h3>
                     <p>Balance your hormones with ease.</p>
                 </div>
             </div>
             <div class="specialty-card" role="article">
-                <img src="<%=request.getContextPath()%>/assets/images/gastroenterology.jpg" alt="Gastroenterology care">
+                <img src="<%=request.getContextPath()%>/assets/images/Gastroenterology.png" alt="Gastroenterology care">
                 <div class="specialty-card-content">
                     <h3>Gastroenterology</h3>
                     <p>Digestive health, simplified.</p>

@@ -27,7 +27,7 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length >= 6) {
+                if (parts.length >= 6) { // Expect id, patientId, doctorId, tokenID, date, time, priority
                     try {
                         String dateTime = parts[4].trim() + " " + parts[5].trim();
                         Appointment appt = new Appointment(
@@ -38,9 +38,6 @@ public class FileHandler {
                                 dateTime,                          // dateTime
                                 Integer.parseInt(parts[6].trim())  // priority
                         );
-                        if (parts.length > 7) {
-                            appt.setPatientName(parts[7].trim()); // Optional patientName
-                        }
                         appointments.add(appt);
                     } catch (NumberFormatException e) {
                         LOGGER.log(Level.WARNING, "Invalid number format in line: " + line, e);
@@ -59,15 +56,14 @@ public class FileHandler {
             for (Appointment appt : appointments) {
                 String[] dateTimeParts = appt.getDateTime().split(" ");
                 if (dateTimeParts.length != 2) continue;
-                String line = String.format("%d,%s,%s,%s,%s,%s,%d,%s",
+                String line = String.format("%d,%s,%s,%s,%s,%s,%d",
                         appt.getId(),
                         appt.getPatientId(),
                         appt.getDoctorId(),
                         appt.getTokenID(),
-                        dateTimeParts[0],
-                        dateTimeParts[1],
-                        appt.getPriority(),
-                        appt.getPatientName() != null ? appt.getPatientName() : "Unknown");
+                        dateTimeParts[0], // date
+                        dateTimeParts[1], // time
+                        appt.getPriority());
                 writer.write(line);
                 writer.newLine();
             }
@@ -91,7 +87,7 @@ public class FileHandler {
         }
     }
 
-    // New method to get patient name by username
+    // Keep this method for fetching patient names when needed
     public String getPatientNameByUsername(String username, String patientFilePath) throws IOException {
         FileHandler patientFileHandler = new FileHandler(patientFilePath);
         List<String> lines = patientFileHandler.readLines();
