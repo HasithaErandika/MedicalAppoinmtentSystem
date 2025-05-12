@@ -165,15 +165,7 @@
                 <div class="form-group">
                     <i class="ri-heart-pulse-line"></i>
                     <label>Specialization</label>
-                    <select id="editSpecialization" name="specialization" required>
-                        <option value="">Select Specialization</option>
-                        <option value="Cardiology">Cardiology</option>
-                        <option value="Neurology">Neurology</option>
-                        <option value="Orthopedics">Orthopedics</option>
-                        <option value="Pediatrics">Pediatrics</option>
-                        <option value="Pulmonology">Pulmonology</option>
-                        <option value="Dermatology">Dermatology</option>
-                        <option value="Oncology">Oncology</option>
+                    <input type="text" id="editSpecialization" name="specialization" required>
                     </select>
                 </div>
                 <div class="form-group">
