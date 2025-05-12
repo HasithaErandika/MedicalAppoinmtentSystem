@@ -24,7 +24,7 @@
             <c:forEach var="appt" items="${appointments}">
               <tr>
                 <td><c:out value="${appt.id}" /></td>
-                <td><c:out value="${appt.patientName != null ? appt.patientName : 'Unknown'}" /></td>
+                <td><c:out value="${patientNames[appt.patientId] != null ? patientNames[appt.patientId] : 'Unknown'}" /></td>
                 <td><c:out value="${appt.dateTime}" /></td>
                 <td>
                   <span class="priority-badge ${appt.priority == 1 ? 'emergency' : 'regular'}">
@@ -32,7 +32,7 @@
                   </span>
                 </td>
                 <td>
-                  <button class="btn btn-cancel" onclick="showCancelModal(${appt.id}, '${appt.patientName != null ? appt.patientName : 'Unknown'}', '${appt.dateTime}')" aria-label="Cancel Appointment ${appt.id}">
+                  <button class="btn btn-cancel" onclick="showCancelModal(${appt.id}, '${patientNames[appt.patientId] != null ? patientNames[appt.patientId] : 'Unknown'}', '${appt.dateTime}')" aria-label="Cancel Appointment ${appt.id}">
                     <i class="fas fa-times"></i> Cancel
                   </button>
                 </td>
