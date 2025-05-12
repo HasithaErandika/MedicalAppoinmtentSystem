@@ -6,6 +6,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Appointment;
 import model.Doctor;
+import java.util.Map;
+import java.util.HashMap;
 import service.AppointmentService;
 import service.DoctorAvailabilityService;
 import service.FileHandler;
@@ -67,6 +69,14 @@ public class DoctorServlet extends HttpServlet {
             LocalDateTime now = LocalDateTime.now();
             LocalDate today = LocalDate.now();
 
+            // Create a map to store patientId -> patientName
+            FileHandler patientFileHandler = new FileHandler(getServletContext().getRealPath("") + "/data/patients.txt");
+            Map<String, String> patientNames = new HashMap<>();
+            for (Appointment appt : appointments) {
+                String patientName = patientFileHandler.getPatientNameByUsername(appt.getPatientId(), getServletContext().getRealPath("") + "/data/patients.txt");
+                patientNames.put(appt.getPatientId(), patientName);
+            }
+
             int totalAppointments = appointments.size();
             int upcomingAppointments = (int) appointments.stream()
                     .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).isAfter(now))
@@ -87,6 +97,7 @@ public class DoctorServlet extends HttpServlet {
             request.setAttribute("todayAppointments", todayAppointments);
             request.setAttribute("completedAppointments", completedAppointments);
             request.setAttribute("appointments", appointments);
+            request.setAttribute("patientNames", patientNames); // Pass the patient names map
             request.setAttribute("doctor", doctor);
             request.setAttribute("section", section);
 
