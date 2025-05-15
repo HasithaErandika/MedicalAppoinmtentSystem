@@ -1,407 +1,324 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-    <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>MediSchedule - Manage Doctors</title>
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <style>
-            :root {
-                --primary: #4A90E2;
-                --secondary: #26A69A;
-                --accent: #EF5350;
-                --success: #2ECC71;
-                --bg-light: #F5F6F5;
-                --text-primary: #333333;
-                --text-muted: #666666;
-                --card-bg: #FFFFFF;
-                --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-                --border: #E0E0E0;
-                --hover: #F9FAFB;
-                --transition: all 0.3s ease;
-            }
-
-            * { margin: 0; padding: 0; box-sizing: border-box; }
-            body {
-                font-family: 'Segoe UI', Arial, sans-serif;
-                background: var(--bg-light);
-                color: var(--text-primary);
-                line-height: 1.6;
-                font-size: 16px;
-            }
-
-            .container {
-                max-width: 1280px;
-                margin: 2rem auto;
-                padding: 0 1.5rem;
-            }
-
-            /* Header Improvements */
-            .header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 2.5rem;
-                padding-bottom: 1rem;
-                border-bottom: 1px solid var(--border);
-            }
-            .header h1 {
-                color: var(--primary);
-                font-size: 2.25rem;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 0.75rem;
-            }
-            .back-btn {
-                color: var(--primary);
-                text-decoration: none;
-                font-weight: 500;
-                padding: 0.5rem 1rem;
-                border-radius: 6px;
-                transition: var(--transition);
-            }
-            .back-btn:hover {
-                background: var(--hover);
-                color: #357ABD;
-            }
-
-            /* Card and Form Improvements */
-            .card {
-                background: var(--card-bg);
-                border-radius: 16px;
-                box-shadow: var(--shadow);
-                padding: 2rem;
-                margin-bottom: 2.5rem;
-                transition: var(--transition);
-            }
-            .card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-            }
-
-            .form-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 1.5rem;
-                margin-bottom: 2rem;
-            }
-            .form-group {
-                position: relative;
-            }
-            .form-group label {
-                font-size: 0.95rem;
-                font-weight: 500;
-                margin-bottom: 0.5rem;
-                color: var(--text-primary);
-                display: flex;
-                align-items: center;
-                gap: 0.25rem;
-            }
-            .form-group input {
-                width: 100%;
-                padding: 0.875rem;
-                border: 1px solid var(--border);
-                border-radius: 8px;
-                font-size: 1rem;
-                background: #FFFFFF;
-                transition: var(--transition);
-            }
-            .form-group input:focus {
-                border-color: var(--primary);
-                box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
-                outline: none;
-            }
-            .form-group input:invalid:focus {
-                border-color: var(--accent);
-                box-shadow: 0 0 0 3px rgba(239, 83, 80, 0.1);
-            }
-
-            /* Button Improvements */
-            .btn {
-                padding: 0.875rem 1.75rem;
-                border: none;
-                border-radius: 8px;
-                font-weight: 500;
-                font-size: 1rem;
-                cursor: pointer;
-                transition: var(--transition);
-                display: inline-flex;
-                align-items: center;
-                gap: 0.5rem;
-            }
-            .btn-primary {
-                background: var(--primary);
-                color: #FFFFFF;
-            }
-            .btn-primary:hover {
-                background: #357ABD;
-                box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
-            }
-            .btn-danger {
-                background: var(--accent);
-                color: #FFFFFF;
-            }
-            .btn-danger:hover {
-                background: #D32F2F;
-                box-shadow: 0 2px 8px rgba(239, 83, 80, 0.3);
-            }
-            .btn-edit {
-                background: var(--secondary);
-                color: #FFFFFF;
-            }
-            .btn-edit:hover {
-                background: #00897B;
-                box-shadow: 0 2px 8px rgba(38, 166, 154, 0.3);
-            }
-
-            /* Table Improvements */
-            .table-container {
-                overflow-x: auto;
-                margin-bottom: 2rem;
-            }
-            table {
-                width: 100%;
-                border-collapse: separate;
-                border-spacing: 0;
-                background: var(--card-bg);
-                border-radius: 16px;
-                box-shadow: var(--shadow);
-                overflow: hidden;
-            }
-            th {
-                background: var(--primary);
-                color: #FFFFFF;
-                font-weight: 600;
-                padding: 1.25rem;
-                text-align: left;
-                font-size: 1.05rem;
-            }
-            td {
-                padding: 1.25rem;
-                border-bottom: 1px solid var(--border);
-                vertical-align: middle;
-            }
-            tr {
-                transition: var(--transition);
-            }
-            tr:hover {
-                background: var(--hover);
-                cursor: pointer;
-            }
-            .action-cell {
-                display: flex;
-                gap: 0.75rem;
-                align-items: center;
-            }
-
-            /* Modal Improvements */
-            .modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: rgba(0, 0, 0, 0.6);
-                justify-content: center;
-                align-items: center;
-                z-index: 1000;
-                animation: fadeIn 0.3s ease;
-            }
-            .modal-content {
-                background: var(--card-bg);
-                padding: 2.5rem;
-                border-radius: 16px;
-                box-shadow: var(--shadow);
-                width: 90%;
-                max-width: 700px;
-                max-height: 90vh;
-                overflow-y: auto;
-                animation: slideIn 0.3s ease;
-            }
-            .modal-header {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                margin-bottom: 2rem;
-            }
-            .modal-content h2 {
-                font-size: 1.75rem;
-                color: var(--primary);
-            }
-
-            /* Animations */
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            @keyframes slideIn {
-                from { transform: translateY(-20px); opacity: 0; }
-                to { transform: translateY(0); opacity: 1; }
-            }
-
-            /* Responsive Design */
-            @media (max-width: 768px) {
-                .form-grid { grid-template-columns: 1fr; }
-                .header { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-                .container { padding: 0 1rem; }
-                .btn { width: 100%; justify-content: center; }
-                .action-cell { flex-direction: column; gap: 0.5rem; }
-            }
-        </style>
-    </head>
-    <body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-user-md"></i> Manage Doctors</h1>
-            <a href="<%=request.getContextPath()%>/AdminServlet" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-        </div>
-
-        <div class="card">
-            <form action="<%=request.getContextPath()%>/ManageDoctorsServlet" method="post" class="doctor-form">
-                <input type="hidden" name="action" value="add">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="username"><i class="fas fa-user"></i> Username</label>
-                        <input type="text" id="username" name="username" required placeholder="Enter username">
-                    </div>
-                    <div class="form-group">
-                        <label for="password"><i class="fas fa-lock"></i> Password</label>
-                        <input type="password" id="password" name="password" required placeholder="Enter password">
-                    </div>
-                    <div class="form-group">
-                        <label for="name"><i class="fas fa-id-card"></i> Name</label>
-                        <input type="text" id="name" name="name" required placeholder="Enter full name">
-                    </div>
-                    <div class="form-group">
-                        <label for="specialization"><i class="fas fa-stethoscope"></i> Specialization</label>
-                        <input type="text" id="specialization" name="specialization" required placeholder="Enter specialization">
-                    </div>
-                    <div class="form-group">
-                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="email" name="email" required placeholder="Enter email address">
-                    </div>
-                    <div class="form-group">
-                        <label for="phone"><i class="fas fa-phone"></i> Phone</label>
-                        <input type="tel" id="phone" name="phone" required placeholder="Enter phone number" pattern="[0-9]{10}">
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-plus"></i> Add Doctor</button>
-            </form>
-        </div>
-
-        <div class="table-container">
-            <table>
-                <thead>
-                <tr>
-                    <th>Username</th>
-                    <th>Name</th>
-                    <th>Specialization</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>Actions</th>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach var="doctor" items="${doctors}">
-                    <tr>
-                        <td><c:out value="${doctor.split(',')[0]}"/></td>
-                        <td><c:out value="${doctor.split(',')[2]}"/></td>
-                        <td><c:out value="${doctor.split(',')[3]}"/></td>
-                        <td><c:out value="${doctor.split(',')[4]}"/></td>
-                        <td><c:out value="${doctor.split(',')[5]}"/></td>
-                        <td class="action-cell">
-                            <button class="btn btn-edit" onclick="openEditModal(
-                                    '<c:out value="${doctor.split(',')[0]}"/>',
-                                    '<c:out value="${doctor.split(',')[1]}"/>',
-                                    '<c:out value="${doctor.split(',')[2]}"/>',
-                                    '<c:out value="${doctor.split(',')[3]}"/>',
-                                    '<c:out value="${doctor.split(',')[4]}"/>',
-                                    '<c:out value="${doctor.split(',')[5]}"/>'
-                                    )"><i class="fas fa-edit"></i> Edit</button>
-                            <form action="<%=request.getContextPath()%>/ManageDoctorsServlet" method="post" style="display:inline;">
-                                <input type="hidden" name="action" value="remove">
-                                <input type="hidden" name="username" value="${doctor.split(',')[0]}">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to remove this doctor?');">
-                                    <i class="fas fa-trash"></i> Remove
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                </c:forEach>
-                </tbody>
-            </table>
-        </div>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediSchedule - Manage Doctors</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/manageOperations.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1><i class="ri-stethoscope-line"></i> Manage Doctors</h1>
+        <a href="<%=request.getContextPath()%>/AdminServlet" class="back-btn">
+            <i class="ri-arrow-left-line"></i> Back to Dashboard
+        </a>
     </div>
 
-    <!-- Edit Modal -->
-    <div class="modal" id="editModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-user-edit"></i> Edit Doctor</h2>
-                <button class="modal-close" onclick="closeEditModal()">×</button>
+    <div class="main-content">
+        <div>
+            <div class="card">
+                <button class="btn btn-primary" onclick="openAddModal()">
+                    <i class="ri-user-add-line"></i> Add New Doctor
+                </button>
             </div>
+
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search doctors..." onkeyup="searchTable()">
+                <button class="btn btn-primary" onclick="sortTable()">
+                    <i class="ri-sort-desc"></i> Sort (Newest First)
+                </button>
+            </div>
+
+            <div class="card">
+                <h2><i class="ri-pie-chart-line"></i> Specialization Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="specializationChart"></canvas>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="doctorsTable">
+                    <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Specialization</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                    </thead>
+                    <tbody id="doctorsBody">
+                    <c:forEach var="doctor" items="${doctors}">
+                        <tr>
+                            <td><c:out value="${doctor.split(',')[0]}"/></td>
+                            <td><c:out value="${doctor.split(',')[2]}"/></td>
+                            <td><c:out value="${doctor.split(',')[3]}"/></td>
+                            <td><c:out value="${doctor.split(',')[4]}"/></td>
+                            <td><c:out value="${doctor.split(',')[5]}"/></td>
+                            <td>
+                                <button class="btn btn-edit" onclick="openEditModal(
+                                        '<c:out value="${doctor.split(',')[0]}"/>',
+                                        '<c:out value="${doctor.split(',')[1]}"/>',
+                                        '<c:out value="${doctor.split(',')[2]}"/>',
+                                        '<c:out value="${doctor.split(',')[3]}"/>',
+                                        '<c:out value="${doctor.split(',')[4]}"/>',
+                                        '<c:out value="${doctor.split(',')[5]}"/>'
+                                        )"><i class="ri-edit-line"></i> Edit</button>
+                                <form action="<%=request.getContextPath()%>/ManageDoctorsServlet" method="post" style="display:inline;">
+                                    <input type="hidden" name="action" value="remove">
+                                    <input type="hidden" name="username" value="${doctor.split(',')[0]}">
+                                    <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                                        <i class="ri-delete-bin-line"></i> Remove
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    </c:forEach>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Doctor Modal -->
+<div class="modal" id="addModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="ri-user-add-line"></i> Add New Doctor</h2>
+            <button class="modal-close" onclick="closeAddModal()">×</button>
+        </div>
+        <div class="modal-body">
+            <form action="<%=request.getContextPath()%>/ManageDoctorsServlet" method="post">
+                <input type="hidden" name="action" value="add">
+                <div class="form-group">
+                    <i class="ri-user-line"></i>
+                    <label>Username</label>
+                    <input type="text" name="username" required>
+                </div>
+                <div class="form-group">
+                    <i class="ri-lock-line"></i>
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <i class="ri-profile-line"></i>
+                    <label>Name</label>
+                    <input type="text" name="name" required>
+                </div>
+                <div class="form-group">
+                    <i class="ri-heart-pulse-line"></i>
+                    <label>Specialization</label>
+                    <input type="text" name="specialization" required>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <i class="ri-mail-line"></i>
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <i class="ri-phone-line"></i>
+                    <label>Phone</label>
+                    <input type="tel" name="phone" required pattern="[0-9]{10}">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-add-line"></i> Add Doctor
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Modal -->
+<div class="modal" id="editModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="ri-user-settings-line"></i> Edit Doctor</h2>
+            <button class="modal-close" onclick="closeEditModal()">×</button>
+        </div>
+        <div class="modal-body">
             <form action="<%=request.getContextPath()%>/ManageDoctorsServlet" method="post">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="originalUsername" id="editOriginalUsername">
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label for="editUsername"><i class="fas fa-user"></i> Username</label>
-                        <input type="text" id="editUsername" name="username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPassword"><i class="fas fa-lock"></i> Password</label>
-                        <input type="password" id="editPassword" name="password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editName"><i class="fas fa-id-card"></i> Name</label>
-                        <input type="text" id="editName" name="name" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editSpecialization"><i class="fas fa-stethoscope"></i> Specialization</label>
-                        <input type="text" id="editSpecialization" name="specialization" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editEmail"><i class="fas fa-envelope"></i> Email</label>
-                        <input type="email" id="editEmail" name="email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="editPhone"><i class="fas fa-phone"></i> Phone</label>
-                        <input type="tel" id="editPhone" name="phone" required pattern="[0-9]{10}">
-                    </div>
+                <div class="form-group">
+                    <i class="ri-user-line"></i>
+                    <label>Username</label>
+                    <input type="text" id="editUsername" name="username" required>
                 </div>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> Save Changes</button>
+                <div class="form-group">
+                    <i class="ri-lock-line"></i>
+                    <label>Password</label>
+                    <input type="password" id="editPassword" name="password" required>
+                </div>
+                <div class="form-group">
+                    <i class="ri-profile-line"></i>
+                    <label>Name</label>
+                    <input type="text" id="editName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <i class="ri-heart-pulse-line"></i>
+                    <label>Specialization</label>
+                    <input type="text" id="editSpecialization" name="specialization" required>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <i class="ri-mail-line"></i>
+                    <label>Email</label>
+                    <input type="email" id="editEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <i class="ri-phone-line"></i>
+                    <label>Phone</label>
+                    <input type="tel" id="editPhone" name="phone" required pattern="[0-9]{10}">
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="ri-save-line"></i> Save Changes
+                </button>
             </form>
         </div>
     </div>
+</div>
 
-    <script>
-        function openEditModal(username, password, name, specialization, email, phone) {
-            document.getElementById('editOriginalUsername').value = username;
-            document.getElementById('editUsername').value = username;
-            document.getElementById('editPassword').value = password;
-            document.getElementById('editName').value = name;
-            document.getElementById('editSpecialization').value = specialization;
-            document.getElementById('editEmail').value = email;
-            document.getElementById('editPhone').value = phone;
-            document.getElementById('editModal').style.display = 'flex'; // Fixed typo: 'getElementOfId' to 'getElementById'
+<script>
+    // Add Modal functions
+    function openAddModal() {
+        document.getElementById('addModal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+        document.getElementById('addModal').style.display = 'none';
+    }
+
+    // Edit Modal functions
+    function openEditModal(username, password, name, specialization, email, phone) {
+        document.getElementById('editOriginalUsername').value = username;
+        document.getElementById('editUsername').value = username;
+        document.getElementById('editPassword').value = password;
+        document.getElementById('editName').value = name;
+        document.getElementById('editSpecialization').value = specialization;
+        document.getElementById('editEmail').value = email;
+        document.getElementById('editPhone').value = phone;
+        document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // Search function
+    function searchTable() {
+        const input = document.getElementById('searchInput');
+        const filter = input.value.toLowerCase();
+        const table = document.getElementById('doctorsTable');
+        const tr = table.getElementsByTagName('tr');
+
+        for (let i = 1; i < tr.length; i++) {
+            let found = false;
+            const td = tr[i].getElementsByTagName('td');
+            for (let j = 0; j < td.length - 1; j++) {
+                const cell = td[j];
+                if (cell) {
+                    const txtValue = cell.textContent || cell.innerText;
+                    if (txtValue.toLowerCase().indexOf(filter) > -1) {
+                        found = true;
+                        break;
+                    }
+                }
+            }
+            tr[i].style.display = found ? '' : 'none';
         }
+    }
 
-        function closeEditModal() {
-            document.getElementById('editModal').style.display = 'none';
+    // Sort function (assuming newer entries have more recent phone numbers as a proxy)
+    function sortTable() {
+        const table = document.getElementById('doctorsTable');
+        const tbody = document.getElementById('doctorsBody');
+        const rows = Array.from(tbody.getElementsByTagName('tr'));
+
+        rows.sort((a, b) => {
+            const phoneA = a.cells[4].textContent;
+            const phoneB = b.cells[4].textContent;
+            return phoneB.localeCompare(phoneA); // Newest first (assuming higher numbers are newer)
+        });
+
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
         }
+        rows.forEach(row => tbody.appendChild(row));
+    }
 
-        window.onclick = function(event) {
-            const modal = document.getElementById('editModal');
-            if (event.target === modal) {
-                closeEditModal();
+    // Specialization Pie Chart
+    const doctorsData = [
+        <c:forEach var="doctor" items="${doctors}">
+        '<c:out value="${doctor.split(',')[3]}"/>',
+        </c:forEach>
+    ];
+
+    const specializationCount = doctorsData.reduce((acc, curr) => {
+        acc[curr] = (acc[curr] || 0) + 1;
+        return acc;
+    }, {});
+
+    const ctx = document.getElementById('specializationChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: Object.keys(specializationCount),
+            datasets: [{
+                data: Object.values(specializationCount),
+                backgroundColor: [
+                    'rgba(74, 144, 226, 0.8)',
+                    'rgba(38, 166, 154, 0.8)',
+                    'rgba(239, 83, 80, 0.8)',
+                    'rgba(156, 39, 176, 0.8)',
+                    'rgba(255, 159, 64, 0.8)',
+                    'rgba(46, 204, 113, 0.8)'
+                ],
+                borderWidth: 2,
+                borderColor: '#FFFFFF'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    padding: 10,
+                    cornerRadius: 8
+                },
+                title: {
+                    display: true,
+                    text: 'Doctors by Specialization',
+                    font: { size: 16 }
+                }
             }
         }
-    </script>
-    </body>
-    </html>
+    });
+
+    window.onclick = function(event) {
+        const addModal = document.getElementById('addModal');
+        const editModal = document.getElementById('editModal');
+        if (event.target === addModal) {
+            closeAddModal();
+        } else if (event.target === editModal) {
+            closeEditModal();
+        }
+    }
+</script>
+</body>
+</html>

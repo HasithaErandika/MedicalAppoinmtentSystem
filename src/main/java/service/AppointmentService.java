@@ -1,84 +1,117 @@
 package service;
 
 import model.Appointment;
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class AppointmentService {
+    private static final Logger LOGGER = Logger.getLogger(AppointmentService.class.getName());
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
     private final String filePath;
     private final FileHandler fileHandler;
-    private PriorityQueue<Appointment> emergencyQueue;
+    private final PriorityQueue<Appointment> emergencyQueue;
+    private List<Appointment> cachedAppointments;
+    private final String patientFilePath = "/data/patients.txt"; // Adjust as needed
 
-    public AppointmentService(String filePath) {
+    public AppointmentService(String filePath) throws IOException {
         this.filePath = filePath;
         this.fileHandler = new FileHandler(filePath);
-        this.emergencyQueue = new PriorityQueue<>((a1, a2) -> Integer.compare(a2.getPriority(), a1.getPriority()));
-        try {
-            List<Appointment> appointments = readAppointments();
-            if (appointments != null) {
-                emergencyQueue.addAll(appointments);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+        this.emergencyQueue = new PriorityQueue<>(Comparator.comparingInt(Appointment::getPriority));
+        this.cachedAppointments = readAppointments();
+        if (cachedAppointments != null) {
+            emergencyQueue.addAll(cachedAppointments);
+        } else {
+            cachedAppointments = new ArrayList<>();
         }
+        enrichAppointmentsWithPatientNames();
     }
 
     public List<Appointment> readAppointments() throws IOException {
-        List<String> lines = fileHandler.readLines();
-        if (lines == null) return new ArrayList<>();
-        List<Appointment> appointments = new ArrayList<>();
-        for (String line : lines) {
-            String[] parts = line.split(",");
-            if (parts.length == 5) {
-                int id = Integer.parseInt(parts[0]);
-                String patientId = parts[1];
-                String doctorId = parts[2];
-                String dateTime = parts[3];
-                int priority = Integer.parseInt(parts[4]);
-                appointments.add(new Appointment(id, patientId, doctorId, dateTime, priority));
-            }
+        return fileHandler.readAppointments();
+    }
+
+    public synchronized void bookAppointment(String patientId, String doctorId, String tokenID, String dateTime, boolean isEmergency) throws IOException {
+        if (patientId == null || doctorId == null || tokenID == null || dateTime == null) {
+            throw new IllegalArgumentException("Invalid appointment details");
         }
-        return appointments;
-    }
-
-    public void bookAppointment(String patientId, String doctorId, String dateTime, boolean isEmergency) throws IOException {
-        List<Appointment> appointments = readAppointments();
-        int newId = appointments.stream().mapToInt(Appointment::getId).max().orElse(0) + 1;
-        Appointment newAppointment = new Appointment(newId, patientId, doctorId, dateTime, isEmergency ? 1 : 2);
-        appointments.add(newAppointment);
+        int newId = cachedAppointments.stream().mapToInt(Appointment::getId).max().orElse(0) + 1;
+        int priority = isEmergency ? 1 : 2;
+        Appointment newAppointment = new Appointment(newId, patientId, doctorId, tokenID, dateTime, priority);
+        String patientName = fileHandler.getPatientNameByUsername(patientId, patientFilePath);
+        newAppointment.setPatientName(patientName);
+        cachedAppointments.add(newAppointment);
         if (isEmergency) emergencyQueue.add(newAppointment);
-        writeAppointments(appointments);
+        writeAppointments(cachedAppointments);
+        LOGGER.info("Booked appointment: " + newAppointment);
     }
 
-    public void updateAppointment(int id, String patientId, String doctorId, String dateTime, int priority) throws IOException {
-        List<Appointment> appointments = readAppointments();
-        for (int i = 0; i < appointments.size(); i++) {
-            if (appointments.get(i).getId() == id) {
-                appointments.set(i, new Appointment(id, patientId, doctorId, dateTime, priority));
+    public synchronized void updateAppointment(int id, String patientId, String doctorId, String tokenID, String dateTime, int priority) throws IOException {
+        boolean found = false;
+        for (int i = 0; i < cachedAppointments.size(); i++) {
+            if (cachedAppointments.get(i).getId() == id) {
+                Appointment updated = new Appointment(id, patientId, doctorId, tokenID, dateTime, priority);
+                String patientName = fileHandler.getPatientNameByUsername(patientId, patientFilePath);
+                updated.setPatientName(patientName);
+                cachedAppointments.set(i, updated);
+                found = true;
                 break;
             }
         }
+        if (!found) throw new IllegalArgumentException("Appointment with ID " + id + " not found");
         emergencyQueue.clear();
-        emergencyQueue.addAll(appointments);
-        writeAppointments(appointments);
+        emergencyQueue.addAll(cachedAppointments);
+        writeAppointments(cachedAppointments);
+        LOGGER.info("Updated appointment ID: " + id);
     }
 
-    public void cancelAppointment(int id) throws IOException {
-        List<Appointment> appointments = readAppointments();
-        appointments.removeIf(appt -> appt.getId() == id);
+    public synchronized void cancelAppointment(int id) throws IOException {
+        boolean removed = cachedAppointments.removeIf(appt -> appt.getId() == id);
+        if (!removed) throw new IllegalArgumentException("Appointment with ID " + id + " not found");
         emergencyQueue.clear();
-        emergencyQueue.addAll(appointments);
-        writeAppointments(appointments);
+        emergencyQueue.addAll(cachedAppointments);
+        writeAppointments(cachedAppointments);
+        LOGGER.info("Cancelled appointment ID: " + id);
     }
 
     private void writeAppointments(List<Appointment> appointments) throws IOException {
-        List<String> lines = new ArrayList<>();
-        for (Appointment appt : appointments) {
-            lines.add(String.format("%d,%s,%s,%s,%d", appt.getId(), appt.getPatientId(), appt.getDoctorId(), appt.getDateTime(), appt.getPriority()));
+        fileHandler.writeAppointments(appointments);
+    }
+
+    private void enrichAppointmentsWithPatientNames() throws IOException {
+        for (Appointment appt : cachedAppointments) {
+            String patientName = fileHandler.getPatientNameByUsername(appt.getPatientId(), patientFilePath);
+            appt.setPatientName(patientName);
         }
-        fileHandler.writeLines(lines);
+    }
+
+    public Appointment getNextEmergency() {
+        return emergencyQueue.poll();
+    }
+
+    public List<Appointment> getAllAppointments() {
+        return new ArrayList<>(cachedAppointments);
+    }
+
+    public List<Appointment> getAppointmentsByPatientId(String patientId) {
+        return cachedAppointments.stream()
+                .filter(appt -> appt.getPatientId().equals(patientId))
+                .collect(Collectors.toList());
+    }
+
+    public List<Appointment> getSortedAppointments() {
+        List<Appointment> appointments = new ArrayList<>(cachedAppointments);
+        Collections.sort(appointments, Comparator.comparing(
+                appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER)));
+        return appointments;
+    }
+
+    public List<Appointment> getAppointmentsByDoctorId(String doctorId) {
+        return cachedAppointments.stream()
+                .filter(appt -> appt.getDoctorId().equals(doctorId))
+                .collect(Collectors.toList());
     }
 }
