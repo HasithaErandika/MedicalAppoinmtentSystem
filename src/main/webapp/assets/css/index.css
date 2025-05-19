@@ -1,0 +1,746 @@
+/* Root Variables for Professional Medical Theme */
+:root {
+    --primary: #2C6E8F;    /* Deep teal - Professional and calming */
+    --secondary: #5BB9A8;  /* Soft green - Trust and health */
+    --accent: #E8F0F2;     /* Light gray-blue - Clean and neutral */
+    --text: #1A2E44;       /* Dark blue-gray - Readable and serious */
+    --white: #FFFFFF;      /* Pure white - Clarity and simplicity */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    --highlight: #F4A261;  /* Warm orange - Subtle accent for CTAs */
+    --error: #D9534F;      /* Red for errors */
+    --border-radius: 8px;  /* Consistent rounding */
+    --transition: all 0.3s ease; /* Smooth transitions */
+    --font-size-base: 16px;
+    --font-size-large: 1.5rem;
+    --font-size-small: 0.875rem;
+}
+
+/* General Body Styles */
+body {
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    background: var(--white);
+    color: var(--text);
+    line-height: 1.6;
+    margin: 0;
+    font-size: var(--font-size-base);
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* Navigation */
+nav {
+    background: var(--white);
+    box-shadow: var(--shadow);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    color: var(--primary);
+    font-size: var(--font-size-large);
+    font-weight: 700;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.logo i {
+    font-size: 1.8rem;
+}
+
+.logo:hover {
+    color: var(--secondary);
+}
+
+.nav-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.dropdown-btn, .register-btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    border: none;
+    background: var(--primary);
+    color: var(--white);
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: var(--transition);
+    text-decoration: none;
+}
+
+.dropdown-btn:hover, .register-btn:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* Mobile Menu Toggle */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--primary);
+    cursor: pointer;
+}
+
+/* Dropdown Menu */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    min-width: 200px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: var(--transition);
+    padding: 0.5rem;
+    z-index: 10;
+}
+
+.dropdown:hover .dropdown-menu,
+.dropdown-btn:focus + .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-menu a {
+    padding: 0.75rem 1.5rem;
+    display: block;
+    color: var(--text);
+    text-decoration: none;
+    font-size: var(--font-size-small);
+    border-radius: 4px;
+    transition: var(--transition);
+}
+
+.dropdown-menu a:hover,
+.dropdown-menu a:focus {
+    background: var(--secondary);
+    color: var(--white);
+}
+
+/* Hero Section */
+.hero {
+    background: linear-gradient(45deg, var(--primary), var(--secondary));
+    color: var(--white);
+    padding: 6rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content h1 {
+    font-size: 2.8rem;
+    margin-bottom: 1rem;
+    animation: fadeInUp 1s ease;
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto 2rem;
+}
+
+.cta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    background: var(--white);
+    color: var(--primary);
+    border-radius: 25px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: var(--transition);
+}
+
+.cta-btn:hover,
+.cta-btn:focus {
+    background: var(--highlight);
+    color: var(--white);
+    transform: scale(1.05);
+}
+
+/* Appointment Section */
+.appointment-section {
+    padding: 4rem 2rem;
+    background: var(--accent);
+    border-radius: 16px;
+    margin: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.appointment-section h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+}
+
+.tabs {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.tab-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    background: var(--white);
+    color: var(--text);
+    border-radius: var(--border-radius);
+    font-size: var(--font-size-small);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.tab-btn:hover,
+.tab-btn:focus {
+    background: var(--secondary);
+    color: var(--white);
+}
+
+.tab-content {
+    background: var(--white);
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow);
+}
+
+.tab-pane {
+    display: none;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h3 {
+    font-size: 1.8rem;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.section-header i {
+    color: var(--primary);
+}
+
+/* Form Fields */
+.form-field {
+    margin-bottom: 1rem;
+}
+
+.form-label {
+    display: block;
+    font-size: var(--font-size-small);
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text);
+}
+
+.form-select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid var(--accent);
+    border-radius: var(--border-radius);
+    background: var(--white);
+    font-size: var(--font-size-small);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(44, 110, 143, 0.2);
+    outline: none;
+}
+
+.error-text {
+    color: var(--error);
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+.filter-section {
+    margin: 1.5rem 0;
+}
+
+.filter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+/* Tables */
+.table-container, .table-section {
+    margin-top: 1.5rem;
+}
+
+.availability-table, .appointments-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--white);
+    border-radius: var(--border-radius);
+    overflow: hidden;
+}
+
+.availability-table th, .appointments-table th {
+    background: var(--primary);
+    color: var(--white);
+    padding: 1rem;
+    font-weight: 600;
+    text-align: left;
+}
+
+.availability-table td, .appointments-table td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--accent);
+}
+
+.availability-table tbody tr:hover, .appointments-table tbody tr:hover {
+    background: var(--accent);
+}
+
+.sortable {
+    cursor: pointer;
+}
+
+.sortable i {
+    margin-left: 0.5rem;
+}
+
+.no-results, .no-appointments {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text);
+}
+
+.no-results i, .no-appointments i {
+    font-size: 2rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+/* Table Action Buttons */
+.availability-table .book-btn, .appointments-table .cancel-appointment-btn {
+    padding: 0.5rem 1rem;
+    background: var(--primary);
+    color: var(--white);
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.availability-table .book-btn:hover,
+.availability-table .book-btn:focus,
+.appointments-table .cancel-appointment-btn:hover,
+.appointments-table .cancel-appointment-btn:focus {
+    background: var(--secondary);
+}
+
+.appointments-table .cancel-appointment-btn {
+    background: var(--error);
+}
+
+.appointments-table .cancel-appointment-btn:hover,
+.appointments-table .cancel-appointment-btn:focus {
+    background: #c9302c;
+}
+
+/* Modals */
+.modal {
+    border: none;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    max-width: 400px;
+    margin: auto;
+    background: var(--white);
+}
+
+.modal-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: var(--text);
+}
+
+.appointment-details p {
+    margin: 0.5rem 0;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.cancel-btn, .confirm-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    transition: var(--transition);
+}
+
+.cancel-btn {
+    background: var(--accent);
+    color: var(--text);
+}
+
+.cancel-btn:hover {
+    background: var(--highlight);
+    color: var(--white);
+}
+
+.confirm-btn {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.confirm-btn:hover {
+    background: var(--secondary);
+}
+
+/* Login Popup */
+.login-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+}
+
+.login-popup-content {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 16px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: var(--shadow);
+    animation: slideIn 0.3s ease;
+}
+
+.popup-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.popup-header i {
+    font-size: 1.5rem;
+    color: var(--primary);
+}
+
+.login-btn {
+    background: var(--primary);
+    color: var(--white);
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    border: none;
+    cursor: pointer;
+    font-size: var(--font-size-small);
+    width: 100%;
+    transition: var(--transition);
+}
+
+.login-btn:hover,
+.login-btn:focus {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+.countdown {
+    margin: 1rem 0;
+    font-size: var(--font-size-small);
+    color: var(--text);
+}
+
+/* Features Section */
+.features {
+    padding: 4rem 2rem;
+    background: var(--white);
+}
+
+.features h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+}
+
+.feature-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    text-align: center;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+}
+
+.feature-card h3 {
+    font-size: 1.3rem;
+    margin-bottom: 0.5rem;
+}
+
+.feature-card p {
+    font-size: var(--font-size-small);
+    color: var(--text);
+}
+
+/* Specialties Section */
+.specialties {
+    padding: 4rem 2rem;
+    background: var(--accent);
+}
+
+.specialties h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.specialties-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.specialty-card {
+    background: var(--white);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+}
+
+.specialty-card:hover {
+    transform: translateY(-5px);
+}
+
+.specialty-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius);
+}
+
+.specialty-card-content {
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.specialty-card h3 {
+    font-size: 1.2rem;
+    margin: 0.5rem 0;
+}
+
+.specialty-card p {
+    font-size: var(--font-size-small);
+    color: var(--text);
+}
+
+/* Footer */
+footer {
+    background: var(--text);
+    color: var(--white);
+    padding: 2rem;
+    text-align: center;
+}
+
+.footer-content p {
+    margin-bottom: 1rem;
+    font-size: var(--font-size-small);
+}
+
+.footer-links a {
+    color: var(--accent);
+    margin: 0 1rem;
+    text-decoration: none;
+    font-size: var(--font-size-small);
+    transition: var(--transition);
+}
+
+.footer-links a:hover,
+.footer-links a:focus {
+    color: var(--secondary);
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .nav-actions {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--white);
+        flex-direction: column;
+        padding: 1rem;
+        box-shadow: var(--shadow);
+    }
+
+    .nav-actions.active {
+        display: flex;
+    }
+
+    .mobile-menu-toggle {
+        display: block;
+    }
+
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+
+    .hero-content p {
+        font-size: 1rem;
+    }
+
+    .appointment-section {
+        margin: 1rem;
+        padding: 2rem 1rem;
+    }
+
+    .tabs {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .tab-btn {
+        width: 100%;
+    }
+
+    .filter-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .availability-table, .appointments-table {
+        display: block;
+        overflow-x: auto;
+    }
+
+    .specialty-card img {
+        height: 120px;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero {
+        padding: 4rem 1rem;
+    }
+
+    .cta-btn {
+        padding: 0.75rem 1.5rem;
+        font-size: var(--font-size-small);
+    }
+
+    .login-popup-content {
+        margin: 5vh 1rem;
+        padding: 1.5rem;
+    }
+
+    .features,
+    .specialties {
+        padding: 2rem 1rem;
+    }
+}
+
+/* Accessibility */
+:focus {
+    outline: 3px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
