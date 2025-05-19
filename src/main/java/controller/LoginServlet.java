@@ -17,6 +17,7 @@ public class LoginServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(LoginServlet.class.getName());
     private static final String DATA_DIR = "/data/";
 
+
     private String getBasePath(HttpServletRequest request) {
         return request.getServletContext().getRealPath(DATA_DIR);
     }
@@ -102,7 +103,7 @@ public class LoginServlet extends HttpServlet {
             case "admin":
                 return "/pages/adminDashboard.jsp";
             default:
-                return "/index.jsp"; // Fallback
+                return "/pages/index.jsp"; // Fallback
         }
     }
 }
