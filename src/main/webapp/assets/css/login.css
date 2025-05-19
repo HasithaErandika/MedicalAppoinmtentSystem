@@ -1,17 +1,20 @@
+/* Root Variables - Matching index.jsp Professional Medical Theme with Role-Specific Colors */
 :root {
-    --primary-patient: #34C759;
-    --primary-doctor: #2C6EBF;
-    --primary-admin: #F59E0B;
-    --bg-light: #F0F4F8;
-    --text-primary: #1F2A44;
-    --text-secondary: #64748B;
-    --card-bg: rgba(255, 255, 255, 0.95);
-    --shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-    --error: #EF4444;
-    --border-radius: 16px;
-    --success: #10B981;
+    --primary: #2C6E8F;    /* Deep teal - Default/Patient role */
+    --doctor: #2C6EBF;     /* Professional blue - Doctor role */
+    --admin: #6B7280;      /* Slate gray - Admin role */
+    --secondary: #5BB9A8;  /* Soft green - Trust and health */
+    --accent: #E8F0F2;     /* Light gray-blue - Clean and neutral */
+    --text: #1A2E44;       /* Dark blue-gray - Readable and serious */
+    --white: #FFFFFF;      /* Pure white - Clarity and simplicity */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+    --highlight: #F4A261;  /* Warm orange - Subtle accent for CTAs */
+    --error: #E57373;      /* Soft red for errors */
+    --success: #5BB9A8;    /* Matches secondary for success */
+    --border-radius: 16px; /* Consistent rounding */
 }
 
+/* Reset and Base Styles */
 * {
     margin: 0;
     padding: 0;
@@ -20,7 +23,7 @@
 
 body {
     font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
-    color: var(--text-primary);
+    color: var(--text);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -45,19 +48,20 @@ body::before {
 
 /* Background images for each role */
 body.patient {
-    background-image: url('https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1585559605688-6374ebdc7078?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
 
 body.doctor {
-    background-image: url('https://images.unsplash.com/photo-1587370560942-25094d5d5f64?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1504813184591-01572f98c85f?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
 
 body.admin {
-    background-image: url('https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=2070&auto=format&fit=crop');
+    background-image: url('https://images.unsplash.com/photo-1643264560215-9c2f72485ca1?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
 }
 
+/* Login Container */
 .login-container {
-    background: var(--card-bg);
+    background: rgba(255, 255, 255, 0.95); /* Slightly translucent white */
     padding: 3rem;
     border-radius: var(--border-radius);
     box-shadow: var(--shadow);
@@ -69,6 +73,7 @@ body.admin {
     border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
+/* Login Header */
 .login-header {
     margin-bottom: 2.5rem;
 }
@@ -90,74 +95,87 @@ body.admin {
 
 .login-header p {
     font-size: 1rem;
-    color: var(--text-secondary);
+    color: #718096; /* Neutral gray for secondary text */
     margin-top: 0.5rem;
 }
 
-/* Role-specific theming */
+/* Role-Specific Theming */
 .patient .logo, .patient h1 {
-    color: var(--primary-patient);
+    color: var(--primary);
 }
 
 .patient .login-btn {
-    background: var(--primary-patient);
+    background: var(--primary);
 }
 
 .patient .login-btn:hover {
-    background: #2DB84C;
+    background: var(--secondary);
 }
 
 .patient .form-input:focus {
-    border-color: var(--primary-patient);
-    box-shadow: 0 0 0 4px rgba(52, 199, 89, 0.2);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 4px rgba(44, 110, 143, 0.2); /* Matches --primary */
+}
+
+.patient .form-input:focus + i {
+    color: var(--primary);
 }
 
 .patient .link:hover {
-    color: var(--primary-patient);
+    color: var(--primary);
 }
 
 .doctor .logo, .doctor h1 {
-    color: var(--primary-doctor);
+    color: var(--doctor);
 }
 
 .doctor .login-btn {
-    background: var(--primary-doctor);
+    background: var(--doctor);
 }
 
 .doctor .login-btn:hover {
-    background: #255DA3;
+    background: #255DA3; /* Slightly darker blue for hover */
 }
 
 .doctor .form-input:focus {
-    border-color: var(--primary-doctor);
-    box-shadow: 0 0 0 4px rgba(44, 110, 191, 0.2);
+    border-color: var(--doctor);
+    box-shadow: 0 0 0 4px rgba(44, 110, 191, 0.2); /* Matches --doctor */
+}
+
+.doctor .form-input:focus + i {
+    color: var(--doctor);
 }
 
 .doctor .link:hover {
-    color: var(--primary-doctor);
+    color: var(--doctor);
 }
 
 .admin .logo, .admin h1 {
-    color: var(--primary-admin);
+    color: var(--admin);
 }
 
 .admin .login-btn {
-    background: var(--primary-admin);
+    background: var(--admin);
 }
 
 .admin .login-btn:hover {
-    background: #D97706;
+    background: #5F6673; /* Slightly darker gray for hover */
 }
 
 .admin .form-input:focus {
-    border-color: var(--primary-admin);
-    box-shadow: 0 0 0 4px rgba(245, 158, 11, 0.2);
+    border-color: var(--admin);
+    box-shadow: 0 0 0 4px rgba(107, 114, 128, 0.2); /* Matches --admin */
+}
+
+.admin .form-input:focus + i {
+    color: var(--admin);
 }
 
 .admin .link:hover {
-    color: var(--primary-admin);
+    color: var(--admin);
 }
 
+/* Form Group */
 .form-group {
     position: relative;
     margin-bottom: 1.75rem;
@@ -167,7 +185,7 @@ body.admin {
 .form-group label {
     font-size: 0.95rem;
     font-weight: 500;
-    color: var(--text-secondary);
+    color: #718096; /* Matches secondary text */
     margin-bottom: 0.5rem;
     display: block;
 }
@@ -175,17 +193,17 @@ body.admin {
 .form-input {
     width: 100%;
     padding: 1rem 1rem 1rem 3rem;
-    border: 1px solid #D1D5DB;
+    border: 1px solid var(--accent);
     border-radius: 10px;
     font-size: 1rem;
-    background: #F9FAFB;
+    background: var(--white);
     transition: all 0.3s ease;
     height: 56px; /* Larger touch target */
 }
 
 .form-input:focus {
     outline: none;
-    background: #FFFFFF;
+    background: var(--white);
 }
 
 .form-group i {
@@ -193,30 +211,18 @@ body.admin {
     left: 1rem;
     top: 50%;
     transform: translateY(-50%);
-    color: var(--text-secondary);
+    color: #A0AEC0;
     font-size: 1.2rem;
     transition: color 0.3s ease;
 }
 
-/* Adjust icon color on focus based on role */
-.patient .form-input:focus + i {
-    color: var(--primary-patient);
-}
-
-.doctor .form-input:focus + i {
-    color: var(--primary-doctor);
-}
-
-.admin .form-input:focus + i {
-    color: var(--primary-admin);
-}
-
+/* Login Button */
 .login-btn {
     width: 100%;
     padding: 1rem;
     border: none;
     border-radius: var(--border-radius);
-    color: #FFFFFF;
+    color: var(--white);
     font-size: 1rem;
     font-weight: 600;
     cursor: pointer;
@@ -233,19 +239,21 @@ body.admin {
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
+/* Error Message */
 .error-message {
     color: var(--error);
     margin: 1rem 0;
     font-size: 0.9rem;
-    background: rgba(239, 68, 68, 0.1);
+    background: rgba(229, 115, 115, 0.1); /* Matches --error */
     padding: 0.75rem;
     border-radius: 10px;
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(229, 115, 115, 0.2);
     display: flex;
     align-items: center;
     gap: 0.5rem;
 }
 
+/* Links */
 .links {
     margin-top: 2rem;
     display: flex;
@@ -255,7 +263,7 @@ body.admin {
 }
 
 .link {
-    color: var(--text-secondary);
+    color: #718096; /* Neutral gray */
     text-decoration: none;
     transition: all 0.3s ease;
 }
@@ -267,10 +275,10 @@ body.admin {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background: #FFFFFF;
+    background: var(--white);
     padding: 2rem;
     border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    box-shadow: var(--shadow);
     z-index: 1000;
     text-align: center;
     max-width: 90%;
@@ -280,7 +288,7 @@ body.admin {
 
 .popup h2 {
     font-size: 1.5rem;
-    color: var(--text-primary);
+    color: var(--text);
     margin-bottom: 1rem;
 }
 
@@ -294,19 +302,22 @@ body.admin {
     padding: 0.75rem 1.5rem;
     border: none;
     border-radius: 8px;
-    background: var(--primary-patient); /* Default to patient */
-    color: #FFFFFF;
+    color: var(--white);
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.popup button:hover {
-    background: #2DB84C; /* Default hover */
+.patient .popup button {
+    background: var(--primary);
+}
+
+.patient .popup button:hover {
+    background: var(--secondary);
 }
 
 .doctor .popup button {
-    background: var(--primary-doctor);
+    background: var(--doctor);
 }
 
 .doctor .popup button:hover {
@@ -314,13 +325,14 @@ body.admin {
 }
 
 .admin .popup button {
-    background: var(--primary-admin);
+    background: var(--admin);
 }
 
 .admin .popup button:hover {
-    background: #D97706;
+    background: #5F6673;
 }
 
+/* Overlay */
 .overlay {
     display: none;
     position: fixed;
@@ -332,6 +344,7 @@ body.admin {
     z-index: 999;
 }
 
+/* Animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
@@ -342,6 +355,7 @@ body.admin {
     to { opacity: 1; transform: translate(-50%, -50%); }
 }
 
+/* Responsive Design */
 @media (max-width: 480px) {
     .login-container {
         padding: 2rem;

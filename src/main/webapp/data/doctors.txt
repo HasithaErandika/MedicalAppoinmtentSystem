@@ -12,19 +12,5 @@ doctor11,pass123,Dr. Lakmali Pathiraja,Dermatology,pathiraja@hospital.lk,0778896
 doctor12,pass234,Dr. I L Jayaweera,Venereology,jayaweera@hospital.lk,0778896512
 doctor13,pass345,Dr. Indika Boteju,Consultant Physician,boteju@hospital.lk,0778896513
 doctor14,pass456,Dr. Jeyakumar Janaarthanan,Orthopedic Surgery,janaarthanan@hospital.lk,0778896514
-doctor15,pass567,Dr. Uditha Kodithuwakku,Radiology,kodithuwakku@hospital.lk,0778896515
-doctor16,pass678,Dr. Sagali Rupasinghe,Nutrition,rupasinghe@hospital.lk,0778896516
-doctor17,pass789,Dr. Nalin Gamaathige,Neonatal Pediatrics,gamaathige@hospital.lk,0778896517
-doctor18,pass890,Dr. Rajeev Sathanandaraja,Pediatric Neonatology,sathanandaraja@hospital.lk,0778896518
-doctor19,pass901,Dr. Udara Jayawardena,Subfertility and Gynecology,jayawardena@hospital.lk,0778896519
-doctor20,pass012,Dr. Sanjeewa Samaranayake,Gastrointestinal Surgery,samaranayake@hospital.lk,0778896520
-doctor21,pass123,Dr. Ruwangi Dissanayaka,Pediatric Care,dissanayaka@hospital.lk,0778896521
-doctor22,pass234,Dr. H Ratnayake,Clinical Embryology,ratnayake@hospital.lk,0778896522
-doctor23,pass345,Dr. Nimesha Gamhewage,Neonatology,gamhewage@hospital.lk,0778896523
-doctor24,pass456,Dr. Hashir Ariff,Child Health,ariff@hospital.lk,0778896524
-doctor25,pass567,Dr. Shamitha Dassanayake,Internal Medicine,dassanayake@hospital.lk,0778896525
-doctor26,pass678,Dr. Kosala Karunaratne,Pediatric Medicine,karunaratne@hospital.lk,0778896526
-doctor27,pass789,Dr. Sunil Kulathunga,Women’s Health,kulathunga@hospital.lk,0778896527
-doctor28,pass890,Dr. RMC Asanka,EEG,asanka@hospital.lk,0778896528
-doctor29,pass901,Dr. Shanez Fernando,Mental Health Counseling,fernando@hospital.lk,0778896529
-doctor30,pass012,Dr. Nayana Perera,Skin Care,nayanaperera@hospital.lk,0778896530
+doctor15,pass567,Dr. Uditha Kodithuwakku,Pediatrics,kodithuwakku@hospital.lk,0778896517
+doctor16,pass123,Dr. Dineth Nirosian,Cardiology,dineth@hospital.lk,0778449035

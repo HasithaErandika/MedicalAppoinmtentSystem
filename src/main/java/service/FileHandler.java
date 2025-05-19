@@ -27,7 +27,7 @@ public class FileHandler {
             String line;
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length == 7) {
+                if (parts.length >= 6) { // Expect id, patientId, doctorId, tokenID, date, time, priority
                     try {
                         String dateTime = parts[4].trim() + " " + parts[5].trim();
                         Appointment appt = new Appointment(
@@ -61,8 +61,8 @@ public class FileHandler {
                         appt.getPatientId(),
                         appt.getDoctorId(),
                         appt.getTokenID(),
-                        dateTimeParts[0],
-                        dateTimeParts[1],
+                        dateTimeParts[0], // date
+                        dateTimeParts[1], // time
                         appt.getPriority());
                 writer.write(line);
                 writer.newLine();
@@ -85,5 +85,19 @@ public class FileHandler {
                 writer.newLine();
             }
         }
+    }
+
+    // Keep this method for fetching patient names when needed
+    public String getPatientNameByUsername(String username, String patientFilePath) throws IOException {
+        FileHandler patientFileHandler = new FileHandler(patientFilePath);
+        List<String> lines = patientFileHandler.readLines();
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts.length >= 3 && parts[0].equals(username)) {
+                return parts[2].trim(); // Name is in the third position
+            }
+        }
+        LOGGER.warning("No patient found for username: " + username);
+        return "Unknown Patient";
     }
 }

@@ -8,6 +8,11 @@
         </h2>
     </header>
 
+    <!-- Profile Picture Section -->
+    <div class="profile-picture-container">
+        <img src="https://static.vecteezy.com/system/resources/previews/036/193/398/non_2x/patient-flat-icon-for-personal-and-commercial-use-free-vector.jpg"
+             alt="User Profile Picture"
+             class="profile-picture">
     <!-- Read-only View -->
     <c:if test="${param.edit != 'true'}">
         <div class="details-container">
@@ -18,7 +23,7 @@
                 </div>
                 <div class="detail-item">
                     <dt class="detail-label">Password</dt>
-                    <dd class="detail-value">••••••••</dd> <!-- Masked for security -->
+                    <dd class="detail-value">••••••••</dd>
                 </div>
                 <div class="detail-item">
                     <dt class="detail-label">Full Name</dt>
@@ -94,208 +99,90 @@
 </section>
 
 <style>
-    :root {
-        --primary: #2C5282;
-        --secondary: #38B2AC;
-        --accent: #E53E3E;
-        --bg-light: #F7FAFC;
-        --text-primary: #2D3748;
-        --text-muted: #718096;
-        --card-bg: #FFFFFF;
-        --shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
-        --border: #E2E8F0;
-        --hover: #EDF2F7;
-        --transition: all 0.3s ease;
-        --border-radius: 12px;
-        --spacing-unit: 1rem;
-    }
-
+    /* General container styling */
     .user-details {
-        background: var(--card-bg);
-        border-radius: var(--border-radius);
-        box-shadow: var(--shadow);
-        padding: calc(var(--spacing-unit) * 2);
-        transition: var(--transition);
-        max-width: 900px;
+        max-width: 600px;
         margin: 0 auto;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
+    /* Profile picture styling */
+    .profile-picture-container {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .profile-picture {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%; /* Makes it circular */
+        object-fit: cover; /* Ensures image fits nicely */
+        border: 3px solid #007bff; /* Adds a subtle border */
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header styling */
     .section-header {
-        margin-bottom: calc(var(--spacing-unit) * 1.5);
-        padding-bottom: var(--spacing-unit);
-        border-bottom: 1px solid var(--border);
+        text-align: center;
+        margin-bottom: 20px;
     }
 
     .section-header h2 {
-        font-size: 1.75rem;
-        font-weight: 600;
-        color: var(--primary);
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
+        font-size: 1.5rem;
+        color: #333;
     }
 
-    .section-header h2 i {
-        color: var(--secondary);
-    }
-
+    /* Details list styling */
     .details-container {
-        padding: var(--spacing-unit);
+        padding: 15px;
     }
 
     .details-list {
         display: grid;
-        gap: calc(var(--spacing-unit) * 0.75);
+        gap: 15px;
     }
 
     .detail-item {
-        display: grid;
-        grid-template-columns: 140px 1fr;
-        align-items: center;
-        padding: 0.75rem 0;
-        border-bottom: 1px solid var(--border);
-        transition: var(--transition);
-    }
-
-    .detail-item:hover {
-        background: var(--hover);
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        background-color: #f9f9f9;
+        border-radius: 5px;
     }
 
     .detail-label {
-        font-weight: 600;
-        color: var(--text-primary);
-        font-size: 1rem;
+        font-weight: bold;
+        color: #555;
     }
 
     .detail-value {
-        color: var(--text-muted);
-        font-size: 1rem;
-        word-break: break-word;
+        color: #333;
     }
 
-    .form-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: calc(var(--spacing-unit) * 1.5);
-        margin-bottom: calc(var(--spacing-unit) * 2);
-    }
-
-    .form-field {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .form-label {
-        font-weight: 500;
-        color: var(--text-primary);
-        font-size: 0.95rem;
-    }
-
-    .form-input {
-        padding: 0.75rem;
-        border: 1px solid var(--border);
-        border-radius: 8px;
-        font-size: 1rem;
-        background: var(--card-bg);
-        transition: var(--transition);
-        width: 100%;
-    }
-
-    .form-input:focus {
-        border-color: var(--secondary);
-        box-shadow: 0 0 8px rgba(56, 178, 172, 0.2);
-        outline: none;
-    }
-
-    .form-input:disabled {
-        background: var(--bg-light);
-        color: var(--text-muted);
-        cursor: not-allowed;
-    }
-
-    .error-text, .info-text {
-        font-size: 0.85rem;
-        min-height: 1rem;
-    }
-
-    .error-text {
-        color: var(--accent);
-    }
-
-    .info-text {
-        color: var(--text-muted);
-    }
-
+    /* Button styling */
     .action-buttons {
-        display: flex;
-        justify-content: flex-end;
-        gap: 1rem;
-        margin-top: calc(var(--spacing-unit) * 1.5);
+        text-align: center;
+        margin-top: 20px;
     }
 
     .btn {
-        padding: 0.75rem 1.5rem;
+        padding: 10px 20px;
         border: none;
-        border-radius: 8px;
-        font-size: 1rem;
+        border-radius: 5px;
         cursor: pointer;
-        transition: var(--transition);
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+        font-size: 1rem;
     }
 
     .btn-primary {
-        background: var(--primary);
-        color: #FFFFFF;
+        background-color: #007bff;
+        color: #fff;
     }
 
     .btn-primary:hover {
-        background: #1E3A8A;
-        box-shadow: 0 4px 12px rgba(44, 82, 130, 0.3);
-        transform: translateY(-2px);
-    }
-
-    .btn-secondary {
-        background: var(--text-muted);
-        color: #FFFFFF;
-    }
-
-    .btn-secondary:hover {
-        background: #5A7184;
-        box-shadow: 0 4px 12px rgba(113, 128, 150, 0.3);
-        transform: translateY(-2px);
-    }
-
-    @media (max-width: 768px) {
-        .detail-item {
-            grid-template-columns: 120px 1fr;
-        }
-
-        .form-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .user-details {
-            padding: var(--spacing-unit);
-        }
-
-        .detail-item {
-            grid-template-columns: 1fr;
-            gap: 0.25rem;
-        }
-
-        .action-buttons {
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
+        background-color: #0056b3;
     }
 </style>
+<link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/userProfile.css">
