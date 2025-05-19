@@ -17,6 +17,7 @@ public class FileHandler {
         this.filePath = filePath;
     }
 
+
     public List<Appointment> readAppointments() throws IOException {
         List<Appointment> appointments = new ArrayList<>();
         if (!Files.exists(Paths.get(filePath))) {
