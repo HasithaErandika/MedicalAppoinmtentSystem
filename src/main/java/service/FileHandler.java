@@ -16,8 +16,6 @@ public class FileHandler {
     public FileHandler(String filePath) {
         this.filePath = filePath;
     }
-
-
     public List<Appointment> readAppointments() throws IOException {
         List<Appointment> appointments = new ArrayList<>();
         if (!Files.exists(Paths.get(filePath))) {
@@ -46,6 +44,7 @@ public class FileHandler {
                 } else {
                     LOGGER.warning("Skipping malformed line: " + line);
                 }
+
             }
         }
         LOGGER.info("Loaded " + appointments.size() + " appointments from " + filePath);
