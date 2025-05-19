@@ -45,6 +45,7 @@ public class FileHandler {
                     LOGGER.warning("Skipping malformed line: " + line);
                 }
 
+
             }
         }
         LOGGER.info("Loaded " + appointments.size() + " appointments from " + filePath);
