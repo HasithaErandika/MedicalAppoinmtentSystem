@@ -88,7 +88,8 @@ public class FileHandler {
         }
     }
 
-    // Keep this method for fetching patient names when needed
+    // Keep this method for fetching
+    // patient names when needed
     public String getPatientNameByUsername(String username, String patientFilePath) throws IOException {
         FileHandler patientFileHandler = new FileHandler(patientFilePath);
         List<String> lines = patientFileHandler.readLines();
