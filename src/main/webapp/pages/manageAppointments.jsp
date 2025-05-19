@@ -265,7 +265,7 @@
             return false;
         }
 
-        
+
         const dateTime = date + ' ' + timeSlot;
         $('#editForm').append($('<input>').attr({ type: 'hidden', name: 'dateTime', value: dateTime }));
         return true;
