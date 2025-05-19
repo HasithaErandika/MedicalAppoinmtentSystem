@@ -7,6 +7,7 @@ public class Patient {
     private String username;
     private String password;
 
+
     public Patient(String name, int age, String contact, String username, String password) {
         this.name = name;
         this.age = age;
