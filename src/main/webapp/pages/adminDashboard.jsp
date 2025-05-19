@@ -33,7 +33,7 @@
 
 <div class="main-content" id="main-content">
     <div class="header">
-        <h1><i class="ri-user-settings-line"></i> Welcome, <%= username %>!</h1>
+        <h1><i class="ri-user-settings-line"></i> Welcome, <%= username %> !</h1>
         <form action="<%=request.getContextPath()%>/LogoutServlet" method="post">
             <button type="submit" class="logout-btn"><i class="ri-logout-box-line"></i> Logout</button>
         </form>

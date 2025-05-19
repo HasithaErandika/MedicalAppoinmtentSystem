@@ -3,54 +3,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MediSchedule - User Profile</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MediSchedule – User Profile</title>
 
-    <!-- External Stylesheets -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/userProfile.css">
+    <!-- Fonts & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" />
+
+    <!-- Date Picker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.css" />
+
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/userProfile.css" />
 </head>
 <body>
-<!-- Authentication Check and Initial Data Fetch -->
+
+<!-- 🔐 Authentication Check -->
 <c:if test="${empty sessionScope.username || sessionScope.role != 'patient'}">
-    <c:redirect url="/pages/login.jsp?role=patient"/>
+    <c:redirect url="/pages/login.jsp?role=patient" />
 </c:if>
 
-<!-- Fetch User Details if Not Already Set -->
+<!-- 🚀 Trigger backend init if needed -->
 <c:if test="${empty sessionScope.fullname}">
     <%
-        // Trigger UserServlet to set session attributes
         response.sendRedirect(request.getContextPath() + "/user?action=init");
     %>
 </c:if>
 
-<!-- Sidebar Navigation -->
-<aside class="sidebar" id="sidebar" aria-label="Main navigation">
-    <button class="sidebar-toggle" aria-label="Toggle sidebar" type="button">
+<!-- 🧭 Sidebar -->
+<aside class="sidebar" id="sidebar" aria-label="Sidebar navigation">
+    <button class="sidebar-toggle" aria-label="Toggle navigation">
         <i class="fas fa-bars"></i>
     </button>
-
     <div class="logo">
-        <i class="fas fa-heartbeat" aria-hidden="true"></i>
-        <span>MediSchedule</span>
+        <i class="fas fa-heartbeat"></i> <span>MediSchedule</span>
     </div>
-
-    <nav class="sidebar-nav">
-        <ul>
+    <nav>
+        <ul class="sidebar-nav">
             <li>
                 <a href="#" data-section="userDetails" class="nav-link">
-                    <i class="fas fa-user"></i>
-                    <span>User Details</span>
+                    <i class="fas fa-user"></i> <span>My Details</span>
                 </a>
             </li>
             <li>
-                <form action="<%= request.getContextPath() %>/LogoutServlet" method="post" class="logout-form">
-                    <a href="#" onclick="this.parentNode.submit();" class="nav-link">
-                        <i class="fas fa-sign-out-alt"></i>
-                        <span>Logout</span>
+                <form action="${pageContext.request.contextPath}/LogoutServlet" method="post" class="logout-form">
+                    <a href="#" onclick="this.closest('form').submit();" class="nav-link">
+                        <i class="fas fa-sign-out-alt"></i> <span>Logout</span>
                     </a>
                 </form>
             </li>
@@ -58,15 +57,17 @@
     </nav>
 </aside>
 
-<!-- Main Content -->
-<main class="main-content" id="main-content" aria-live="polite">
+<!-- 🧩 Main Content -->
+<main class="main-content" id="main-content">
     <div class="container">
+        <!-- 🔷 Welcome Header -->
         <header class="dashboard-header">
             <div class="user-info">
-                <div class="avatar" aria-hidden="true">
+                <div class="avatar" title="User Avatar">
                     <c:out value="${not empty sessionScope.username ? sessionScope.username.substring(0, 1).toUpperCase() : 'U'}" />
                 </div>
-                <h1>Welcome,
+                <h1>
+                    Welcome,
                     <span>
                         <c:choose>
                             <c:when test="${not empty sessionScope.fullname}">
@@ -75,9 +76,7 @@
                             <c:when test="${not empty sessionScope.username}">
                                 <c:out value="${sessionScope.username}" />
                             </c:when>
-                            <c:otherwise>
-                                User
-                            </c:otherwise>
+                            <c:otherwise>User</c:otherwise>
                         </c:choose>
                     </span>!
                 </h1>
@@ -87,7 +86,7 @@
             </time>
         </header>
 
-        <!-- Toast Notification -->
+        <!-- ✅ Toast Messages -->
         <c:if test="${not empty message}">
             <div class="toast ${messageType}" role="alert" aria-live="assertive">
                 <i class="fas ${messageType == 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
@@ -97,17 +96,19 @@
             <c:remove var="messageType" scope="request" />
         </c:if>
 
+        <!-- 📝 Profile Content Placeholder -->
+        <div id="userProfileContainer">
+            <!-- AJAX loads user profile content here -->
+        </div>
 
     </div>
 </main>
 
-
-
-<!-- Scripts -->
+<!-- 📜 Scripts -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/flatpickr/4.6.13/flatpickr.min.js"></script>
-<script src="<%= request.getContextPath() %>/assets/js/userProfile.js"></script>
+<script src="${pageContext.request.contextPath}/assets/js/userProfile.js"></script>
 <script>
-    window.contextPath = '<%= request.getContextPath() %>';
+    window.contextPath = '${pageContext.request.contextPath}';
 </script>
 </body>
 </html>
