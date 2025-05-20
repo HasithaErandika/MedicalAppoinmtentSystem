@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class AdminServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(AdminServlet.class.getName());
     private static final String ADMIN_ROLE = "admin";
