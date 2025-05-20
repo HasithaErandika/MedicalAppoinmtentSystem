@@ -76,12 +76,22 @@ public class FileHandler {
         return Files.readAllLines(Paths.get(filePath));
     }
 
-    public void writeLines(List<String> lines) throws IOException {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
-            for (String line : lines) {
-                writer.write(line);
-                writer.newLine();
+
             }
         }
     }
 
+    //  Keep this method for fetching patient names when needed
+    public String getPatientNameByUsername(String username, String patientFilePath) throws IOException {
+        FileHandler patientFileHandler = new FileHandler(patientFilePath);
+        List<String> lines = patientFileHandler.readLines();
+        for (String line : lines) {
+            String[] parts = line.split(",");
+            if (parts.length >= 3 && parts[0].equals(username)) {
+                return parts[2].trim(); // Name is in the third position
+            }
+        }
+        LOGGER.warning("No patient found for username: " + username);
+        return "Unknown Patient";
+    }
+}
