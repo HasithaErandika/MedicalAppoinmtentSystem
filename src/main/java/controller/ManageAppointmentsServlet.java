@@ -164,9 +164,7 @@ public class ManageAppointmentsServlet extends HttpServlet {
             responseData.put("message", "Error: " + e.getMessage());
         }
 
-        try (PrintWriter out = response.getWriter()) {
-            out.print(gson.toJson(responseData));
-            out.flush();
+
         }
     }
 
