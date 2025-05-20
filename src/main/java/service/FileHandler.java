@@ -1,6 +1,5 @@
 package service;
 
-
 import model.Appointment;
 import java.io.*;
 import java.nio.file.Files;
@@ -45,14 +44,11 @@ public class FileHandler {
                 } else {
                     LOGGER.warning("Skipping malformed line: " + line);
                 }
-
-
             }
         }
         LOGGER.info("Loaded " + appointments.size() + " appointments from " + filePath);
         return appointments;
     }
-
     public void writeAppointments(List<Appointment> appointments) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Appointment appt : appointments) {
