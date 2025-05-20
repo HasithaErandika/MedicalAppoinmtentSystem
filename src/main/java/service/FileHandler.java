@@ -76,7 +76,11 @@ public class FileHandler {
         return Files.readAllLines(Paths.get(filePath));
     }
 
-
+    public void writeLines(List<String> lines) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
+            for (String line : lines) {
+                writer.write(line);
+                writer.newLine();
             }
         }
     }
