@@ -75,7 +75,6 @@ public class FileHandler {
         }
         return Files.readAllLines(Paths.get(filePath));
     }
-
     public void writeLines(List<String> lines) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (String line : lines) {
@@ -84,7 +83,6 @@ public class FileHandler {
             }
         }
     }
-
     //  Keep this method for fetching patient names when needed
     public String getPatientNameByUsername(String username, String patientFilePath) throws IOException {
         FileHandler patientFileHandler = new FileHandler(patientFilePath);
