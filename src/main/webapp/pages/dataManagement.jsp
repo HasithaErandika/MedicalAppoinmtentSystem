@@ -20,13 +20,16 @@
     </div>
 
     <div class="card">
-        <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+        <div class="action-buttons">
+            <!-- Backup Button -->
             <form action="<%=request.getContextPath()%>/DataManagementServlet" method="post">
                 <input type="hidden" name="action" value="backup">
                 <button type="submit" class="btn btn-primary">
                     <i class="ri-download-cloud-2-line"></i> Create Backup
                 </button>
             </form>
+
+            <!-- Clear Logs Button -->
             <form action="<%=request.getContextPath()%>/DataManagementServlet" method="post">
                 <input type="hidden" name="action" value="clearLogs">
                 <button type="submit" class="btn btn-danger">
@@ -46,9 +49,7 @@
                 </thead>
                 <tbody>
                 <c:forEach var="log" items="${auditLogs}">
-                    <tr>
-                        <td>${log}</td>
-                    </tr>
+                    <tr><td>${log}</td></tr>
                 </c:forEach>
                 </tbody>
             </table>
@@ -56,37 +57,37 @@
     </div>
 </div>
 
-
+<!-- Optional JavaScript Analysis (Currently not displayed visually) -->
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', () => {
         const logs = [
             <c:forEach var="log" items="${auditLogs}">
             "${log}",
             </c:forEach>
         ];
 
-        // Define the users to filter by
-        const allowedUsers = ['admin', 'admin1', 'admin2', 'admin3']; // Add more usernames as needed
+        const allowedUsers = ['admin', 'admin1', 'admin2', 'admin3'];
 
-        // Count backups by user, filtered by allowedUsers
+        // Count backups by user
         const backupSummary = logs.reduce((acc, log) => {
             if (log.toLowerCase().includes('backup')) {
-                const userMatch = log.match(/User (\w+)/);
-                const username = userMatch ? userMatch[1] : 'Unknown';
-                if (allowedUsers.includes(username)) {
-                    acc[username] = (acc[username] || 0) + 1;
+                const match = log.match(/User (\w+)/);
+                const user = match ? match[1] : 'Unknown';
+                if (allowedUsers.includes(user)) {
+                    acc[user] = (acc[user] || 0) + 1;
                 }
             }
             return acc;
         }, {});
 
-        // Ensure all allowed users are in the summary, even with 0 backups
+        // Ensure all allowed users are included
         allowedUsers.forEach(user => {
             if (!backupSummary[user]) {
                 backupSummary[user] = 0;
             }
         });
 
+        // Optional: use backupSummary to render charts or stats
     });
 </script>
 </body>
