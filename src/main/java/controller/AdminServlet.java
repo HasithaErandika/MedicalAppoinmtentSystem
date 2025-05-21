@@ -38,7 +38,7 @@ public class AdminServlet extends HttpServlet {
             appointmentService = new AppointmentService(basePath + APPOINTMENTS_FILE);
             availabilityService = new DoctorAvailabilityService(basePath + AVAILABILITY_FILE, appointmentService);
             doctorFileHandler = new FileHandler(basePath + DOCTORS_FILE);
-            patientFileHandler = new FileHandler(basePath + PATIENTS_FILE);
+
         } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to initialize services", e);
             throw new ServletException("Failed to initialize AdminServlet services", e);
