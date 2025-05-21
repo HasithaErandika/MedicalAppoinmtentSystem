@@ -7,16 +7,7 @@ The **Medical Appointment Scheduling System** is a web-based application develop
 📄 **For details on OOP usage, see [`docs/OOP.md`](docs/OOP.md)**  
 🔧 **For setup instructions, see [`docs/SetupGuide.md`](docs/SetupGuide.md)**
 
-### Key Features
-- **Role-Based Access**:
-  - **Patients**: Register, book, view, and cancel appointments.
-  - **Admins**: Manage appointments, doctors, patients, and schedules.
-  - **Doctors**: Access a placeholder dashboard (login not implemented).
-- **Appointment Management**: Create, update, and cancel appointments with emergency prioritization using `PriorityQueue`.
-- **Doctor Availability**: Admins configure schedules; patients view available slots.
-- **File-Based Storage**: Stores data in `.txt` files (patients, doctors, appointments, etc.).
-- **Sorting**: Implements bubble sort to order appointments by date and time.
-- **Audit Logging**: Tracks system actions for administrative oversight.
+
 
 ### Project Objectives
 - Apply **OOP principles** (Encapsulation, Abstraction, Inheritance, Polymorphism).
