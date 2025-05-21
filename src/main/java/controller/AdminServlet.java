@@ -103,7 +103,6 @@ public class AdminServlet extends HttpServlet {
             LOGGER.log(Level.SEVERE, "Error processing dashboard data for admin " + username, e);
             request.setAttribute("error", "Error fetching dashboard data: " + e.getMessage());
         }
-
         request.getRequestDispatcher("/pages/adminDashboard.jsp").forward(request, response);
     }
 
@@ -133,7 +132,6 @@ public class AdminServlet extends HttpServlet {
                 if (priority != 0 && priority != 1) {
                     throw new IllegalArgumentException("Priority must be 0 (non-emergency) or 1 (emergency)");
                 }
-
                 appointmentService.updateAppointment(appointmentId, patientId, doctorId, tokenID, dateTime, priority);
                 LOGGER.info("Admin " + username + " updated appointment ID: " + appointmentId);
                 request.setAttribute("message", "Appointment updated successfully");
