@@ -18,6 +18,7 @@
         return;
     }
 %>
+
 <div class="sidebar" id="sidebar">
     <button class="toggle-btn" onclick="toggleSidebar()"><i class="ri-menu-line"></i></button>
     <div class="logo"><i class="ri-hospital-line"></i><span>MediSchedule</span></div>
@@ -33,14 +34,18 @@
 
 <div class="main-content" id="main-content">
     <div class="header">
-        <h1><i class="ri-user-settings-line"></i> Welcome, <%= username %>!</h1>
+        <h1><i class="ri-user-settings-line"></i> Welcome, <%= username %> !</h1>
         <form action="<%=request.getContextPath()%>/LogoutServlet" method="post">
             <button type="submit" class="logout-btn"><i class="ri-logout-box-line"></i> Logout</button>
         </form>
     </div>
 
-    <c:if test="${not empty error}"><div class="message error-message">${error}</div></c:if>
-    <c:if test="${not empty message}"><div class="message success-message">${message}</div></c:if>
+    <c:if test="${not empty error}">
+        <div class="message error-message">${error}</div>
+    </c:if>
+    <c:if test="${not empty message}">
+        <div class="message success-message">${message}</div>
+    </c:if>
 
     <div class="dashboard-grid">
         <div class="card" onclick="window.location.href='<%=request.getContextPath()%>/AdminServlet'">
@@ -77,6 +82,7 @@
 
     <div class="search-section">
         <h2><i class="ri-search-line"></i> Search & Export</h2>
+
         <div class="search-container">
             <div class="search-bar">
                 <input type="text" id="doctorSearch" placeholder="Search doctors..." onkeyup="searchDoctors()">
@@ -84,6 +90,7 @@
             </div>
             <button class="btn export-btn" onclick="exportDoctors()"><i class="ri-download-line"></i> Export Doctors</button>
         </div>
+
         <div class="search-container">
             <div class="search-bar">
                 <input type="text" id="patientSearch" placeholder="Search patients..." onkeyup="searchPatients()">
@@ -91,6 +98,7 @@
             </div>
             <button class="btn export-btn" onclick="exportPatients()"><i class="ri-download-line"></i> Export Patients</button>
         </div>
+
         <div class="search-container">
             <div class="search-bar">
                 <input type="text" id="appointmentSearch" placeholder="Search appointments..." onkeyup="searchAppointments()">
@@ -114,14 +122,23 @@
         "${doctor}",
         </c:forEach>
     ];
+
     const patients = [
         <c:forEach var="patient" items="${patientLines}">
         "${patient}",
         </c:forEach>
     ];
+
     const appointments = [
         <c:forEach var="appt" items="${sortedAppointments}">
-        { id: '${appt.id}', patientId: '${appt.patientId}', doctorId: '${appt.doctorId}', tokenID: '${appt.tokenID}', dateTime: '${appt.dateTime}', priority: ${appt.priority} },
+        {
+            id: '${appt.id}',
+            patientId: '${appt.patientId}',
+            doctorId: '${appt.doctorId}',
+            tokenID: '${appt.tokenID}',
+            dateTime: '${appt.dateTime}',
+            priority: ${appt.priority}
+        },
         </c:forEach>
     ];
 
@@ -184,44 +201,52 @@
         exportToCSV(filteredAppointments, 'appointments', 'ID,Patient ID,Doctor ID,Token ID,Date & Time,Priority');
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Chart for Previous vs Future Appointments
+    document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('appointmentChart').getContext('2d');
         new Chart(ctx, {
             type: 'bar',
             data: {
                 labels: ['Previous Appointments', 'Future Appointments'],
-                datasets: [
-                    {
-                        label: 'Appointment Count',
-                        data: [${previousAppointments}, ${futureAppointments}],
-                        backgroundColor: [
-                            'rgba(239, 83, 80, 0.8)', // Previous (red)
-                            'rgba(38, 166, 154, 0.8)' // Future (teal)
-                        ],
-                        borderColor: [
-                            'rgba(239, 83, 80, 1)',
-                            'rgba(38, 166, 154, 1)'
-                        ],
-                        borderWidth: 1
-                    }
-                ]
+                datasets: [{
+                    label: 'Appointment Count',
+                    data: [${previousAppointments}, ${futureAppointments}],
+                    backgroundColor: [
+                        'rgba(239, 83, 80, 0.8)',
+                        'rgba(38, 166, 154, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(239, 83, 80, 1)',
+                        'rgba(38, 166, 154, 1)'
+                    ],
+                    borderWidth: 1
+                }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        title: { display: true, text: 'Appointment Type', color: '#2D3748' }
+                        title: {
+                            display: true,
+                            text: 'Appointment Type',
+                            color: '#2D3748'
+                        }
                     },
                     y: {
                         beginAtZero: true,
-                        title: { display: true, text: 'Number of Appointments', color: '#2D3748' },
+                        title: {
+                            display: true,
+                            text: 'Number of Appointments',
+                            color: '#2D3748'
+                        },
                         ticks: { stepSize: 1 }
                     }
                 },
                 plugins: {
-                    legend: { position: 'top', labels: { font: { size: 14 } } },
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 14 } }
+                    },
                     title: {
                         display: true,
                         text: 'Previous vs Future Appointments',
