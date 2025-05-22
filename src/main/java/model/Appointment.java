@@ -1,6 +1,7 @@
 package model;
 
 public class Appointment {
+    //Define attributes
     private int id;
     private String patientId;
     private String doctorId;
@@ -10,6 +11,7 @@ public class Appointment {
     private String patientName;
     private String doctorName;
 
+    //Constructor to set values for attributes
     public Appointment(int id, String patientId, String doctorId, String tokenID, String dateTime, int priority) {
         this.id = id;
         this.patientId = patientId;
