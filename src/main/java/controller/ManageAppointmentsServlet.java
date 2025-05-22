@@ -43,7 +43,7 @@ public class ManageAppointmentsServlet extends HttpServlet {
         }
     }
 
-    // Simple class to hold doctor/patient data
+    // class to hold doctor/patient data
     static class User {
         String id;
         String name;
@@ -180,6 +180,6 @@ public class ManageAppointmentsServlet extends HttpServlet {
                 .mapToInt(Integer::parseInt)
                 .max()
                 .orElse(0);
-        return String.format("TOK%03d", maxTokenNum + 1); // e.g., TOK001, TOK002
+        return String.format("TOK%03d", maxTokenNum + 1); // TOK001, TOK002
     }
 }
