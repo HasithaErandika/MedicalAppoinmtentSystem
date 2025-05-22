@@ -100,3 +100,4 @@ patient99,pass123,Tharindu Eranga,patient99@gmail.com,0778449133,1974-12-03
 patient100,pass123,Sanduni Fernando,patient100@gmail.com,0778449134,1989-06-10
 patient101,pass123,Indika Wickramasinghe,haindika@gmail.com,0777802709,1972-03-29
 patient123,Login@123456,Thiyum Dulran,adhyrks@gmail.com,0785698584,1985-11-21
+amalnaynaka,Dewni12345,amal nayanaka,amalnayanaka2@gmail.com,0765435363,2003-07-31
