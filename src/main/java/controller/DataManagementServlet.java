@@ -27,6 +27,7 @@ public class DataManagementServlet extends HttpServlet {
 
         auditService = new AuditService(auditFileHandler);
         backupService = new BackupService(dataDirectory, auditService);
+
     }
 
     @Override
