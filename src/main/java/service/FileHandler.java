@@ -16,7 +16,6 @@ public class FileHandler {
     public FileHandler(String filePath) {
         this.filePath = filePath;
     }
-
     public List<Appointment> readAppointments() throws IOException {
         List<Appointment> appointments = new ArrayList<>();
         if (!Files.exists(Paths.get(filePath))) {
@@ -50,7 +49,6 @@ public class FileHandler {
         LOGGER.info("Loaded " + appointments.size() + " appointments from " + filePath);
         return appointments;
     }
-
     public void writeAppointments(List<Appointment> appointments) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (Appointment appt : appointments) {
@@ -77,7 +75,6 @@ public class FileHandler {
         }
         return Files.readAllLines(Paths.get(filePath));
     }
-
     public void writeLines(List<String> lines) throws IOException {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(filePath))) {
             for (String line : lines) {
@@ -86,8 +83,7 @@ public class FileHandler {
             }
         }
     }
-
-    // Keep this method for fetching patient names when needed
+    //  Keep this method for fetching patient names when needed
     public String getPatientNameByUsername(String username, String patientFilePath) throws IOException {
         FileHandler patientFileHandler = new FileHandler(patientFilePath);
         List<String> lines = patientFileHandler.readLines();
