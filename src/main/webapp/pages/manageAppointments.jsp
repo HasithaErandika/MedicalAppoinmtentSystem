@@ -8,6 +8,18 @@
     <title>MediSchedule - Manage Appointments</title>
     <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="<%=request.getContextPath()%>/assets/css/manageOperations.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        .search-container { margin-bottom: 20px; display: flex; gap: 10px; }
+        .filter-select { width: auto; }
+        .table-container { margin-top: 20px; }
+        .priority-emergency { color: red; font-weight: bold; }
+        .modal .form-group { margin-bottom: 15px; }
+        .modal .form-group i { margin-right: 10px; }
+        .modal .checkbox { display: flex; align-items: center; }
+    </style>
 </head>
 <body>
 <div class="container">
@@ -25,28 +37,19 @@
     </c:if>
 
     <div class="search-container">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search appointments..." onkeyup="searchTable()">
-        <select class="filter-select" id="yearFilter" onchange="filterTable()">
+        <input type="text" class="form-control search-input" id="searchInput" placeholder="Search appointments...">
+        <select class="form-select filter-select" id="yearFilter" onchange="filterTable()">
             <option value="">All Years</option>
             <option value="2024">2024</option>
             <option value="2025">2025</option>
         </select>
-        <select class="filter-select" id="monthFilter" onchange="filterTable()">
+        <select class="form-select filter-select" id="monthFilter" onchange="filterTable()">
             <option value="">All Months</option>
-            <option value="01">January</option>
-            <option value="02">February</option>
-            <option value="03">March</option>
-            <option value="04">April</option>
-            <option value="05">May</option>
-            <option value="06">June</option>
-            <option value="07">July</option>
-            <option value="08">August</option>
-            <option value="09">September</option>
-            <option value="10">October</option>
-            <option value="11">November</option>
-            <option value="12">December</option>
+            <c:forEach var="month" begin="1" end="12">
+                <option value="${String.format('%02d', month)}">${new java.text.SimpleDateFormat("MMMM").format(new java.util.Date(0, month - 1, 1))}</option>
+            </c:forEach>
         </select>
-        <select class="filter-select" id="dayFilter" onchange="filterTable()">
+        <select class="form-select filter-select" id="dayFilter" onchange="filterTable()">
             <option value="">All Days</option>
             <% for (int i = 1; i <= 31; i++) { %>
             <option value="<%= String.format("%02d", i) %>"><%= String.format("%02d", i) %></option>
@@ -60,7 +63,7 @@
     <div class="card">
         <h2 style="margin-bottom: 1.5rem;"><i class="ri-list-check"></i> Current Appointments</h2>
         <div class="table-container">
-            <table id="appointmentsTable">
+            <table id="appointmentsTable" class="table table-striped">
                 <thead>
                 <tr>
                     <th>ID</th>
@@ -84,13 +87,21 @@
                                 ${appt.priority == 1 ? 'Emergency' : 'Normal'}
                         </td>
                         <td>
-                            <button class="btn btn-edit" onclick="openEditModal('${appt.id}', '${appt.patientId}', '${appt.doctorId}', '${appt.tokenID}', '${appt.dateTime.substring(0,10)}', '${appt.dateTime.substring(11)}', '${appt.priority == 1}')">
+                            <button class="btn btn-edit btn-sm"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#editModal"
+                                    data-id="${appt.id}"
+                                    data-patient="${appt.patientId}"
+                                    data-doctor="${appt.doctorId}"
+                                    data-token="${appt.tokenID}"
+                                    data-datetime="${appt.dateTime}"
+                                    data-priority="${appt.priority}">
                                 <i class="ri-edit-line"></i> Edit
                             </button>
-                            <form action="<%=request.getContextPath()%>/AdminServlet" method="post" style="display:inline;" onsubmit="return confirmCancel()">
+                            <form action="<%=request.getContextPath()%>/AdminServlet" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to cancel this appointment?')">
                                 <input type="hidden" name="action" value="cancelAppointment">
                                 <input type="hidden" name="appointmentId" value="${appt.id}">
-                                <button type="submit" class="btn btn-cancel"><i class="ri-close-line"></i> Cancel</button>
+                                <button type="submit" class="btn btn-cancel btn-sm"><i class="ri-close-line"></i> Cancel</button>
                             </form>
                         </td>
                     </tr>
@@ -102,100 +113,138 @@
 </div>
 
 <!-- Edit Modal -->
-<div id="editModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2><i class="ri-edit-line"></i> Edit Appointment</h2>
-            <button class="modal-close" onclick="closeEditModal()">×</button>
-        </div>
-        <div class="modal-body">
-            <form id="editForm" action="<%=request.getContextPath()%>/AdminServlet" method="post" onsubmit="return validateForm()">
-                <input type="hidden" name="action" value="updateAppointment">
-                <input type="hidden" id="appointmentId" name="appointmentId">
-                <div class="form-group">
-                    <i class="ri-user-line"></i>
-                    <label>Patient</label>
-                    <select id="patientId" name="patientId" required>
-                        <option value="" disabled>Select a patient</option>
-                        <c:forEach var="patient" items="${patients}">
-                            <option value="${patient.id}">${patient.name} (${patient.id})</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <i class="ri-stethoscope-line"></i>
-                    <label>Doctor</label>
-                    <select id="doctorId" name="doctorId" required onchange="updateTimeSlots()">
-                        <option value="" disabled>Select a doctor</option>
-                        <c:forEach var="doctor" items="${doctors}">
-                            <option value="${doctor.id}">${doctor.name} (${doctor.id})</option>
-                        </c:forEach>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <i class="ri-key-2-line"></i>
-                    <label>Token ID</label>
-                    <input type="text" id="tokenID" name="tokenID" required>
-                </div>
-                <div class="form-group">
-                    <i class="ri-calendar-line"></i>
-                    <label>Date</label>
-                    <input type="date" id="date" name="date" required onchange="updateTimeSlots()" min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
-                </div>
-                <div class="form-group">
-                    <i class="ri-time-line"></i>
-                    <label>Time Slot</label>
-                    <select id="timeSlot" name="time" required>
-                        <option value="" disabled>Select a time slot</option>
-                    </select>
-                </div>
-                <div class="form-group checkbox">
-                    <input type="checkbox" id="isEmergency" name="priority" value="1">
-                    <label for="isEmergency">Emergency</label>
-                </div>
-                <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Update Appointment</button>
-            </form>
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel"><i class="ri-edit-line"></i> Edit Appointment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editForm" action="<%=request.getContextPath()%>/AdminServlet" method="post" onsubmit="return validateForm()">
+                    <input type="hidden" name="action" value="updateAppointment">
+                    <input type="hidden" id="appointmentId" name="appointmentId">
+                    <div class="form-group">
+                        <i class="ri-user-line"></i>
+                        <label>Patient</label>
+                        <select class="form-control" id="patientId" name="patientId" required>
+                            <option value="" disabled>Select a patient</option>
+                            <c:forEach var="patient" items="${patients}">
+                                <option value="${patient.id}">${patient.name} (${patient.id})</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <i class="ri-stethoscope-line"></i>
+                        <label>Doctor</label>
+                        <select class="form-control" id="doctorId" name="doctorId" required onchange="updateTimeSlots()">
+                            <option value="" disabled>Select a doctor</option>
+                            <c:forEach var="doctor" items="${doctors}">
+                                <option value="${doctor.id}">${doctor.name} (${doctor.id})</option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <i class="ri-key-2-line"></i>
+                        <label>Token ID</label>
+                        <input type="text" class="form-control" id="tokenID" name="tokenID" required>
+                    </div>
+                    <div class="form-group">
+                        <i class="ri-calendar-line"></i>
+                        <label>Date</label>
+                        <input type="date" class="form-control" id="date" name="date" required onchange="updateTimeSlots()" min="<%= new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.util.Date()) %>">
+                    </div>
+                    <div class="form-group">
+                        <i class="ri-time-line"></i>
+                        <label>Time Slot</label>
+                        <select class="form-control" id="timeSlot" name="time" required>
+                            <option value="" disabled>Select a time slot</option>
+                        </select>
+                    </div>
+                    <div class="form-group checkbox">
+                        <input type="checkbox" id="isEmergency" name="priority" value="1">
+                        <label for="isEmergency">Emergency</label>
+                    </div>
+                    <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Update Appointment</button>
+                </form>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-    function openEditModal(id, patientId, doctorId, tokenID, date, timeSlot, isEmergency) {
-        document.getElementById('appointmentId').value = id;
-        document.getElementById('patientId').value = patientId;
-        document.getElementById('doctorId').value = doctorId;
-        document.getElementById('tokenID').value = tokenID;
-        document.getElementById('date').value = date;
-        document.getElementById('isEmergency').checked = isEmergency;
+    $(document).ready(function() {
+        // Modal handling for Edit
+        $('.btn-edit').on('click', function() {
+            let id = $(this).data('id');
+            let patient = $(this).data('patient');
+            let doctor = $(this).data('doctor');
+            let token = $(this).data('token');
+            let dateTime = $(this).data('datetime').split(' ');
+            let priority = $(this).data('priority');
 
-        const timeSlotSelect = document.getElementById('timeSlot');
-        timeSlotSelect.innerHTML = '<option value="" disabled>Select a time slot</option>';
-        updateTimeSlots().then(() => {
-            timeSlotSelect.value = timeSlot;
+            $('#appointmentId').val(id);
+            $('#patientId').val(patient);
+            $('#doctorId').val(doctor);
+            $('#tokenID').val(token);
+            $('#date').val(dateTime[0]);
+            $('#isEmergency').prop('checked', priority == 1);
+
+            updateTimeSlots().then(() => {
+                $('#timeSlot').val(dateTime[1]);
+            });
         });
 
-        document.getElementById('editModal').style.display = 'flex';
-    }
+        // Search and filter
+        function filterTable() {
+            const input = $('#searchInput').val().toLowerCase();
+            const year = $('#yearFilter').val();
+            const month = $('#monthFilter').val();
+            const day = $('#dayFilter').val();
+            $('#appointmentsBody tr').each(function() {
+                const td = $(this).find('td');
+                const id = td.eq(0).text().toLowerCase();
+                const patientName = td.eq(1).text().toLowerCase();
+                const doctorName = td.eq(2).text().toLowerCase();
+                const tokenID = td.eq(3).text().toLowerCase();
+                const dateTime = td.eq(4).text();
+                const [datePart] = dateTime.split(' ');
+                const [yearPart, monthPart, dayPart] = datePart.split('-');
 
-    function closeEditModal() {
-        document.getElementById('editModal').style.display = 'none';
-    }
+                let matchesSearch = id.includes(input) || patientName.includes(input) || doctorName.includes(input) || tokenID.includes(input) || dateTime.includes(input);
+                let matchesYear = !year || yearPart === year;
+                let matchesMonth = !month || monthPart === month;
+                let matchesDay = !day || dayPart === day;
+
+                $(this).toggle(matchesSearch && matchesYear && matchesMonth && matchesDay);
+            });
+        }
+
+        $('#searchInput').on('keyup', filterTable);
+
+        // Sort by Date
+        function sortTable() {
+            const rows = $('#appointmentsBody tr').get();
+            rows.sort((a, b) => {
+                const dateTimeA = new Date($(a).find('td:eq(4)').text());
+                const dateTimeB = new Date($(b).find('td:eq(4)').text());
+                return dateTimeB - dateTimeA; // Newest first
+            });
+            $.each(rows, (index, row) => $('#appointmentsBody').append(row));
+        }
+    });
 
     function updateTimeSlots() {
         return new Promise((resolve) => {
-            const doctorId = document.getElementById('doctorId').value;
-            const date = document.getElementById('date').value;
-            const timeSlotSelect = document.getElementById('timeSlot');
-            timeSlotSelect.innerHTML = '<option value="" disabled>Select a time slot</option>';
+            const doctorId = $('#doctorId').val();
+            const date = $('#date').val();
+            const timeSlotSelect = $('#timeSlot');
+            timeSlotSelect.empty().append('<option value="" disabled>Select a time slot</option>');
 
             if (doctorId && date) {
-                // Mock time slots (replace with actual fetch if DoctorAvailabilityService provides an endpoint)
                 const mockSlots = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '14:00', '14:30', '15:00'];
                 mockSlots.forEach(slot => {
-                    const option = document.createElement('option');
-                    option.value = slot;
-                    option.text = slot;
-                    timeSlotSelect.appendChild(option);
+                    timeSlotSelect.append($('<option>', { value: slot, text: slot }));
                 });
                 resolve();
             } else {
@@ -205,86 +254,21 @@
     }
 
     function validateForm() {
-        const patientId = document.getElementById('patientId').value;
-        const doctorId = document.getElementById('doctorId').value;
-        const tokenID = document.getElementById('tokenID').value;
-        const date = document.getElementById('date').value;
-        const timeSlot = document.getElementById('timeSlot').value;
+        const patientId = $('#patientId').val();
+        const doctorId = $('#doctorId').val();
+        const tokenID = $('#tokenID').val();
+        const date = $('#date').val();
+        const timeSlot = $('#timeSlot').val();
 
         if (!patientId || !doctorId || !tokenID || !date || !timeSlot) {
             alert('Please fill in all required fields, including Token ID.');
             return false;
         }
 
-        // Combine date and time for submission
+
         const dateTime = date + ' ' + timeSlot;
-        const form = document.getElementById('editForm');
-        const hiddenDateTime = document.createElement('input');
-        hiddenDateTime.type = 'hidden';
-        hiddenDateTime.name = 'dateTime';
-        hiddenDateTime.value = dateTime;
-        form.appendChild(hiddenDateTime);
-
+        $('#editForm').append($('<input>').attr({ type: 'hidden', name: 'dateTime', value: dateTime }));
         return true;
-    }
-
-    function confirmCancel() {
-        return confirm('Are you sure you want to cancel this appointment?');
-    }
-
-    function searchTable() {
-        const input = document.getElementById('searchInput').value.toLowerCase();
-        const year = document.getElementById('yearFilter').value;
-        const month = document.getElementById('monthFilter').value;
-        const day = document.getElementById('dayFilter').value;
-        const table = document.getElementById('appointmentsTable');
-        const tr = table.getElementsByTagName('tr');
-
-        for (let i = 1; i < tr.length; i++) {
-            const td = tr[i].getElementsByTagName('td');
-            const id = td[0].textContent.toLowerCase();
-            const patientName = td[1].textContent.toLowerCase();
-            const doctorName = td[2].textContent.toLowerCase();
-            const tokenID = td[3].textContent.toLowerCase();
-            const dateTime = td[4].textContent;
-            const [datePart] = dateTime.split(' ');
-            const [yearPart, monthPart, dayPart] = datePart.split('-');
-
-            let matchesSearch = id.includes(input) || patientName.includes(input) || doctorName.includes(input) || tokenID.includes(input) || dateTime.includes(input);
-            let matchesYear = !year || yearPart === year;
-            let matchesMonth = !month || monthPart === month;
-            let matchesDay = !day || dayPart === day;
-
-            tr[i].style.display = (matchesSearch && matchesYear && matchesMonth && matchesDay) ? '' : 'none';
-        }
-    }
-
-    function filterTable() {
-        searchTable();
-    }
-
-    function sortTable() {
-        const table = document.getElementById('appointmentsTable');
-        const tbody = document.getElementById('appointmentsBody');
-        const rows = Array.from(tbody.getElementsByTagName('tr'));
-
-        rows.sort((a, b) => {
-            const dateTimeA = new Date(a.cells[4].textContent);
-            const dateTimeB = new Date(b.cells[4].textContent);
-            return dateTimeB - dateTimeA; // Newest first
-        });
-
-        while (tbody.firstChild) {
-            tbody.removeChild(tbody.firstChild);
-        }
-        rows.forEach(row => tbody.appendChild(row));
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('editModal');
-        if (event.target === modal) {
-            closeEditModal();
-        }
     }
 </script>
 </body>

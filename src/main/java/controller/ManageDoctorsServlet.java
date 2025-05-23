@@ -48,6 +48,7 @@ public class ManageDoctorsServlet extends HttpServlet {
                     throw new IllegalArgumentException("Invalid action: " + action);
             }
 
+
             doctorFileHandler.writeLines(doctors);
             response.sendRedirect(request.getContextPath() + "/ManageDoctorsServlet");
         } catch (Exception e) {

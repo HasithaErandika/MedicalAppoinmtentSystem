@@ -34,6 +34,7 @@ public class Appointment {
     public String getDoctorName() { return doctorName; }
     public void setDoctorName(String doctorName) { this.doctorName = doctorName; }
 
+
     @Override
     public String toString() {
         return "Appointment{id=" + id +

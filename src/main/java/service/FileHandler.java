@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+
 public class FileHandler {
     private static final Logger LOGGER = Logger.getLogger(FileHandler.class.getName());
     private final String filePath;
@@ -22,6 +23,7 @@ public class FileHandler {
             LOGGER.info("File does not exist yet: " + filePath);
             return appointments;
         }
+
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -83,7 +85,7 @@ public class FileHandler {
             }
         }
     }
-    //  Keep this method for fetching patient names when needed
+
     public String getPatientNameByUsername(String username, String patientFilePath) throws IOException {
         FileHandler patientFileHandler = new FileHandler(patientFilePath);
         List<String> lines = patientFileHandler.readLines();

@@ -15,7 +15,7 @@ import java.util.logging.Logger;
 public class DoctorScheduleServlet extends HttpServlet {
     private static final Logger logger = Logger.getLogger(DoctorScheduleServlet.class.getName());
 
-    private FileHandler availabilityFileHandler;
+     FileHandler availabilityFileHandler;
     private FileHandler doctorFileHandler;
 
     @Override

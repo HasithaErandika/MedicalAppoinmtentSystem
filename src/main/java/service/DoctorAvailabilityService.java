@@ -21,6 +21,7 @@ public class DoctorAvailabilityService {
         this.appointmentService = appointmentService;
     }
 
+
     public List<String> readAvailability() throws IOException {
         List<String> lines = fileHandler.readLines();
         if (lines == null) {
