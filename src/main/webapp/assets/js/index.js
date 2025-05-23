@@ -1,32 +1,26 @@
 let allSpecialties = [];
 let allDoctors = [];
 let allAvailability = [];
-let userAppointments = []; // User's booked appointments with tokens
-let pendingBooking = null; // Temporary storage for booking details
-let doctorIdToNameMap = {}; // Map to store doctorId to doctorName mappings
+let userAppointments = [];
+let pendingBooking = null;
+let doctorIdToNameMap = {};
 
 window.onload = function () {
     console.log("Initializing index page...");
-    // Clear pendingBooking to prevent modal on back navigation
     pendingBooking = null;
-    // Fetch specialties for booking section
     fetchSpecialties();
-    // Fetch user appointments and doctor details if logged in as patient
     if (document.body.dataset.loggedIn === "true" && document.body.dataset.role === "patient") {
-        fetchDoctorDetails(); // New function to fetch doctor names
+        fetchDoctorDetails();
         fetchUserAppointments();
         fetchUserAppointmentsForTokens();
         setupTabNavigation();
     }
-    // Setup event listeners
     setupFormListeners();
     setupModalListeners();
     setupLoginRegisterModal();
-    // Handle query parameters
     handleQueryParameters();
 };
 
-// Fetch Doctor Details
 async function fetchDoctorDetails() {
     try {
         const response = await fetch(`${window.contextPath}/SortServlet?action=getDoctors`, {
@@ -49,14 +43,12 @@ async function fetchDoctorDetails() {
     }
 }
 
-// Handle Query Parameters
 function handleQueryParameters() {
     const urlParams = new URLSearchParams(window.location.search);
     const specialty = urlParams.get('specialty');
     if (specialty) {
         const specialtySelect = document.getElementById('specialty');
         if (specialtySelect) {
-            // Wait for specialties to load
             const interval = setInterval(() => {
                 if (allSpecialties.length > 0) {
                     specialtySelect.value = specialty;
@@ -65,26 +57,22 @@ function handleQueryParameters() {
                 }
             }, 100);
         }
-        // Clear query parameters to prevent back-button issues
         window.history.replaceState({}, document.title, `${window.contextPath}/pages/index.jsp`);
     }
 }
 
-// Tab Navigation (only for logged-in patients)
 function setupTabNavigation() {
     const tabButtons = document.querySelectorAll('.tab-btn');
-    if (!tabButtons.length) return; // Skip if tabs are not present (non-logged-in users)
+    if (!tabButtons.length) return;
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const tabId = button.dataset.tab;
-            // Update active tab
             tabButtons.forEach(btn => {
                 btn.classList.remove('active');
                 btn.setAttribute('aria-selected', 'false');
             });
             button.classList.add('active');
             button.setAttribute('aria-selected', 'true');
-            // Show corresponding pane
             document.querySelectorAll('.tab-pane').forEach(pane => {
                 pane.classList.remove('active');
                 pane.style.display = 'none';
@@ -92,7 +80,6 @@ function setupTabNavigation() {
             const activePane = document.getElementById(tabId);
             activePane.classList.add('active');
             activePane.style.display = 'block';
-            // Initialize content
             if (tabId === 'bookAppointment') {
                 fetchSpecialties();
             } else if (tabId === 'appointments') {
@@ -102,7 +89,6 @@ function setupTabNavigation() {
     });
 }
 
-// Form Listeners
 function setupFormListeners() {
     const specialtySelect = document.getElementById('specialty');
     if (specialtySelect) {
@@ -112,13 +98,11 @@ function setupFormListeners() {
     const filterDate = document.getElementById('filterDate');
     if (filterDoctor) filterDoctor.addEventListener('change', filterTable);
     if (filterDate) filterDate.addEventListener('change', filterTable);
-    // Appointment table sorting (only for logged-in users)
     document.querySelectorAll('#appointments .sortable').forEach(th => {
         th.addEventListener('click', () => sortTable(parseInt(th.dataset.sort)));
     });
 }
 
-// Modal Listeners
 function setupModalListeners() {
     const confirmBtn = document.getElementById('confirmBtn');
     const cancelBtn = document.getElementById('cancelBtn');
@@ -129,7 +113,14 @@ function setupModalListeners() {
     if (confirmBtn) {
         confirmBtn.addEventListener('click', () => {
             if (pendingBooking) {
-                confirmBooking(pendingBooking.doctorId, pendingBooking.doctorName, pendingBooking.date, pendingBooking.startTime, pendingBooking.nextToken);
+                confirmBooking(
+                    pendingBooking.doctorId,
+                    pendingBooking.doctorName,
+                    pendingBooking.date,
+                    pendingBooking.startTime,
+                    pendingBooking.nextToken,
+                    pendingBooking.isEmergency
+                );
                 pendingBooking = null;
             }
             closeModal();
@@ -151,7 +142,6 @@ function setupModalListeners() {
     }
 }
 
-// Login/Register Modal
 function setupLoginRegisterModal() {
     const loginBtn = document.getElementById('loginModalBtn');
     const registerBtn = document.getElementById('registerModalBtn');
@@ -174,7 +164,6 @@ function setupLoginRegisterModal() {
     }
 }
 
-// Fetch Specialties
 async function fetchSpecialties() {
     const specialtySelect = document.getElementById('specialty');
     if (!specialtySelect) return;
@@ -209,7 +198,6 @@ function populateSpecialties() {
     });
 }
 
-// Update Availability Table
 async function updateAvailabilityTable() {
     const specialty = document.getElementById('specialty')?.value;
     const table = document.getElementById('availabilityTable');
@@ -246,7 +234,6 @@ async function updateAvailabilityTable() {
         allAvailability = data.availability || [];
         allDoctors = data.doctors || [];
 
-        // Update doctorIdToNameMap with availability data
         allAvailability.forEach(avail => {
             doctorIdToNameMap[avail.doctorId] = avail.doctorName;
         });
@@ -325,7 +312,6 @@ function filterTable() {
     document.getElementById('availabilityTable').style.display = visibleRows === 0 ? 'none' : 'table';
 }
 
-// Handle Book Button Click
 function handleBookClick(doctorId, doctorName, date, startTime, nextToken, event) {
     if (event) {
         event.preventDefault();
@@ -335,11 +321,11 @@ function handleBookClick(doctorId, doctorName, date, startTime, nextToken, event
         showLoginRegisterModal();
         return;
     }
-    showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken, event);
+    const isEmergency = document.getElementById('isEmergency').checked;
+    showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken, isEmergency, event);
 }
 
-// Booking Confirmation Modal
-function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken, event) {
+function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToken, isEmergency, event) {
     if (event) {
         event.preventDefault();
         event.stopPropagation();
@@ -361,9 +347,10 @@ function showBookingConfirmation(doctorId, doctorName, date, startTime, nextToke
         <p><strong>Date:</strong> ${date}</p>
         <p><strong>Start Time:</strong> ${startTime}</p>
         <p><strong>Your Token:</strong> ${nextToken}</p>
+        <p><strong>Priority:</strong> ${isEmergency ? 'Emergency' : 'Regular'}</p>
     `;
 
-    pendingBooking = { doctorId, doctorName, date, startTime, nextToken };
+    pendingBooking = { doctorId, doctorName, date, startTime, nextToken, isEmergency };
     document.body.classList.add('modal-open');
     modal.showModal();
 }
@@ -376,8 +363,7 @@ function closeModal() {
     }
 }
 
-// Success Modal
-function showSuccessModal(doctorName, date, startTime, nextToken) {
+function showSuccessModal(doctorName, date, startTime, nextToken, isEmergency) {
     const modal = document.getElementById('successModal');
     const message = document.getElementById('successMessage');
     const details = document.getElementById('successAppointmentDetails');
@@ -394,6 +380,7 @@ function showSuccessModal(doctorName, date, startTime, nextToken) {
         <p><strong>Date:</strong> ${date}</p>
         <p><strong>Start Time:</strong> ${startTime}</p>
         <p><strong>Your Token:</strong> ${nextToken}</p>
+        <p><strong>Priority:</strong> ${isEmergency ? 'Emergency' : 'Regular'}</p>
     `;
 
     document.body.classList.add('modal-open');
@@ -408,7 +395,7 @@ function closeSuccessModal() {
     }
 }
 
-function confirmBooking(doctorId, doctorName, date, startTime, nextToken) {
+function confirmBooking(doctorId, doctorName, date, startTime, nextToken, isEmergency) {
     const button = document.querySelector(`button[onclick*="handleBookClick('${doctorId}', '${doctorName}', '${date}', '${startTime}', '${nextToken}')"]`);
     if (button) {
         button.disabled = true;
@@ -427,7 +414,7 @@ function confirmBooking(doctorId, doctorName, date, startTime, nextToken) {
             date,
             timeSlot: startTime,
             token: nextToken,
-            isEmergency: 'off'
+            isEmergency: isEmergency ? 'on' : 'off'
         })
     })
         .then(response => {
@@ -438,9 +425,8 @@ function confirmBooking(doctorId, doctorName, date, startTime, nextToken) {
             if (data.success) {
                 userAppointments.push({ doctorId, date, timeSlot: startTime, token: nextToken });
                 updateAvailabilityTable();
-                fetchUserAppointments(); // Refresh appointments tab
-                showSuccessModal(doctorName, date, startTime, nextToken);
-                // Clear query parameters
+                fetchUserAppointments();
+                showSuccessModal(doctorName, date, startTime, nextToken, isEmergency);
                 window.history.replaceState({}, document.title, `${window.contextPath}/pages/index.jsp`);
             } else {
                 showToast("Booking failed: " + (data.message || "Unknown error"), 'error');
@@ -458,7 +444,6 @@ function confirmBooking(doctorId, doctorName, date, startTime, nextToken) {
         });
 }
 
-// Fetch User Appointments
 async function fetchUserAppointments() {
     const table = document.querySelector('#appointments table tbody');
     const noAppointmentsMessage = document.getElementById('noAppointmentsMessage');
@@ -480,10 +465,9 @@ async function fetchUserAppointments() {
         appointments.forEach(appt => {
             const dateTime = appt.dateTime;
             const apptDateTime = new Date(dateTime);
-            const currentDate = new Date('2025-04-23'); // Current date
+            const currentDate = new Date('2025-04-23');
             const isUpcoming = apptDateTime >= currentDate;
             const rowClass = isUpcoming ? 'upcoming-appointment' : 'past-appointment';
-            // Use doctor name from doctorIdToNameMap, fallback to doctorId
             const doctorName = doctorIdToNameMap[appt.doctorId] || appt.doctorId;
             if (!doctorIdToNameMap[appt.doctorId]) {
                 console.warn(`Doctor name not found for ID: ${appt.doctorId}. Displaying ID as fallback.`);
@@ -537,7 +521,6 @@ async function fetchUserAppointmentsForTokens() {
     }
 }
 
-// Cancel Appointment Modal
 function showCancelModal(appointmentId, doctorName, dateTime, tokenID) {
     const modal = document.getElementById('cancelModal');
     const message = document.getElementById('cancelMessage');
@@ -607,7 +590,6 @@ function cancelAppointment(appointmentId) {
         });
 }
 
-// Sort Appointments Table
 function sortTable(col) {
     const table = document.querySelector('#appointments table tbody');
     const rows = Array.from(table.rows);
@@ -623,19 +605,18 @@ function sortTable(col) {
     rows.sort((a, b) => {
         const x = a.cells[col].textContent.trim();
         const y = b.cells[col].textContent.trim();
-        if (col === 0) return isAsc ? parseInt(x) - parseInt(y) : parseInt(y) - parseInt(x); // ID
-        if (col === 3) return isAsc ? new Date(x) - new Date(y) : new Date(y) - new Date(x); // DateTime
+        if (col === 0) return isAsc ? parseInt(x) - parseInt(y) : parseInt(y) - parseInt(x);
+        if (col === 3) return isAsc ? new Date(x) - new Date(y) : new Date(y) - new Date(x);
         if (col === 4) {
             const priorityOrder = { 'Emergency': 1, 'Normal': 0 };
-            return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x]; // Priority
+            return isAsc ? priorityOrder[x] - priorityOrder[y] : priorityOrder[y] - priorityOrder[x];
         }
-        return isAsc ? x.localeCompare(y) : y.localeCompare(x); // DoctorName, Token
+        return isAsc ? x.localeCompare(y) : y.localeCompare(x);
     });
 
     rows.forEach(row => table.appendChild(row));
 }
 
-// Login/Register Modal Functions
 function showLoginRegisterModal() {
     const modal = document.getElementById('loginRegisterModal');
     if (!modal) {
@@ -655,7 +636,6 @@ function closeLoginRegisterModal() {
     }
 }
 
-// Toast Notification
 function showToast(message, type) {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
