@@ -15,16 +15,16 @@
             <tr>
               <th data-type="number">ID</th>
               <th>Patient Name</th>
-              <th data-type="date">Date & Time</th>
-              <th data-type="priority">Priority</th>
+              <th data-type="date" aria-sort="ascending">Date & Time <i class="fas fa-sort-up"></i></th>
+              <th data-type="priority" aria-sort="ascending">Priority <i class="fas fa-sort-up"></i></th>
               <th>Action</th>
             </tr>
             </thead>
             <tbody>
             <c:forEach var="appt" items="${appointments}">
-              <tr>
+              <tr class="${appt.priority == 1 ? 'emergency-row' : 'regular-row'}">
                 <td><c:out value="${appt.id}" /></td>
-                <td><c:out value="${patientNames[appt.patientId] != null ? patientNames[appt.patientId] : 'Unknown'}" /></td>
+                <td><c:out value="${patientNames[appt.patientId] != null ? patientNames[appt.patientId] : 'Unknown Patient'}" /></td>
                 <td><c:out value="${appt.dateTime}" /></td>
                 <td>
                   <span class="priority-badge ${appt.priority == 1 ? 'emergency' : 'regular'}">
@@ -32,7 +32,7 @@
                   </span>
                 </td>
                 <td>
-                  <button class="btn btn-cancel" onclick="showCancelModal(${appt.id}, '${patientNames[appt.patientId] != null ? patientNames[appt.patientId] : 'Unknown'}', '${appt.dateTime}')" aria-label="Cancel Appointment ${appt.id}">
+                  <button class="btn btn-cancel" onclick="showCancelModal(${appt.id}, '${patientNames[appt.patientId] != null ? patientNames[appt.patientId] : 'Unknown Patient'}', '${appt.dateTime}', ${appt.priority})" aria-label="Cancel Appointment ${appt.id}">
                     <i class="fas fa-times"></i> Cancel
                   </button>
                 </td>
@@ -64,5 +64,39 @@
     </div>
   </dialog>
 </div>
+
+<script>
+  function showCancelModal(appointmentId, patientName, dateTime, priority) {
+    const modal = document.getElementById('cancelModal');
+    const detailsDiv = document.getElementById('cancelAppointmentDetails');
+    const confirmBtn = document.getElementById('cancelModalConfirmBtn');
+    detailsDiv.innerHTML = `
+        <p><strong>Patient:</strong> ${patientName}</p>
+        <p><strong>Date & Time:</strong> ${dateTime}</p>
+        <p><strong>Priority:</strong> ${priority == 1 ? 'Emergency' : 'Regular'}</p>
+    `;
+    modal.showModal();
+    confirmBtn.focus();
+    confirmBtn.onclick = function() {
+      fetch('DoctorServlet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: `action=cancelAppointment&appointmentId=${appointmentId}`
+      }).then(response => {
+        if (response.ok) {
+          location.reload();
+        } else {
+          alert('Failed to cancel appointment.');
+        }
+      });
+    };
+  }
+
+  function closeCancelModal() {
+    const modal = document.getElementById('cancelModal');
+    modal.close();
+    document.querySelector('.btn-cancel').focus();
+  }
+</script>
 
 <link rel="stylesheet" href="<%= request.getContextPath() %>/assets/css/doctorDashboard.css">
