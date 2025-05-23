@@ -4,6 +4,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import service.AuditService;
 import service.BackupService;
 import service.FileHandler;
@@ -21,51 +22,73 @@ public class DataManagementServlet extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        String basePath = getServletContext().getRealPath("/data/");
-        FileHandler auditFileHandler = new FileHandler(basePath + "audit.txt");
+        String dataDirectory = getServletContext().getRealPath("/data/");
+        FileHandler auditFileHandler = new FileHandler(dataDirectory + "audit.txt");
+
         auditService = new AuditService(auditFileHandler);
-        backupService = new BackupService(basePath, auditService);
+        backupService = new BackupService(dataDirectory, auditService);
+
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        loadAuditLogs(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
+
+        try {
+            switch (action) {
+                case "backup":
+                    createBackup(request);
+                    break;
+                case "clearLogs":
+                    clearAuditLogs();
+                    break;
+                default:
+                    logger.warning("Invalid action: " + action);
+                    break;
+            }
+
+            response.sendRedirect(request.getContextPath() + "/DataManagementServlet");
+
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Error handling action: " + action, e);
+            forwardToErrorPage(request, response, e.getMessage());
+        }
+    }
+
+    // --- Helper Methods ---
+
+    private void loadAuditLogs(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         try {
             List<String> auditLogs = auditService.readAuditLogs();
             request.setAttribute("auditLogs", auditLogs);
             request.getRequestDispatcher("/pages/dataManagement.jsp").forward(request, response);
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Error reading audit logs", e);
-            request.setAttribute("message", "Error: " + e.getMessage());
-            request.setAttribute("messageType", "error");
-            request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
+            forwardToErrorPage(request, response, e.getMessage());
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String action = request.getParameter("action");
-
-        try {
-            if ("backup".equals(action)) {
-                handleBackup(request);
-            } else if ("clearLogs".equals(action)) {
-                handleClearLogs();
-            }
-            response.sendRedirect(request.getContextPath() + "/DataManagementServlet");
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Error processing action", e);
-            request.setAttribute("message", "Error: " + e.getMessage());
-            request.setAttribute("messageType", "error");
-            request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
-        }
-    }
-
-    private void handleBackup(HttpServletRequest request) throws IOException {
+    private void createBackup(HttpServletRequest request) throws IOException {
         String username = (String) request.getSession().getAttribute("username");
         backupService.createBackup(username);
     }
 
-    private void handleClearLogs() throws IOException {
+    private void clearAuditLogs() throws IOException {
         auditService.clearAuditLogs();
+    }
+
+    private void forwardToErrorPage(HttpServletRequest request, HttpServletResponse response, String errorMessage)
+            throws ServletException, IOException {
+        request.setAttribute("message", "Error: " + errorMessage);
+        request.setAttribute("messageType", "error");
+        request.getRequestDispatcher("/pages/error.jsp").forward(request, response);
     }
 }

@@ -84,6 +84,13 @@
                         </select>
                         <span class="error-text" id="specialty-error" aria-live="polite"></span>
                     </div>
+                    <div class="form-field">
+                        <label for="isEmergency" class="form-label">
+                            <input type="checkbox" id="isEmergency" name="isEmergency" aria-describedby="emergency-help">
+                            Emergency Appointment
+                        </label>
+                        <span class="help-text" id="emergency-help">Check if this is an urgent appointment requiring immediate attention.</span>
+                    </div>
                     <div id="filterContainer" class="filter-section" style="display: none;">
                         <div class="filter-grid">
                             <div class="form-field">
@@ -176,6 +183,13 @@
                             <option value="">Select Specialty</option>
                         </select>
                         <span class="error-text" id="specialty-error" aria-live="polite"></span>
+                    </div>
+                    <div class="form-field">
+                        <label for="isEmergency" class="form-label">
+                            <input type="checkbox" id="isEmergency" name="isEmergency" aria-describedby="emergency-help">
+                            Emergency Appointment
+                        </label>
+                        <span class="help-text" id="emergency-help">Check if this is an urgent appointment requiring immediate attention.</span>
                     </div>
                     <div id="filterContainer" class="filter-section" style="display: none;">
                         <div class="filter-grid">

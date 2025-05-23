@@ -1,11 +1,13 @@
 package model;
 
 public class Doctor {
+    //Define attributes
     private String id;
     private String name;
     private String specialization;
     private String contact;
 
+    //Constructor to set values for attributes
     public Doctor(String id, String name, String specialization, String contact) {
         this.id = id;
         this.name = name;

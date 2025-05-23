@@ -1,6 +1,7 @@
 package model;
 
 public class Patient {
+    //Define attributes
     private String name;
     private int age;
     private String contact;
