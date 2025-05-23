@@ -1,4 +1,5 @@
 patient1,pass123,Hasitha Erandika,patient1@gmail.com,0778449035,2015-03-01
+patient2,pass123,Amandi Rashmika,patient2@gmail.com,0778449036,2008-06-12
 patient3,pass123,Julana Premasekara,patient3@gmail.com,0778449037,2006-11-25
 patient4,pass123,Jayindu Karunanayake,patient4@gmail.com,0778449038,2010-04-18
 patient5,pass123,Nandun Samarasekara,patient5@gmail.com,0778449039,1998-09-30
@@ -97,5 +98,5 @@ patient97,pass123,Shamila Perera,patient97@gmail.com,0778449131,1993-05-14
 patient98,pass123,Nuwan Kulasekara,patient98@gmail.com,0778449132,1981-08-27
 patient99,pass123,Tharindu Eranga,patient99@gmail.com,0778449133,1974-12-03
 patient100,pass123,Sanduni Fernando,patient100@gmail.com,0778449134,1989-06-10
+patient101,pass123,Indika Wickramasinghe,haindika@gmail.com,0777802709,1972-03-29
 patient123,Login@123456,Thiyum Dulran,adhyrks@gmail.com,0785698584,1985-11-21
-maleesha1,Malee12345,Maleeshaviduranga,maleesha@gmail.com,0763425678,2000-09-06

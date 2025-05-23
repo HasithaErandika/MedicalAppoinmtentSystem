@@ -6,8 +6,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Appointment;
 import model.Doctor;
-import java.util.Map;
-import java.util.HashMap;
 import service.AppointmentService;
 import service.DoctorAvailabilityService;
 import service.FileHandler;
@@ -16,7 +14,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -66,7 +67,15 @@ public class DoctorServlet extends HttpServlet {
                 throw new IOException("Doctor not found for username: " + username);
             }
 
-            List<Appointment> appointments = appointmentService.getAppointmentsByDoctorId(doctor.getId());
+            // Get sorted appointments and filter by doctorId
+            List<Appointment> allAppointments = appointmentService.getSortedAppointments();
+            List<Appointment> appointments = new ArrayList<>();
+            for (Appointment appt : allAppointments) {
+                if (appt.getDoctorId().equals(doctor.getId())) {
+                    appointments.add(appt);
+                }
+            }
+
             LocalDateTime now = LocalDateTime.now();
             LocalDate today = LocalDate.now();
 
@@ -79,18 +88,26 @@ public class DoctorServlet extends HttpServlet {
             }
 
             int totalAppointments = appointments.size();
-            int upcomingAppointments = (int) appointments.stream()
-                    .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).isAfter(now))
-                    .count();
-            int emergencyAppointments = (int) appointments.stream()
-                    .filter(appt -> appt.getPriority() == 1)
-                    .count();
-            int todayAppointments = (int) appointments.stream()
-                    .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).toLocalDate().equals(today))
-                    .count();
-            int completedAppointments = (int) appointments.stream()
-                    .filter(appt -> LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER).isBefore(now))
-                    .count();
+            int upcomingAppointments = 0;
+            int emergencyAppointments = 0;
+            int todayAppointments = 0;
+            int completedAppointments = 0;
+
+            for (Appointment appt : appointments) {
+                LocalDateTime apptTime = LocalDateTime.parse(appt.getDateTime(), DATE_TIME_FORMATTER);
+                if (apptTime.isAfter(now)) {
+                    upcomingAppointments++;
+                }
+                if (appt.getPriority() == 1) {
+                    emergencyAppointments++;
+                }
+                if (apptTime.toLocalDate().equals(today)) {
+                    todayAppointments++;
+                }
+                if (apptTime.isBefore(now)) {
+                    completedAppointments++;
+                }
+            }
 
             request.setAttribute("totalAppointments", totalAppointments);
             request.setAttribute("upcomingAppointments", upcomingAppointments);
@@ -98,7 +115,7 @@ public class DoctorServlet extends HttpServlet {
             request.setAttribute("todayAppointments", todayAppointments);
             request.setAttribute("completedAppointments", completedAppointments);
             request.setAttribute("appointments", appointments);
-            request.setAttribute("patientNames", patientNames); // Pass the patient names map
+            request.setAttribute("patientNames", patientNames);
             request.setAttribute("doctor", doctor);
             request.setAttribute("section", section);
 
