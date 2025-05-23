@@ -15,6 +15,7 @@ public class RegisterServlet extends HttpServlet {
     private static final Logger LOGGER = Logger.getLogger(RegisterServlet.class.getName());
     private FileHandler patientFileHandler;
 
+
     @Override
     public void init() throws ServletException {
         patientFileHandler = new FileHandler(getServletContext().getRealPath("/data/patients.txt"));

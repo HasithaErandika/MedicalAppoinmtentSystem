@@ -8,7 +8,6 @@ public class Patient {
     private String username;
     private String password;
 
-    //Constructor to set values for attributes
     public Patient(String name, int age, String contact, String username, String password) {
         this.name = name;
         this.age = age;
